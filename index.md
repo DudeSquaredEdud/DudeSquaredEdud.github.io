@@ -1,4 +1,11 @@
-# Ashton Andrepont
+
+| [Home](/index.md) | [Other Stuff](/other_stuff.md) |
+| :---------------: | :----------------------------: |
+
+---
+# Home
+
+## Ashton Andrepont
 
 ![A 20 year old from rural Louisiana trying to help fix his state's education crisis using AI.](/me.png)
 
@@ -14,6 +21,45 @@ I want to help people learn using software.
 I grew up in rural Louisiana, where the education system is rather in a crisis. We are often ranked the 50th in education quality (51st counting D.C.)[${^2}$](#2) After I switched from toiling through public school to learning at a magnet school, I was exposed to how a quality education can change someone's life.
 
 It made me want to help people like me learn; kids in under-served communities struggling to satisfy their thirst for knowledge and desire to express their creativity. 
+
+## Cool Stuff I've Done
+
+### 2024
+
+#### Graduation!
+Set to graduate college on December 20th! :tada:
+
+#### Presented My Research
+Presented my research on calculating image complexity and using it to train classification networks at AICS'24 at the Thomas J. Watson IBM Research Center in Yorktown Heights.
+
+#### Aluminotes
+Note: Aluminotes is now an abandoned project. To be made open source sometime soon.
+
+Me and some friends made a website: Aluminotes.net. It's an AI note-taking app.
+
+### 2023
+
+#### New job
+Became an AI researcher for the ULL DADL Lab
+
+### 2022
+
+#### Accepted to ULL
+I got accepted to the University of Louisiana at Lafayette.
+
+It has great scholarships for me.
+
+#### Graduation!
+Graduated from LSMSA!
+
+
+
+
+
+
+
+
+
 
 # Footnotes
 ## 0 
