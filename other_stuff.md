@@ -1,6 +1,7 @@
 
-| [Home](/index.md) | [Blog](/blog.md) | [Other Stuff](/other_stuff.md) |
+|  | |  |
 | :---------------: | :--------------: | :----------------------------: |
+| [Home](/index.md) | [Blog](/blog.md) | [Other Stuff](/other_stuff.md) |
 
 ---
 # Other Stuff
