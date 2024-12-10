@@ -28,7 +28,7 @@ It made me want to help people like me learn; kids in under-served communities s
 ### 2024
 
 #### Graduation!
-Set to graduate college on December 20th! :tada:
+Set to graduate college on December 20th!
 
 #### Presented My Research
 Presented my research on calculating image complexity and using it to train classification networks at AICS'24 at the Thomas J. Watson IBM Research Center in Yorktown Heights.
