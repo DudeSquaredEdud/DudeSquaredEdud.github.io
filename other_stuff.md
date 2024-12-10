@@ -1,11 +1,6 @@
 
-|  | |  |
-| :---------------: | :--------------: | :----------------------------: |
-| [Home](/index.md) | [Blog](/blog.md) | [Other Stuff](/other_stuff.md) |
-
-
 <table>
-      <tr><td>[Home](/index.md)</td><td>[Blog](/blog.md)</td><td>[Other Stuff](/other_stuff.md)</td></tr>
+      <tr><td> <a href="/index.md">Home</a> </td><td><a href="/blog.md">Blog</a> </td><td><a href="/other_stuff.md">Other Stuff</a></td></tr>
 </table>
 ---
 # Other Stuff
