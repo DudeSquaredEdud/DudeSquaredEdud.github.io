@@ -3,6 +3,10 @@
 | :---------------: | :--------------: | :----------------------------: |
 | [Home](/index.md) | [Blog](/blog.md) | [Other Stuff](/other_stuff.md) |
 
+
+<table>
+      <tr><td>[Home](/index.md)</td><td>[Blog](/blog.md)</td><td>[Other Stuff](/other_stuff.md)</td></tr>
+</table>
 ---
 # Other Stuff
 
