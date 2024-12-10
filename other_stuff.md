@@ -1,7 +1,7 @@
 # Other Stuff
 
 <table>
-      <tr><td> <a href="/index.md">Home</a> </td><td><a href="/blog.md">Blog</a> </td><td><a href="/other_stuff.md">Other Stuff</a></td></tr>
+      <tr><td> <a href="/index">Home</a> </td><td><a href="/blog">Blog</a> </td><td><a href="/other_stuff">Other Stuff</a></td></tr>
 </table>
 ---
 
