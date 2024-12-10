@@ -9,7 +9,7 @@
 ## 0001 First Entry: Exit
 **December 10, 2024 - Tuesday**
 
-I'm graduating soon. Like, 10 days soon. Part of me is excited. The other part of me is gonna need to adapt pretty quickly. And so I spent some time last night writing out a plan for the six months I have between now and grad school [0](#0001-fn-0).
+I'm graduating soon. Like, 10 days soon. Part of me is excited. The other part of me is gonna need to adapt pretty quickly. And so I spent some time last night writing out a plan for the six months I have between now and grad school [[0](#0001-fn-0)].
 
 It boils down to two things:
 - Get a job.
@@ -17,7 +17,7 @@ It boils down to two things:
 
 The job part is tricky right now; I've applied to places before. I would *imagine* I'm quite qualified for the places I apply to given my resume, but so far I have had no luck in finding work except for the DADL Lab.
 
-The research part is easy [3](#0001-fn-3) -- I want to look at more research papers [1](#0001-Fn-1). It would be especially helpful to look at research papers once I get into grad school [0](#0001-fn-0).
+The research part is easy [[3](#0001-fn-3)] -- I want to look at more research papers [[1](#0001-Fn-1)]. It would be especially helpful to look at research papers once I get into grad school [[0](#0001-fn-0)].
 
 ---
 
@@ -26,7 +26,7 @@ The research part is easy [3](#0001-fn-3) -- I want to look at more research pap
 Fingers crossed in this economy.
 #### 0001 Fn 1
 I actually have a bucket list:
-- Education/AI papers, from places like the iSAT lab at CU Boulder. [2](#0001-fn-2)
+- Education/AI papers, from places like the iSAT lab at CU Boulder. [[2](#0001-fn-2)]
 - Modern pedagogy papers from Harvard and other schools that study pedagogy.
 - Random crap that catches my interest.
 

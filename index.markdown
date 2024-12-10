@@ -12,14 +12,14 @@
 
 
 ## Introduction
-Hi, I'm Ashton Andrepont [ [1](#1) ].
+Hi, I'm Ashton Andrepont [[1](#1)].
 
 I like computers and pedagogy.
 
 I want to help people learn using software.
 
 ## Backstory
-I grew up in rural Louisiana, where the education system is rather in a crisis. We are often ranked the 50th in education quality (51st counting D.C.) [ [2](#2) ]. After I switched from toiling through public school to learning at a magnet school, I was exposed to how a quality education can change someone's life.
+I grew up in rural Louisiana, where the education system is rather in a crisis. We are often ranked the 50th in education quality (51st counting D.C.) [[2](#2)]. After I switched from toiling through public school to learning at a magnet school, I was exposed to how a quality education can change someone's life.
 
 It made me want to help people like me learn; kids in under-served communities struggling to satisfy their thirst for knowledge and desire to express their creativity. 
 
