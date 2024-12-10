@@ -27,8 +27,7 @@ I hang up posters around campus.
 ![alt text](hyena2.png){:width="300px"} 
 ![alt text](jay-z.png){:width="300px"} 
 ![alt text](leaf(share).png){:width="300px"} 
-![alt text](long-leaf-pine.png){:width="300px"} 
-![alt text](me.png){:width="300px"} 
+![alt text](long-leaf-pine.png){:width="300px"}
 ![alt text](mongoose-HERE.png){:width="300px"} 
 ![alt text](mongoose.png){:width="300px"} 
 ![alt text](november.png){:width="300px"} 
