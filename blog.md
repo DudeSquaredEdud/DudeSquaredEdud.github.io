@@ -20,6 +20,28 @@ My last final is today now.
 Kinda dreading it. Not because it's hard or because it's for a particularly... *special* class, 
 but because it's at 5 p.m. and I don't have other plans yet.
 
+***At lunch, on the same day***
+
+I got a goodbye letter from my friend Gabriel [[0](#00002-fn-0)] earlier. I might frame it. 
+Wrote one back to him. I'm smiling right now.
+
+I'm waiting for a friend to join me for lunch right now; part of me feels like I should be studying but the other part of me is incendiary and is simply too tired to fight the feeling of all-consuming disgust and recurring feelings of when I study for this class.
+
+***In Oliver Hall, T-minus 4 hours and 13 minutes until final***
+
+I'll be gone soon. Very soon I won't need to think about this class.
+
+...When I'm done, will I feel satisfied? Will I feel like I completed something? Or will I feel like I escaped something? Did I overcome an obstacle or serve an undeserved sentence?
+
+...
+
+Anyway, I'm writing thank-you letters to faculty. It's a pleasant experience.
+
+---
+### 0002 Footnotes
+#### 00002 Fn 0
+No idea if you're reading this, but I know you got my letter nontheless. Many, many thanks.
+
 
 ## 0001 First Entry: Exit
 **December 10, 2024 - Tuesday**
