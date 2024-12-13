@@ -5,6 +5,21 @@
 </table>
 ---
 
+## 0002 Huh, I'm Really Almost Done
+**December 12, 2024 - Thursday**
+
+My last final is tomorrow.
+
+I guess I need to go to grad school; I don't feel quite satisfied with what I know just yet. 
+I want to be more specialized. That will come in time though -- I'm still waiting for acceptance letters.
+
+**December 13, 2024 - Friday**
+
+My last final is today now.
+
+Kinda dreading it. Not because it's hard or because it's for a particularly... *special* class, 
+but because it's at 5 p.m. and I don't have other plans yet.
+
 
 ## 0001 First Entry: Exit
 **December 10, 2024 - Tuesday**
