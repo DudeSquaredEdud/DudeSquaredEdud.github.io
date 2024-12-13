@@ -34,3 +34,13 @@ I hang up posters around campus.
 ![alt text](spoky.png){:width="300px"} 
 ![alt text](<thumbnail_EOY Deer.png>){:width="300px"} 
 ![alt text](thumbnail_mechashark.png){:width="300px"}
+
+## Music
+I make music every now and then.
+
+If you're *really* curious you can snoop around my channels and such and see all kinds of behind-the-scenes Ashton Andrepont content; the two below are my favorite two though.
+
+[Ass's Rat](https://www.youtube.com/watch?v=EluztWQoJ_c)
+
+[Salsa Song](https://soundcloud.com/rat_said_ass_hola/salsa-song)
+
