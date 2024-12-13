@@ -37,6 +37,16 @@ I'll be gone soon. Very soon I won't need to think about this class.
 
 Anyway, I'm writing thank-you letters to faculty. It's a pleasant experience.
 
+***Afterward***
+
+It was so easy.
+
+I'm so tired.
+
+I'm done.
+
+I'm really done...
+
 ---
 ### 0002 Footnotes
 #### 00002 Fn 0
