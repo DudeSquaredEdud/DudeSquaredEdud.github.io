@@ -22,7 +22,7 @@ but because it's at 5 p.m. and I don't have other plans yet.
 
 ***At lunch, on the same day***
 
-I got a goodbye letter from my friend Gabriel [[0](#00002-fn-0)] earlier. I might frame it. 
+I got a goodbye letter from my friend Gabriel [[0](#0002-fn-0)] earlier. I might frame it. 
 Wrote one back to him. I'm smiling right now.
 
 I'm waiting for a friend to join me for lunch right now; part of me feels like I should be studying but the other part of me is incendiary and is simply too tired to fight the feeling of all-consuming disgust and recurring feelings of when I study for this class.
@@ -47,10 +47,29 @@ I'm done.
 
 I'm really done...
 
+***Post-Afterward***
+
+It felt kinda wrong that it was easy; I had put a lot of effort into studying and it turns out that the final was half of the topics we studied.
+
+Now that it's not the minutes after finishing the final, I'm doing much better. Honestly I'm glad it wasn't difficult; everyone had the thought that it would be needlessly unfair.  
+
+It's... oh, one second.
+
+**December 14, 2024 - Saturday**
+
+It's 12:12, I'm staying up on a call with my boyfriend and listening to his college's radio. [[1](#0002-fn-1)]
+
+I'm having a good night.
+
 ---
 ### 0002 Footnotes
-#### 00002 Fn 0
+#### 0002 Fn 0
 No idea if you're reading this, but I know you got my letter nontheless. Many, many thanks.
+
+#### 0002 Fn 1
+Kudos to KLPI! The current song playing is "Sure that you're the Northern Star." Oh, it switched to landslide.
+
+Not sure how much of a devil of details you are; I listened to the Smashing Pumpkins version of this song first. I grew up on 90's music actually; my mom made us listen to her CDs.
 
 
 ## 0001 First Entry: Exit
