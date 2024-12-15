@@ -24,6 +24,14 @@ Either way, it can be great for a portfolio.
 
 ...ugh. Job security.
 
+**December 15, 2024 - Sunday**
+
+I wonder if any cartels are hiring...
+
+I would love to see a movie about a man trying to get hired in software development, when a 
+group of bank robbers / thugs push him to the ground. He offers his resume and gets hired.
+
+...who in the world is hiring?
 
 
 ## 0002 Huh, I'm Really Almost Done
