@@ -5,6 +5,27 @@
 </table>
 ---
 
+## 0003 Oh yeah, a job. I forgot about that.
+**December 14, 2024 - Saturday**
+
+Thought of the day: "...Well crap."
+
+I'm not quite sure if I'll be able to get a job between now and grad school.
+
+I _could_ go work with my uncle, and it'd certainly be a fun job, but it's not in my field.
+
+...
+
+I tried networking a bit today. The market is difficult for everyone right now, this is to be expected, but now I'm just wondering what I might do if I can't.
+
+I've had this idea in mind. Making a software for comprehending research papers. Maybe it can be really good, who knows.
+
+Either way, it can be great for a portfolio.
+
+...ugh. Job security.
+
+
+
 ## 0002 Huh, I'm Really Almost Done
 **December 12, 2024 - Thursday**
 
