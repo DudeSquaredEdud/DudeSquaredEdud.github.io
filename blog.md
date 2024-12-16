@@ -5,7 +5,48 @@
 </table>
 ---
 
-## 0003 Oh yeah, a job. I forgot about that.
+## 0004: I should make an editor for my blog.
+**December 16, 2024 - Monday**
+
+Don't get me wrong, I love markdown, but I'm doing this in VS Code. And don't get me wrong, I love VS Code, but I kinda want something more special.
+
+Hmmmmm
+
+I mean there's probably software out there, but this sounds like a good project.
+
+I'll go for a walk and think of a name.
+
+_**A short time later...**_
+
+![alt text](blog_editor_graph.png)
+
+So I made this graph that details the basic plan for how I want to organize everything, but I still don't have a name.
+
+I'll go on another walk.
+
+_**A longer time later...**_
+
+Ok so I found a good name and a simple idea for a layout.
+
+_Stonecutter.md_ sounds good. It's also meant to cut what would end up being a monolithic markdown file into much smaller chunks.
+
+The layout is as simple as possible.
+
+![alt text](stonecutter_layout.png)
+
+And yeah, I realized that this just looks like obsidian. But whatever, I just want a special tool to use.
+
+I guess I need a logo too, huh...
+
+_**One GIMP window later...**_
+
+![alt text](StonecutterMD.png)
+
+boom.
+
+I'm hungry now, I'm gonna make some food.
+
+## 0003: Oh yeah, a job. I forgot about that.
 **December 14, 2024 - Saturday**
 
 Thought of the day: "...Well crap."
@@ -34,7 +75,7 @@ group of bank robbers / thugs push him to the ground. He offers his resume and g
 ...who in the world is hiring?
 
 
-## 0002 Huh, I'm Really Almost Done
+## 0002: Huh, I'm Really Almost Done
 **December 12, 2024 - Thursday**
 
 My last final is tomorrow.
@@ -101,7 +142,7 @@ Kudos to KLPI! The current song playing is "Sure that you're the Northern Star."
 Not sure how much of a devil of details you are; I listened to the Smashing Pumpkins version of this song first. I grew up on 90's music actually; my mom made us listen to her CDs.
 
 
-## 0001 First Entry: Exit
+## 0001: First Entry: Exit
 **December 10, 2024 - Tuesday**
 
 I'm graduating soon. Like, 10 days soon. Part of me is excited. The other part of me is gonna need to adapt pretty quickly. And so I spent some time last night writing out a plan for the six months I have between now and grad school [[0](#0001-fn-0)].
