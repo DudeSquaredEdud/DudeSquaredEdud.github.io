@@ -3,7 +3,11 @@
 <table>
       <tr><td> <a href="/index">Home</a> </td><td><a href="/blog">Blog</a> </td><td><a href="/other_stuff">Other Stuff</a></td></tr>
 </table>
+
 ---
+## 0005:
+![alt text](stonecuttermd_alpha.png)
+
 
 ## 0004: I should make an editor for my blog.
 **December 16, 2024 - Monday**
@@ -28,7 +32,7 @@ _**A longer time later...**_
 
 Ok so I found a good name and a simple idea for a layout.
 
-_Stonecutter.md_ sounds good. It's also meant to cut what would end up being a monolithic markdown file into much smaller chunks.
+_Stonecutter\.md_ sounds good. It's meant to cut what would end up being a monolithic markdown file into much smaller chunks.
 
 The layout is as simple as possible.
 
