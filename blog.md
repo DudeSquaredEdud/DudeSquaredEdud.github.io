@@ -5,6 +5,9 @@
 </table>
 
 ---
+## 0006:
+![alt text](<stonecutter development pt2.png>)
+
 ## 0005:
 ![alt text](stonecuttermd_alpha.png)
 
