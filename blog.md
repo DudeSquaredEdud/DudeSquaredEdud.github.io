@@ -5,6 +5,21 @@
 </table>
 
 ---
+
+## 0007: Stonecutter.md, Part 3
+---
+
+***New Section*** On Thu Dec 19 2024, at 09:00:03
+
+Stonecutter is coming along great! I was able to make this text in it. Hope it generates correctly on the site... [[1](#0007-fn-1)]
+
+
+### Footnotes
+#### 0007 Fn 1 
+Woo!
+
+
+
 ## 0006:
 ![alt text](<stonecutter development pt2.png>)
 
