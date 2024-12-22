@@ -5,6 +5,32 @@
 </table>
 
 ---
+## 0008: Post Graduation Blues
+---
+
+***The Part Where There's Nothing Again*** On Sun Dec 22 2024, at 13:08:52
+
+Well there's like, Christmas I guess.
+But I don't have a job lined up, I don't know where I'm going to grad school at yet, 
+it's the holidays but I feel too antsy to sit at home and do nothing. I thought that 
+I could stow the antsyness [[1](####_0006_fn_1)] by having topics to study, but I still need money for 
+grad school. I'll *try* for something in comp sci but I have little hope until the summer. Until then, 
+some part time job would be nice.
+
+
+### Footnotes
+#### 0008 Fn 1
+Not a real word apparently; it has a red squiggly line in stonecutter [2].
+
+#### 0008 Fn 2
+"stonecutter" is also not a word, but "Stonecutter" -oh, nevermind [3] that's also not a word.
+
+#### 0008 Fn
+3Oh come on, I am certain that "nevermind" is a word. Who wrote this dictionary?
+
+#### 0008 Fn
+4[Kurt Cobain did, apparently.](https://kris-spisak.com/episode-1-never-mind-vs-nevermind/)
+
 
 ## 0007: Stonecutter.md, Part 3
 ---
