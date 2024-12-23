@@ -5,6 +5,44 @@
 </table>
 
 ---
+
+## 0009: Hope
+---
+
+***I know I can do it. I know I'm qualified.*** On Mon Dec 23 2024, at 12:46:24
+
+...but does it matter?
+
+Worries like this can hurt a lot. It conflicts with the values that come from an identity. I see myself as a smart person. Not getting into a certain place or field doesn't make me dumb, but it does make me upset. To put so much of my identity on the line is scary when it comes to big decisions.
+
+Ironically, posting up for so many jobs helps me take away that fear.
+
+It gives me a bunch of reasons to reflect on everything that I'm good at. Yeah, I presented at that symposium! Yeah, I did data analysis for a bunch of colleges [[1](####_0000_fn_1)]! Yeah, those hobbies I have, they can come in useful in this niche of a job!
+
+I have a bunch of reasons to see myself in a good light. And if I'm applying to a bajillion [[2](####_0000_fn_2)] companies, then I don't need to worry too much about missing one.
+
+I just hope I can make like, one.
+
+...
+
+I need to admit, that fear never goes away. With the sudden job market switch-up in computer science, I wouldn't be surprised if job insecurity defines my young adult life.
+
+C'est la vie, though. Gotta stay strong.
+
+I have promises I need to keep.
+
+
+### Footnotes
+#### 0000 Fn 1
+
+And I was damn good at it too.
+
+#### 0000 Fn 2
+
+Contrary to the last post, I am not going to argue on this one.
+
+
+
 ## 0008: Post Graduation Blues
 ---
 
