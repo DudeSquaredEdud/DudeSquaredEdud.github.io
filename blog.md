@@ -25,11 +25,11 @@ Not a real word apparently; it has a red squiggly line in stonecutter [2].
 #### 0008 Fn 2
 "stonecutter" is also not a word, but "Stonecutter" -oh, nevermind [3] that's also not a word.
 
-#### 0008 Fn
-3Oh come on, I am certain that "nevermind" is a word. Who wrote this dictionary?
+#### 0008 Fn 3
+Oh come on, I am certain that "nevermind" is a word. Who wrote this dictionary?
 
-#### 0008 Fn
-4[Kurt Cobain did, apparently.](https://kris-spisak.com/episode-1-never-mind-vs-nevermind/)
+#### 0008 Fn 4
+[Kurt Cobain did, apparently.](https://kris-spisak.com/episode-1-never-mind-vs-nevermind/)
 
 
 ## 0007: Stonecutter.md, Part 3
