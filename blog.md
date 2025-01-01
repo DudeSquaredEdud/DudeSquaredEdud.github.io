@@ -6,6 +6,53 @@
 
 ---
 
+## 0011: New Year, Less Teeth, Burned Stuff, Ballin'
+---
+
+***New Year*** On Wed Jan 01 2025, at 12:44:34
+
+Happy new year!
+I spent the days before the new year at my boyfriend's grandmother's place. (I love him so much)
+
+December was 2/3rds "I hate everything" and 1/3rd party. Finals and drama and a birthday I didn't have time to celebrate in the first 2/3rds, then graduation, Christmas, Christmas II, Christmas III, and Christmas IV, all with different parts of the family.
+
+
+I love my family, but at the same time I'm quite happy that all the partying is over.
+
+
+Time for ... forced rest.
+
+***Less Teeth***
+Finally got rid of the competition; but now I'm only left with stupid teeth.
+Wisdom teeth are not fun to have in your mouth. My congratulations to those who don't need to deal with them. My condolences to my fellow sufferers.
+
+I've been too sedentary. I want to move around. But I can't!
+
+...
+
+When I get the chance, I want to go to the library.
+
+***Burned Stuff***
+Burned a paper full of thoughts I wanted to leave behind. And... it worked.
+
+...Pretty glad. :)
+
+***Ballin'***
+
+All that's left for me to do now is make the most of the year.
+
+Theoretically I wouldn't need a whole section dedicated to just this, but I like it.
+
+***Oh right, StoneCutter***
+
+I'm gonna rework it. So far the alpha build has taught me a lot about Angular, but I feel like I'm going about developing it wrong.
+Wish me luck!
+
+
+
+## 0010: A thought about microwaves
+Many American homes have a microwave in them. It's a convenient cooking apparatus that allows for many foods to be re-heated with very little effort. However, most food that comes out of a microwave is unhealthy, and tastes worse than if it was stove cooked. The oils and salts needed to make microwave-cookable foods taste good exceed dietary standards, and the method of re-heating by exciting the water particles causes a significant drop in taste quality. In this blog post, I explore the concept of forcing oneself to eat healthier by not having a microwave.
+
 ## 0009: Hope
 ---
 
@@ -17,9 +64,9 @@ Worries like this can hurt a lot. It conflicts with the values that come from an
 
 Ironically, posting up for so many jobs helps me take away that fear.
 
-It gives me a bunch of reasons to reflect on everything that I'm good at. Yeah, I presented at that symposium! Yeah, I did data analysis for a bunch of colleges [[1](####_0000_fn_1)]! Yeah, those hobbies I have, they can come in useful in this niche of a job!
+It gives me a bunch of reasons to reflect on everything that I'm good at. Yeah, I presented at that symposium! Yeah, I did data analysis for a bunch of colleges [[1](####_0009_fn_1)]! Yeah, those hobbies I have, they can come in useful in this niche of a job!
 
-I have a bunch of reasons to see myself in a good light. And if I'm applying to a bajillion [[2](####_0000_fn_2)] companies, then I don't need to worry too much about missing one.
+I have a bunch of reasons to see myself in a good light. And if I'm applying to a bajillion [[2](####_0009_fn_2)] companies, then I don't need to worry too much about missing one.
 
 I just hope I can make like, one.
 
@@ -33,11 +80,11 @@ I have promises I need to keep.
 
 
 ### Footnotes
-#### 0000 Fn 1
+#### 0009 Fn 1
 
 And I was damn good at it too.
 
-#### 0000 Fn 2
+#### 0009 Fn 2
 
 Contrary to the last post, I am not going to argue on this one.
 
