@@ -11,9 +11,13 @@
 
 After a long time of applying to jobs and getting a side job (without even a main job yet :/ ), on the one snowy day in many years I have taken up my offer and encroached upon my self the task to do that shit and make it happen. And it works! I am very happy.
 
-## It's ALIVE!
+## Next up:
 
-After a long time of applying to jobs and getting a side job (without even a main job yet :/ ), on the one snowy day in many years I have taken up my offer and encroached upon my self the task to do that shit and make it happen. And it works! I am very happy.
+I forgot to add support for footnotes. This is pretty bad on my part. I'll get to that.
+
+For now in my life, I will be annotating data as a work-from-home job until I can get a work-outside-of-home job that pays-more-than-minimum-wage-without-degrading-my-sense-of-self-like-that-time-I-worked-in-a-pizza-kitchen-,-but-I-still-remember-how-fun-it-was-despite-how-sad-I-was.
+
+Anyway, I'm gonna go do stuff now.
 
 ## New Section
 
