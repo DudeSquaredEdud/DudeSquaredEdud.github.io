@@ -11,6 +11,14 @@
 
 ## I hate javascript
 
+I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it 
+
+
+
+# New Post
+
+## I hate javascript
+
 I hate it
 
 ## I hate typescript
