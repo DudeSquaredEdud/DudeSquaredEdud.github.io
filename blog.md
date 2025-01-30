@@ -7,6 +7,14 @@
 ---
 
 
+# 0016: Sidenote to previous
+
+## ...
+
+It felt... good using stonecutter just now.Desipte all my javaignst, it's very easy to use...I'm ... happy with it.:)
+
+
+
 # 0015: I finally finished the beta
 
 ## I feel like a runner after a race
