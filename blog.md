@@ -7,6 +7,14 @@
 ---
 
 
+# 0015: I finally finished the beta
+
+## I feel like a runner after a race
+
+I want to collapse.Angular is not very fun to work with. Some very specific things are extremely difficult to do. It does not feel like the framework for me.I can see why webdevs change frameworks all the time.What if instead of frameworks we used freakworks, and we coded in freakyscript?anyway, that's done now. I'm gonna make a tea-brewing simulator.
+
+
+
 ## It's ALIVE!
 
 After a long time of applying to jobs and getting a side job (without even a main job yet :/ ), on the one snowy day in many years I have taken up my offer and encroached upon my self the task to do that shit and make it happen. And it works! I am very happy.
