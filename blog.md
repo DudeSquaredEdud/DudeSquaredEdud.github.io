@@ -7,6 +7,18 @@
 ---
 
 
+# New Post
+
+## I hate javascript
+
+I hate it
+
+## I hate typescript
+
+I hate it
+
+
+
 ## Oh yeah, I should check that.
 
 
