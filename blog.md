@@ -7,34 +7,6 @@
 ---
 
 
-# New Post
-
-## I hate javascript
-
-I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it I fucking hate it 
-
-
-
-# New Post
-
-## I hate javascript
-
-I hate it
-
-## I hate typescript
-
-I hate it
-
-
-
-## Oh yeah, I should check that.
-
-
-
-## Oh yeah, I should check that.
-
-
-
 ## It's ALIVE!
 
 After a long time of applying to jobs and getting a side job (without even a main job yet :/ ), on the one snowy day in many years I have taken up my offer and encroached upon my self the task to do that shit and make it happen. And it works! I am very happy.
