@@ -1,7 +1,7 @@
 # Home
 
 <table>
-      <tr><td> <a href="/index">Home</a> </td><td><a href="/blog">Blog</a> </td><td><a href="/other_stuff">Other Stuff</a></td></tr>
+      <tr><td> <a href="/index">Home</a> </td><td><a href="/blog">Blog</a> </td><td><a href="/other_stuff">Other Stuff</a></td><td><a href="/CountertopTeaBrewingSimulator">CtTBS (a game)</a></td></tr>
 </table>
 ---
 
