@@ -1,0 +1,88 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const research = await getCollection('research');
+  return research.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<Layout title={`${entry.data.title} - Research`}>
+	<article>
+		<header style="margin-bottom: 2rem;">
+			<h1 style="margin-bottom: 0.5rem;">{entry.data.title}</h1>
+			<p style="color: var(--color-text-light); margin-bottom: 1rem;">
+				{entry.data.status} • {entry.data.date.toLocaleDateString()}
+			</p>
+			<div class="tags">
+				{entry.data.keywords.map((keyword) => (
+					<span class="tag">{keyword}</span>
+				))}
+			</div>
+		</header>
+		
+		<div style="font-family: var(--font-body); line-height: 1.7;">
+			<Content />
+		</div>
+		
+		<footer style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--color-border);">
+			<a href="/research" style="color: var(--color-accent); text-decoration: none;">
+				← Back to Research
+			</a>
+		</footer>
+	</article>
+</Layout>
+
+<style>
+	article :global(h1, h2, h3, h4) {
+		margin-top: 2rem;
+		margin-bottom: 1rem;
+		color: var(--color-text);
+	}
+	
+	article :global(p) {
+		margin-bottom: 1rem;
+		color: var(--color-text-light);
+	}
+	
+	article :global(pre) {
+		background: var(--color-bg-subtle);
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+		padding: 1rem;
+		overflow-x: auto;
+		font-family: var(--font-mono);
+		font-size: 0.9rem;
+		margin: 1.5rem 0;
+	}
+	
+	article :global(code) {
+		font-family: var(--font-mono);
+		background: var(--color-bg-subtle);
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.9em;
+	}
+	
+	article :global(pre code) {
+		background: none;
+		padding: 0;
+	}
+	
+	article :global(ul, ol) {
+		margin-bottom: 1rem;
+		padding-left: 2rem;
+	}
+	
+	article :global(li) {
+		margin-bottom: 0.5rem;
+		color: var(--color-text-light);
+	}
+</style>

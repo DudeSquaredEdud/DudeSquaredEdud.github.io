@@ -1,0 +1,55 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const research = await getCollection('research');
+const sortedResearch = research.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Layout title="Research - Ashton Andrepont">
+	<section class="section">
+		<h2>Research</h2>
+		<p>
+			My research focuses on the intersection of computer science and education, with particular 
+			emphasis on developing technological solutions for underserved communities. I explore how 
+			artificial intelligence, quantum computing, and human-computer interaction can address 
+			real-world educational challenges.
+		</p>
+	</section>
+
+	<section class="section">
+		<h2>Current Projects</h2>
+		{sortedResearch.map((project) => (
+			<div class="research-item">
+				<h3>{project.data.title}</h3>
+				<p><strong>Status:</strong> {project.data.status} | <strong>Date:</strong> {project.data.date.toLocaleDateString()}</p>
+				<p>{project.data.abstract}</p>
+				<div class="tags">
+					{project.data.keywords.map((keyword) => (
+						<span class="tag">{keyword}</span>
+					))}
+				</div>
+				{project.data.collaborators && project.data.collaborators.length > 0 && (
+					<p style="margin-top: 1rem;"><strong>Collaborators:</strong> {project.data.collaborators.join(', ')}</p>
+				)}
+				<p style="margin-top: 1rem;">
+					<a href={`/research/${project.slug}`} style="color: var(--color-accent);">Read full research →</a>
+				</p>
+			</div>
+		))}
+	</section>
+
+	<section class="section">
+		<h2>Research Philosophy</h2>
+		<p>
+			I believe that computer science research should address pressing social challenges. 
+			My work is motivated by the educational disparities I've witnessed in rural Louisiana 
+			and the potential for technology to create more equitable learning opportunities.
+		</p>
+		<p>
+			Each project combines rigorous computational methods with real-world application, 
+			ensuring that theoretical advances translate into practical solutions for educators 
+			and students.
+		</p>
+	</section>
+</Layout>
