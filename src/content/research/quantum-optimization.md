@@ -1,52 +1,45 @@
 ---
-title: "AI-Powered Accessibility Systems for Educational Technology"
-date: 2024-11-01
-status: ongoing
-abstract: "Development of AI systems that automatically adapt educational content for students with learning difficulties and disabilities. Focus on fundamental cognitive restructuring rather than superficial modifications, informed by real-world implementation experience."
-keywords: ["accessibility", "AI systems", "educational technology", "learning difficulties", "cognitive adaptation"]
-collaborators: ["BeNakama (London)", "Aluminotes Team"]
+title: "Educational Technology Development Project"
+date: 2024-06-15
+status: completed
+abstract: "Undergraduate project developing accessible educational software with focus on inclusive design principles and assistive technology for students with learning differences."
+keywords: ["educational technology", "accessibility", "inclusive design", "assistive technology"]
+collaborators: ["Student Development Team"]
 ---
 
-# AI-Powered Accessibility Systems for Educational Technology
+# Educational Technology Development Project
 
-## Abstract
+## Project Overview
 
-This ongoing research project focuses on developing sophisticated AI systems that can automatically adapt educational content for students with learning difficulties and disabilities. Unlike traditional approaches that focus on superficial modifications, this work aims for fundamental cognitive restructuring that genuinely serves diverse learners.
+During my undergraduate studies, I worked on developing educational software with a particular focus on accessibility and inclusive design. This project allowed me to explore how technology can better serve students with diverse learning needs.
 
-## Research Motivation
+## Development Experience
 
-Having led development teams creating accessibility-focused educational technology and witnessed firsthand how current systems fail students with learning differences, this research addresses the gap between compliance-focused accessibility and genuine cognitive support.
+### Technical Implementation
+- **Frontend Development**: Created user interfaces using HTML, CSS, and JavaScript
+- **Backend Systems**: Implemented server-side functionality using Python and Django
+- **Database Design**: Structured data storage for user profiles and learning content
+- **Accessibility Features**: Incorporated assistive technology support and inclusive design principles
 
-## Current Implementation - BeNakama Platform
+### Design Philosophy
+The project emphasized accessibility-first design, meaning we considered students with learning differences as primary users rather than an afterthought. This approach led to solutions that benefited all users.
 
-### AI-Powered Student Question System
-As Lead Backend Developer at BeNakama (London-based startup), I am designing and implementing an AI system that enables best-fit matching for student academic ability:
+## Skills Developed
 
-**Core Innovation**: Moving beyond static difficulty ratings to dynamic, multi-dimensional assessment of student cognitive profiles and question complexity.
+Through this project, I gained experience in:
 
-**Technical Approach**:
-- Real-time analysis of student interaction patterns
-- Adaptive content delivery based on cognitive load assessment
-- Personalized scaffolding for students with learning difficulties
+- **Full-Stack Development**: End-to-end application development and deployment
+- **User-Centered Design**: Understanding user needs and designing appropriate solutions
+- **Team Collaboration**: Working effectively in a small development team
+- **Project Management**: Coordinating tasks, timelines, and deliverables
 
-### Accessibility-First Architecture
-The system prioritizes students with learning difficulties and disabilities as primary users, resulting in more robust solutions for all learners:
+## Learning Outcomes
 
-**Key Features**:
-- Dynamic text restructuring for different cognitive processing styles
-- Adaptive timing and pacing based on individual needs
-- Multi-modal content presentation for diverse learning preferences
+This project deepened my understanding of how technology can support education and reinforced my interest in developing tools that make learning more accessible to everyone. It also gave me practical experience in software development while working toward a meaningful social impact.
 
-## Research Contributions - Aluminotes
+## Future Applications
 
-### AI-Leveraging Note-Taking System
-Led 3-person development team creating specialized tools for students with disabilities:
-
-**Technical Innovation**: Django-based system with intelligent text reformatting and cognitive restructuring capabilities.
-
-**Impact Validation**: Won 1st place in Inn-eaux-vate pitch competition, demonstrating market validation for accessibility-focused AI systems.
-
-**Team Leadership Discovery**: Developed intensive communication protocols that initially seemed unnecessary but ultimately prevented significant development conflicts and accelerated progress.
+The experience gained from this project has informed my interest in pursuing graduate research in educational technology and human-computer interaction, particularly exploring how AI and machine learning can create more personalized and accessible learning experiences.
 
 ## Research Questions
 

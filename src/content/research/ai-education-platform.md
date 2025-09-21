@@ -1,33 +1,38 @@
 ---
-title: "Curriculum Learning for Image Classification CNNs"
+title: "Undergraduate Research in Machine Learning"
 date: 2024-08-15
-status: published
-abstract: "Research applying curriculum learning approaches to image classification using convolutional neural networks. Investigated wavelet entropy-based sorting methods and complexity-based curriculum learning approaches. Presented at IBM Thomas J. Watson Laboratory (AICS'24)."
-keywords: ["curriculum learning", "CNNs", "image classification", "wavelet decomposition", "deep learning"]
-collaborators: ["ULL Data Analysis and Deep Learning Lab"]
-publication: "Presented at IBM Thomas J. Watson Laboratory (AICS'24)"
+status: completed
+abstract: "Undergraduate research project exploring curriculum learning approaches for image classification neural networks, providing hands-on experience with deep learning methodologies and research practices."
+keywords: ["curriculum learning", "machine learning", "undergraduate research", "image classification"]
+collaborators: ["University of Louisiana at Lafayette"]
 ---
 
-# Curriculum Learning for Image Classification CNNs
+# Undergraduate Research in Machine Learning
 
-## Abstract
+## Project Overview
 
-This research project investigated the application of curriculum learning methodologies to improve training efficiency and performance of convolutional neural networks (CNNs) for image classification tasks. The study explored various complexity measures, with particular focus on wavelet entropy-based sorting methods, to develop effective curriculum strategies.
+As an undergraduate student, I had the opportunity to work on a research project investigating curriculum learning approaches for training neural networks on image classification tasks. This experience introduced me to machine learning research methodologies and gave me hands-on experience with deep learning frameworks.
 
-## Research Context
+## Research Focus
 
-At the ULL Data Analysis and Deep Learning Lab, I served as principal researcher examining how curriculum learning - the practice of training machine learning models by gradually introducing examples from easy to difficult - can be optimized for computer vision tasks.
+The project explored how the order and structure of training examples can affect neural network learning performance. Rather than training on randomly ordered data, we investigated whether presenting examples in a structured progression from simple to complex could improve learning outcomes.
 
-## Key Findings
+## Skills Developed
 
-### Wavelet Entropy Investigation
-- **Initial Hypothesis**: Sorting training images by wavelet entropy would provide an effective complexity measure for curriculum learning
-- **Discovery**: Wavelet entropy alone produced poor results, leading to deeper investigation into multi-factor complexity measures
-- **Innovation**: Developed hybrid approaches combining multiple complexity indicators for more robust curriculum design
+Through this research experience, I gained:
 
-### Methodology
-- **Wavelet Decomposition**: Implemented advanced wavelet theory for feature extraction and complexity analysis
-- **Experimental Design**: Rigorous statistical modeling and controlled experiments comparing curriculum vs. random training
+- **Technical Skills**: Experience with Python, deep learning frameworks, and data analysis tools
+- **Research Methods**: Understanding of experimental design, hypothesis testing, and result interpretation  
+- **Problem Solving**: Approach to debugging complex machine learning systems and analyzing unexpected results
+- **Academic Communication**: Practice presenting technical concepts and research findings
+
+## Learning Outcomes
+
+This research experience helped me understand the iterative nature of machine learning research and the importance of careful experimental design. It reinforced my interest in pursuing graduate study in computational learning systems.
+
+## Future Directions
+
+This undergraduate research experience has motivated me to pursue more advanced study in machine learning and human-computer interaction, particularly exploring how AI systems can better support human learning and education.
 - **Performance Metrics**: Comprehensive evaluation across multiple image classification benchmarks
 
 ## Technical Implementation
