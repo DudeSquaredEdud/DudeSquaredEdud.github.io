@@ -1,60 +1,59 @@
 ---
-title: "AI-Driven Educational Platform for Rural Louisiana"
-date: 2024-12-01
-status: ongoing
-abstract: "Development of a machine learning-based educational platform specifically designed to address the unique challenges of rural Louisiana schools, including limited resources, teacher shortages, and diverse student needs."
-keywords: ["machine learning", "education technology", "rural education", "adaptive learning", "Louisiana"]
-collaborators: ["Louisiana Department of Education", "Local School Districts"]
+title: "Curriculum Learning for Image Classification CNNs"
+date: 2024-08-15
+status: published
+abstract: "Research applying curriculum learning approaches to image classification using convolutional neural networks. Investigated wavelet entropy-based sorting methods and complexity-based curriculum learning approaches. Presented at IBM Thomas J. Watson Laboratory (AICS'24)."
+keywords: ["curriculum learning", "CNNs", "image classification", "wavelet decomposition", "deep learning"]
+collaborators: ["ULL Data Analysis and Deep Learning Lab"]
+publication: "Presented at IBM Thomas J. Watson Laboratory (AICS'24)"
 ---
 
-# AI-Driven Educational Platform for Rural Louisiana
+# Curriculum Learning for Image Classification CNNs
 
 ## Abstract
 
-This ongoing research project focuses on developing a comprehensive AI-powered educational platform tailored to the specific needs of rural Louisiana school districts. The platform addresses critical challenges including teacher shortages, limited technological infrastructure, and diverse student learning needs through adaptive learning algorithms and intelligent resource allocation.
+This research project investigated the application of curriculum learning methodologies to improve training efficiency and performance of convolutional neural networks (CNNs) for image classification tasks. The study explored various complexity measures, with particular focus on wavelet entropy-based sorting methods, to develop effective curriculum strategies.
 
-## Research Objectives
+## Research Context
 
-1. **Adaptive Learning System**: Develop machine learning models that adapt to individual student learning patterns and pace
-2. **Resource Optimization**: Create algorithms for optimal allocation of limited educational resources
-3. **Teacher Support Tools**: Design AI assistants to support teachers with limited training in educational technology
-4. **Accessibility Focus**: Ensure the platform works effectively with limited internet connectivity and older hardware
+At the ULL Data Analysis and Deep Learning Lab, I served as principal researcher examining how curriculum learning - the practice of training machine learning models by gradually introducing examples from easy to difficult - can be optimized for computer vision tasks.
 
-## Methodology
+## Key Findings
 
-### Data Collection
-- Student performance data from partner school districts
-- Learning pattern analysis from existing educational platforms
-- Infrastructure assessment of rural Louisiana schools
+### Wavelet Entropy Investigation
+- **Initial Hypothesis**: Sorting training images by wavelet entropy would provide an effective complexity measure for curriculum learning
+- **Discovery**: Wavelet entropy alone produced poor results, leading to deeper investigation into multi-factor complexity measures
+- **Innovation**: Developed hybrid approaches combining multiple complexity indicators for more robust curriculum design
 
-### Algorithm Development
-- Reinforcement learning for adaptive content delivery
-- Natural language processing for automated essay grading
-- Computer vision for engagement analysis during remote learning
+### Methodology
+- **Wavelet Decomposition**: Implemented advanced wavelet theory for feature extraction and complexity analysis
+- **Experimental Design**: Rigorous statistical modeling and controlled experiments comparing curriculum vs. random training
+- **Performance Metrics**: Comprehensive evaluation across multiple image classification benchmarks
 
-### Implementation Strategy
-- Pilot program with 3 rural Louisiana school districts
-- Iterative development based on teacher and student feedback
-- Scalability analysis for statewide deployment
+## Technical Implementation
 
-## Preliminary Results
+### Core Technologies
+- **Deep Learning Frameworks**: PyTorch/TensorFlow for CNN implementation
+- **Signal Processing**: Advanced wavelet decomposition techniques
+- **Statistical Analysis**: Experimental design and hypothesis testing
+- **Research Documentation**: Comprehensive results tracking and analysis
 
-Early testing shows:
-- 23% improvement in student engagement metrics
-- 31% reduction in teacher workload for assessment tasks
-- 89% successful operation on limited-bandwidth connections
+### Research Contributions
+1. **Complexity Measure Innovation**: Novel approaches to measuring image complexity for curriculum design
+2. **Negative Results Documentation**: Important findings about limitations of single-factor sorting methods
+3. **Methodology Development**: Rigorous experimental protocols for curriculum learning research
 
-## Future Work
+## Academic Impact
 
-- Expansion to additional subject areas beyond mathematics and reading
-- Integration with existing Louisiana educational technology infrastructure
-- Development of multilingual support for diverse student populations
-- Long-term impact study on educational outcomes
+**Conference Presentation**: Presented research findings at IBM Thomas J. Watson Laboratory during the AICS'24 conference, demonstrating the caliber of research recognized by industry leaders.
 
-## Technical Stack
+**Research Insights**: The discovery that simple complexity measures like wavelet entropy alone are insufficient for effective curriculum learning opened new research directions into multi-modal complexity assessment.
 
-- **Backend**: Python, TensorFlow, FastAPI
-- **Frontend**: React, TypeScript
-- **Database**: PostgreSQL with Redis caching
-- **Deployment**: Docker containers with AWS/Azure hybrid cloud
-- **Offline Capability**: Progressive Web App with local storage
+## Future Directions
+
+This research established the foundation for more sophisticated curriculum learning approaches, highlighting the need for:
+- Multi-factor complexity measures
+- Adaptive curriculum strategies
+- Domain-specific curriculum design principles
+
+The work demonstrates both technical rigor and the kind of critical thinking that leads to breakthrough insights through careful investigation of negative results.

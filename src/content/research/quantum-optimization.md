@@ -1,101 +1,88 @@
 ---
-title: "Quantum Optimization Algorithms for Educational Resource Allocation"
-date: 2024-10-15
+title: "AI-Powered Accessibility Systems for Educational Technology"
+date: 2024-11-01
 status: ongoing
-abstract: "Research into quantum computing applications for solving complex optimization problems in educational resource distribution, with focus on rural and underserved school districts."
-keywords: ["quantum computing", "optimization", "resource allocation", "QAOA", "educational equity"]
-collaborators: []
+abstract: "Development of AI systems that automatically adapt educational content for students with learning difficulties and disabilities. Focus on fundamental cognitive restructuring rather than superficial modifications, informed by real-world implementation experience."
+keywords: ["accessibility", "AI systems", "educational technology", "learning difficulties", "cognitive adaptation"]
+collaborators: ["BeNakama (London)", "Aluminotes Team"]
 ---
 
-# Quantum Optimization Algorithms for Educational Resource Allocation
+# AI-Powered Accessibility Systems for Educational Technology
 
 ## Abstract
 
-This research explores the application of quantum optimization algorithms, specifically the Quantum Approximate Optimization Algorithm (QAOA), to solve complex resource allocation problems in educational systems. The work addresses the computational challenges of optimally distributing limited resources across multiple schools while considering various constraints and objectives.
+This ongoing research project focuses on developing sophisticated AI systems that can automatically adapt educational content for students with learning difficulties and disabilities. Unlike traditional approaches that focus on superficial modifications, this work aims for fundamental cognitive restructuring that genuinely serves diverse learners.
 
-## Problem Statement
+## Research Motivation
 
-Educational resource allocation in rural areas involves:
-- Limited budgets across multiple categories (personnel, technology, materials)
-- Complex dependency relationships between resources
-- Multiple optimization objectives (equity, efficiency, student outcomes)
-- Dynamic constraints based on changing needs and availability
+Having led development teams creating accessibility-focused educational technology and witnessed firsthand how current systems fail students with learning differences, this research addresses the gap between compliance-focused accessibility and genuine cognitive support.
 
-These problems exhibit exponential complexity that may benefit from quantum computational approaches.
+## Current Implementation - BeNakama Platform
 
-## Research Approach
+### AI-Powered Student Question System
+As Lead Backend Developer at BeNakama (London-based startup), I am designing and implementing an AI system that enables best-fit matching for student academic ability:
 
-### Quantum Algorithm Design
+**Core Innovation**: Moving beyond static difficulty ratings to dynamic, multi-dimensional assessment of student cognitive profiles and question complexity.
 
-**QAOA Implementation**:
-- Mapping resource allocation to Maximum Weighted Independent Set problems
-- Designing quantum circuits for constraint encoding
-- Optimization of variational parameters using classical-quantum hybrid approaches
+**Technical Approach**:
+- Real-time analysis of student interaction patterns
+- Adaptive content delivery based on cognitive load assessment
+- Personalized scaffolding for students with learning difficulties
 
-**Problem Formulation**:
-- State space representing all possible resource allocations
-- Objective function encoding multiple optimization criteria
-- Constraint penalties for infeasible allocations
+### Accessibility-First Architecture
+The system prioritizes students with learning difficulties and disabilities as primary users, resulting in more robust solutions for all learners:
 
-### Classical Benchmarking
+**Key Features**:
+- Dynamic text restructuring for different cognitive processing styles
+- Adaptive timing and pacing based on individual needs
+- Multi-modal content presentation for diverse learning preferences
 
-Comparison with traditional optimization methods:
-- Integer Linear Programming (ILP)
-- Genetic Algorithms
-- Simulated Annealing
-- Greedy heuristics
+## Research Contributions - Aluminotes
 
-## Experimental Setup
+### AI-Leveraging Note-Taking System
+Led 3-person development team creating specialized tools for students with disabilities:
 
-### Quantum Hardware
-- IBM Quantum Experience (qiskit framework)
-- Simulation on classical hardware for algorithm development
-- Testing on NISQ devices for proof-of-concept validation
+**Technical Innovation**: Django-based system with intelligent text reformatting and cognitive restructuring capabilities.
 
-### Problem Instances
-- Synthetic datasets modeling Louisiana school districts
-- Real anonymized data from partner educational institutions
-- Scalability testing with varying problem sizes
+**Impact Validation**: Won 1st place in Inn-eaux-vate pitch competition, demonstrating market validation for accessibility-focused AI systems.
 
-## Preliminary Results
+**Team Leadership Discovery**: Developed intensive communication protocols that initially seemed unnecessary but ultimately prevented significant development conflicts and accelerated progress.
 
-### Algorithm Performance
-- Quantum advantage observed for specific problem structures
-- Improved solution quality for highly constrained problems
-- Computational complexity analysis showing theoretical benefits
+## Research Questions
 
-### Practical Considerations
-- Current quantum hardware limitations require problem size restrictions
-- Hybrid classical-quantum approaches show most promise for near-term applications
-- Error mitigation techniques critical for reliable results
+1. **Cognitive Restructuring**: How can AI systems move beyond text resizing to fundamental reorganization of information architecture for different cognitive processing styles?
 
-## Implications for Educational Policy
+2. **Real-time Adaptation**: What are the optimal methods for detecting cognitive load and learning difficulty patterns in real-time educational interactions?
 
-This research contributes to:
-- More equitable resource distribution strategies
-- Data-driven policy decisions in education funding
-- Computational tools for educational administrators
-- Framework for future quantum applications in social optimization
+3. **Universal Design Benefits**: How does designing primarily for students with learning difficulties create better systems for all learners?
+
+4. **Cross-Cultural Implementation**: How do accessibility needs vary across different educational contexts (UK vs. US vs. international)?
+
+## Technical Methodology
+
+### AI System Architecture
+- **Backend**: Secure classroom systems with international deployment capability
+- **Frontend**: React, Mantine UI for accessible interface design
+- **AI Components**: Custom algorithms for cognitive load detection and content adaptation
+- **Accessibility Framework**: WCAG 2.1 AA+ compliance with enhanced cognitive accessibility features
+
+### Research Validation
+- **Real-world Testing**: Active deployment in UK high school environments
+- **Competitive Validation**: 1st place pitch competition win
+- **International Scale**: Remote leadership of international development team
+- **Iterative Development**: Continuous feedback from students with learning difficulties
+
+## Philosophical Approach
+
+**Anti-Compliance Mindset**: Rejecting systems that prioritize administrative convenience over genuine learning support. Every design decision tested against "does this genuinely help students with learning difficulties?"
+
+**Accessibility as Innovation**: Treating accessibility not as an afterthought but as the primary design driver that leads to breakthrough innovations in educational technology.
 
 ## Future Directions
 
-1. **Algorithm Enhancement**: Development of problem-specific quantum algorithms
-2. **Real-world Validation**: Deployment in actual school district planning processes
-3. **Scalability Studies**: Investigation of quantum advantage thresholds
-4. **Policy Integration**: Framework for incorporating quantum optimization into educational policy
+1. **Scalability Research**: How to maintain personalized accessibility at scale across diverse educational contexts
+2. **Cognitive Science Integration**: Incorporating latest research in learning differences and cognitive processing
+3. **Teacher Training Systems**: Developing AI tools that help teachers understand and support diverse cognitive needs
+4. **Policy Impact**: Translating research insights into educational technology policy recommendations
 
-## Technical Implementation
-
-```python
-# Quantum circuit design for resource allocation
-from qiskit import QuantumCircuit
-from qiskit.optimization import QuadraticProgram
-
-# Problem encoding
-qp = QuadraticProgram()
-# Add variables for resource allocation decisions
-# Add constraints for budget and capacity limits
-# Define objective function for optimization
-```
-
-This work represents an intersection of theoretical computer science and practical educational policy, demonstrating how advanced computational methods can address real-world social challenges.
+This research represents the intersection of rigorous AI research with real-world implementation, ensuring that advances in educational accessibility translate into measurable improvements for the students who need them most.
