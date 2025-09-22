@@ -135,6 +135,9 @@ const { title, description = "Ashton Andrepont - Computer Science Research" } = 
 				flex-wrap: wrap;
 				gap: 0.5rem;
 				margin-top: 1rem;
+				/* Fallback for browsers that don't support gap */
+				margin-left: -0.5rem;
+				margin-bottom: -0.5rem;
 			}
 
 			.tag {
@@ -146,7 +149,10 @@ const { title, description = "Ashton Andrepont - Computer Science Research" } = 
 				font-weight: 500;
 				border: none;
 				display: inline-block;
+				margin-left: 0.5rem;
+				margin-bottom: 0.5rem;
 				transition: background-color 0.2s ease;
+				white-space: nowrap;
 			}
 
 			.tag:hover {

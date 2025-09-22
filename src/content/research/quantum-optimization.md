@@ -1,53 +1,57 @@
 ---
-title: "Educational Technology Development Project"
+title: "AI-Powered Educational Technology Development"
 date: 2024-06-15
-status: completed
-abstract: "Undergraduate project developing accessible educational software with focus on inclusive design principles and assistive technology for students with learning differences."
-keywords: ["educational technology", "accessibility", "inclusive design", "assistive technology"]
-collaborators: ["Student Development Team"]
+status: ongoing
+abstract: "Development of AI-powered accessibility systems for educational technology, focusing on students with learning difficulties. Includes work with London-based EdTech startup and award-winning accessibility applications."
+keywords: ["educational technology", "accessibility", "AI systems", "learning difficulties", "inclusive design"]
+collaborators: ["BeNakama (London)", "Aluminotes Team"]
 ---
 
-# Educational Technology Development Project
+# AI-Powered Educational Technology Development
 
 ## Project Overview
 
-During my undergraduate studies, I worked on developing educational software with a particular focus on accessibility and inclusive design. This project allowed me to explore how technology can better serve students with diverse learning needs.
+As Lead Backend Developer for BeNakama, a London-based EdTech startup, I have been developing advanced classroom systems and educational technology serving UK high schools since February 2025. Additionally, I led the development of Aluminotes, an AI-leveraging note-taking app that won 1st place in the Inn-eaux-vate pitch competition.
 
-## Development Experience
+## Current Work: BeNakama Educational Platform
 
 ### Technical Implementation
-- **Frontend Development**: Created user interfaces using HTML, CSS, and JavaScript
-- **Backend Systems**: Implemented server-side functionality using Python and Django
-- **Database Design**: Structured data storage for user profiles and learning content
-- **Accessibility Features**: Incorporated assistive technology support and inclusive design principles
+- **AI Student Question System**: Developing AI-powered student question matching for best-fit academic ability assessment
+- **Secure Classroom Systems**: Leading backend architecture for "Ascend" gamified learning tool
+- **International Development**: Managing remote development from Louisiana for UK deployment
+- **Accessibility Focus**: Empowering students with learning difficulties through intelligent technology
 
 ### Design Philosophy
-The project emphasized accessibility-first design, meaning we considered students with learning differences as primary users rather than an afterthought. This approach led to solutions that benefited all users.
+The development prioritizes genuine learning over compliance metrics, directly opposing the failures of systems like Edgenuity that make learning unnecessarily difficult. Every design decision centers students with learning difficulties as primary users, creating universally beneficial solutions.
+
+## Aluminotes: Award-Winning Accessibility Application
+
+### Project Leadership
+- **Tech Lead Role**: Led 3-person development team creating AI-leveraging note-taking app for students with disabilities
+- **Technical Stack**: Django, HTML, JavaScript, Python for accessibility-focused educational technology
+- **Competitive Success**: Won 1st place in Inn-eaux-vate pitch competition
+- **Mission Impact**: Reformatting and rewording text to assist students with disabilities
+
+### Development Insights
+Overcame initial code conflicts through intensive communication protocols that became highly efficient. The experience demonstrated how technical challenges are often secondary to coordination and team dynamics in successful project delivery.
 
 ## Skills Developed
 
-Through this project, I gained experience in:
+Through these projects, I have gained experience in:
 
-- **Full-Stack Development**: End-to-end application development and deployment
-- **User-Centered Design**: Understanding user needs and designing appropriate solutions
-- **Team Collaboration**: Working effectively in a small development team
-- **Project Management**: Coordinating tasks, timelines, and deliverables
+- **Full-Stack Development**: React, Mantine UI, Django backend architecture for educational systems
+- **AI Integration**: Implementing AI-powered student question systems and accessibility features
+- **International Collaboration**: Managing technical development across time zones and cultural contexts
+- **Mission-Driven Development**: Balancing technical excellence with social impact objectives
+- **Team Leadership**: Leading technical teams while maintaining focus on accessibility and educational outcomes
 
-## Learning Outcomes
+## Personal Motivation
 
-This project deepened my understanding of how technology can support education and reinforced my interest in developing tools that make learning more accessible to everyone. It also gave me practical experience in software development while working toward a meaningful social impact.
+Having experienced educational inequality from both sides - under-resourced Louisiana classrooms where Edgenuity represented "future of education," to cutting-edge London EdTech development - I understand how technology can either bridge or widen educational disparities. This drives my commitment to creating technology that serves learners rather than administrators.
 
-## Future Applications
+## Future Research Applications
 
-The experience gained from this project has informed my interest in pursuing graduate research in educational technology and human-computer interaction, particularly exploring how AI and machine learning can create more personalized and accessible learning experiences.
-
-## Research Questions
-
-1. **Cognitive Restructuring**: How can AI systems move beyond text resizing to fundamental reorganization of information architecture for different cognitive processing styles?
-
-2. **Real-time Adaptation**: What are the optimal methods for detecting cognitive load and learning difficulty patterns in real-time educational interactions?
-
-3. **Universal Design Benefits**: How does designing primarily for students with learning difficulties create better systems for all learners?
+This professional experience has informed my interest in pursuing graduate research in computational learning systems, particularly exploring how AI can amplify human teaching capabilities while avoiding the compliance-focused design that characterizes failed educational technology.
 
 4. **Cross-Cultural Implementation**: How do accessibility needs vary across different educational contexts (UK vs. US vs. international)?
 

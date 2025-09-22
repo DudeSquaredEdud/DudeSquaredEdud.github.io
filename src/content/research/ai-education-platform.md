@@ -1,52 +1,45 @@
 ---
-title: "Undergraduate Research in Machine Learning"
+title: "Curriculum Learning for Image Classification CNNs"
 date: 2024-08-15
 status: completed
-abstract: "Undergraduate research project exploring curriculum learning approaches for image classification neural networks, providing hands-on experience with deep learning methodologies and research practices."
-keywords: ["curriculum learning", "machine learning", "undergraduate research", "image classification"]
-collaborators: ["University of Louisiana at Lafayette"]
+abstract: "Undergraduate research investigating curriculum learning approaches for image classification CNNs, presented at IBM Thomas J. Watson Laboratory (AICS'24). Explored complexity-based training methods with focus on experimental methodology."
+keywords: ["curriculum learning", "machine learning", "image classification", "CNN", "undergraduate research"]
+collaborators: ["ULL DADL Lab - Dr. Aminul Islam"]
 ---
 
-# Undergraduate Research in Machine Learning
+# Curriculum Learning for Image Classification CNNs
 
 ## Project Overview
 
-As an undergraduate student, I had the opportunity to work on a research project investigating curriculum learning approaches for training neural networks on image classification tasks. This experience introduced me to machine learning research methodologies and gave me hands-on experience with deep learning frameworks.
+As principal researcher in the ULL DADL Lab (Data Analysis and Deep Learning Lab) under Dr. Aminul Islam, I investigated curriculum learning approaches for training convolutional neural networks on image classification tasks. This research was presented at IBM Thomas J. Watson Laboratory during AICS'24, providing valuable experience with academic research methodologies and scientific presentation.
 
 ## Research Focus
 
-The project explored how the order and structure of training examples can affect neural network learning performance. Rather than training on randomly ordered data, we investigated whether presenting examples in a structured progression from simple to complex could improve learning outcomes.
+The project explored how the complexity and ordering of training examples affects CNN learning performance. A key finding was that sorting images by wavelet entropy alone produced poor results, leading to investigation of more sophisticated complexity-based curriculum learning approaches that combine multiple indicators.
 
 ## Skills Developed
 
 Through this research experience, I gained:
 
-- **Technical Skills**: Experience with Python, deep learning frameworks, and data analysis tools
-- **Research Methods**: Understanding of experimental design, hypothesis testing, and result interpretation  
+- **Technical Skills**: Experience with Python, CNN architectures, and wavelet analysis techniques
+- **Research Methods**: Understanding of experimental design, statistical modeling, and negative result interpretation
 - **Problem Solving**: Approach to debugging complex machine learning systems and analyzing unexpected results
-- **Academic Communication**: Practice presenting technical concepts and research findings
+- **Academic Communication**: Experience presenting technical research at IBM Thomas J. Watson Laboratory
+
+## Key Findings
+
+- **Negative Results**: Wavelet entropy alone as a complexity measure produced poor curriculum learning results
+- **Methodology Insights**: Importance of rigorous experimental design in curriculum learning research  
+- **Technical Learning**: Hands-on experience with CNN training methods and statistical analysis
+- **Research Skills**: Understanding of academic presentation and peer review processes
 
 ## Learning Outcomes
 
-This research experience helped me understand the iterative nature of machine learning research and the importance of careful experimental design. It reinforced my interest in pursuing graduate study in computational learning systems.
+This research experience demonstrated the value of negative results in advancing scientific understanding and reinforced my interest in pursuing graduate study in computational learning systems. The presentation at IBM validated the quality of undergraduate research contributions to the field.
 
 ## Future Directions
 
-This undergraduate research experience has motivated me to pursue more advanced study in machine learning and human-computer interaction, particularly exploring how AI systems can better support human learning and education.
-- **Performance Metrics**: Comprehensive evaluation across multiple image classification benchmarks
-
-## Technical Implementation
-
-### Core Technologies
-- **Deep Learning Frameworks**: PyTorch/TensorFlow for CNN implementation
-- **Signal Processing**: Advanced wavelet decomposition techniques
-- **Statistical Analysis**: Experimental design and hypothesis testing
-- **Research Documentation**: Comprehensive results tracking and analysis
-
-### Research Contributions
-1. **Complexity Measure Innovation**: Novel approaches to measuring image complexity for curriculum design
-2. **Negative Results Documentation**: Important findings about limitations of single-factor sorting methods
-3. **Methodology Development**: Rigorous experimental protocols for curriculum learning research
+This experience has motivated me to pursue advanced study in machine learning and educational technology, particularly exploring how AI systems can better support human learning while avoiding the pitfalls of poorly designed educational technology.
 
 ## Academic Impact
 
