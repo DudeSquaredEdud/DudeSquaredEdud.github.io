@@ -25,9 +25,9 @@ const sortedResearch = research.sort((a, b) => b.data.date.getTime() - a.data.da
 				<p><strong>Status:</strong> {project.data.status} | <strong>Date:</strong> {project.data.date.toLocaleDateString()}</p>
 				<p>{project.data.abstract}</p>
 				<div class="tags">
-					{project.data.keywords.map((keyword) => (
-						<span class="tag">{keyword}</span>
-					))}
+					{project.data.keywords.map((keyword, index) => 
+						<span key={index} class="tag">{keyword}</span>
+					)}
 				</div>
 				{project.data.collaborators && project.data.collaborators.length > 0 && (
 					<p style="margin-top: 1rem;"><strong>Collaborators:</strong> {project.data.collaborators.join(', ')}</p>

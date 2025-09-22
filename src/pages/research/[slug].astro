@@ -22,9 +22,9 @@ const { Content } = await entry.render();
 				{entry.data.status} • {entry.data.date.toLocaleDateString()}
 			</p>
 			<div class="tags">
-				{entry.data.keywords.map((keyword) => (
-					<span class="tag">{keyword}</span>
-				))}
+				{entry.data.keywords.map((keyword, index) => 
+					<span key={index} class="tag">{keyword}</span>
+				)}
 			</div>
 		</header>
 		
