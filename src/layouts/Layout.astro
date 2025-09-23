@@ -179,6 +179,55 @@ const { title, description = "Ashton Andrepont - Computer Science Research" } = 
 				color: var(--color-text-light);
 			}
 
+			/* Markdown Content Styling */
+			.markdown-content {
+				max-width: none;
+			}
+
+			.markdown-content h1 {
+				font-size: 2rem;
+				margin: 2rem 0 1rem 0;
+				color: var(--color-text);
+				border-bottom: 2px solid var(--color-border);
+				padding-bottom: 0.5rem;
+			}
+
+			.markdown-content h2 {
+				font-size: 1.5rem;
+				margin: 2rem 0 1rem 0;
+				color: var(--color-text);
+			}
+
+			.markdown-content h3 {
+				font-size: 1.25rem;
+				margin: 1.5rem 0 0.5rem 0;
+				color: var(--color-text);
+			}
+
+			.markdown-content p {
+				margin-bottom: 1rem;
+				line-height: 1.7;
+			}
+
+			.markdown-content strong {
+				font-weight: 600;
+				color: var(--color-accent);
+			}
+
+			.markdown-content a {
+				color: var(--color-accent);
+				text-decoration: none;
+			}
+
+			.markdown-content a:hover {
+				text-decoration: underline;
+			}
+
+			/* Style markdown content to match existing design */
+			.markdown-content > h1:first-child {
+				margin-top: 0;
+			}
+
 			@media (max-width: 768px) {
 				.container {
 					padding: 0 1rem;

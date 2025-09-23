@@ -1,5 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const homepageContent = import.meta.glob('../content/homepage-content.md', { eager: true });
+const content = Object.values(homepageContent)[0] as any;
 ---
 
 <Layout title="Ashton Andrepont - Educational Technology Research">
@@ -10,128 +13,8 @@ import Layout from '../layouts/Layout.astro';
 		<p>Location: Louisiana, USA</p>
 	</div>
 
-	<section class="about">
-		<h2>About</h2>
-		<p>I am a computer science graduate and educational technology developer driven by a personal mission to create learning systems that serve students rather than frustrate them. My journey from being an "Edgenuity victim" to EdTech innovator shapes my approach to designing technology that genuinely supports human learning.</p>
-		
-		<p>Currently working as Lead Backend Developer for BeNakama, a London-based EdTech startup, I develop AI-powered classroom systems for UK high schools while pursuing graduate research opportunities in computational learning systems and human-AI collaboration.</p>
-		
-		<p>I completed my BS in Computer Science at the University of Louisiana at Lafayette in 2.5 years, graduating magna cum laude with a 3.83 GPA and receiving the Distinctive Researcher designation. My research on curriculum learning for CNNs was presented at IBM Thomas J. Watson Laboratory (AICS'24).</p>
-	</section>	<section class="section">
-		<h2>Experience</h2>
-		<div class="research-item">
-			<h3>Research - Curriculum Learning for CNNs</h3>
-			<p>
-				Principal researcher investigating curriculum learning approaches for image classification CNNs. 
-				Key finding: sorting images by wavelet entropy alone produced poor results, leading to exploration 
-				of hybrid complexity measures. Research presented at IBM Thomas J. Watson Laboratory (AICS'24).
-			</p>
-			<div class="tags">
-				<span class="tag">Machine Learning</span>
-				<span class="tag">CNN</span>
-				<span class="tag">Academic Research</span>
-			</div>
-		</div>
-
-		<div class="research-item">
-			<h3>Lead Backend Developer - BeNakama (London)</h3>
-			<p>
-				Developing AI-powered educational systems for UK high schools, including secure classroom platform
-				and "Ascend" gamified learning tool. Leading AI student question system development with focus 
-				on accessibility for students with learning difficulties. Remote work from Louisiana since February 2025.
-			</p>
-			<div class="tags">
-				<span class="tag">AI Systems</span>
-				<span class="tag">EdTech</span>
-				<span class="tag">Backend Development</span>
-			</div>
-		</div>
-
-		<div class="research-item">
-			<h3>Tech Lead - Aluminotes (Award-Winning)</h3>
-			<p>
-				Led 3-person development team creating AI-leveraging note-taking app for students with disabilities.
-				Won 1st place in Inn-eaux-vate pitch competition. Full-stack development using Django, HTML, 
-				JavaScript, and Python with focus on accessibility-first design principles.
-			</p>
-			<div class="tags">
-				<span class="tag">Team Leadership</span>
-				<span class="tag">Accessibility</span>
-				<span class="tag">Competition Winner</span>
-			</div>
-		</div>
-	</section>
-
-		<div class="research-item">
-			<h3>Leadership & Project Management</h3>
-			<p>
-				I led a small team developing an educational application and served as president 
-				of my high school's Computer Science Club. These experiences taught me project 
-				coordination, team communication, and technical mentoring skills.
-			</p>
-			<div class="tags">
-				<span class="tag">Team Leadership</span>
-				<span class="tag">Project Management</span>
-				<span class="tag">Mentoring</span>
-			</div>
-		</div>
-	</section>
-
-	<section class="section">
-		<h2>Personal Mission</h2>
-		<div class="research-item">
-			<h3>From Edgenuity Victim to EdTech Innovator</h3>
-			<p>
-				My approach to educational technology is shaped by personal experience with systems like Edgenuity, 
-				where broken answer detection made learning unnecessarily frustrating. This experience taught me that 
-				educational technology fails when it prioritizes administrative convenience over human cognition.
-			</p>
-			<p>
-				Having witnessed educational inequality from rural Louisiana classrooms to cutting-edge London EdTech 
-				development, I'm committed to creating technology that bridges rather than widens educational disparities. 
-				Every design decision in my work prioritizes genuine learning over compliance metrics.
-			</p>
-		</div>
-	</section>
-
-	<section class="section">
-		<h2>Research Interests</h2>
-		<div class="research-item">
-			<h3>AI-Powered Accessibility Systems</h3>
-			<p>
-				Using machine learning to automatically adapt educational content for students with 
-				learning difficulties and disabilities, moving beyond simple modifications to 
-				fundamental cognitive restructuring that genuinely serves diverse learners.
-			</p>
-		</div>
-
-		<div class="research-item">
-			<h3>Human-AI Collaboration in Education</h3>
-			<p>
-				Exploring how AI can amplify human teaching capabilities rather than replacing them, 
-				ensuring technology serves as a tool for empowerment rather than a replacement for 
-				human connection and understanding.
-			</p>
-		</div>
-
-		<div class="research-item">
-			<h3>Cognitive Load Calibration</h3>
-			<p>
-				Creating AI systems that dynamically adjust complexity and pacing of educational 
-				content based on individual cognitive capacity, preventing both under-challenge 
-				and overwhelming experiences.
-			</p>
-		</div>
-	</section>
-
-	<section class="section">
-		<h2>Mission</h2>
-		<p>
-			My work represents a natural evolution toward solving what I consider the most important 
-			problem of our time: making high-quality education accessible, engaging, and effective 
-			for every learner. Having experienced both the failures of poorly designed educational 
-			technology and the transformative potential of well-designed systems, I understand how 
-			technology can either bridge or widen existing educational gaps.
-		</p>
-	</section>
+	<!-- Markdown Content Rendered Here -->
+	<div class="markdown-content">
+		<content.Content />
+	</div>
 </Layout>
