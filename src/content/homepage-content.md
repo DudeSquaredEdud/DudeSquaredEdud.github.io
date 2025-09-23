@@ -1,3 +1,9 @@
+<p align="center">
+    <img src="src/content/image-6.png" style="height: auto;width: 20em;">
+</p>
+
+
+
 # About
 
 Lifelong learner and software engineer, passionate about creating educational systems that empower underserved communities.
