@@ -1,8 +1,6 @@
 <p align="center">
-    <img src="/src/content/image6.png" style="height: auto;width: 20em;">
+    <img src="image6.png" style="height: auto;width: 20em;">
 </p>
-
-
 
 # About
 
