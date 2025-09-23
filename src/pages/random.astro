@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const randomContent = import.meta.glob('../content/random-stuff.md', { eager: true });
+const content = Object.values(randomContent)[0] as any;
+---
+
+<Layout title="Ashton Andrepont - Random Stuff">
+
+	<!-- Markdown Content Rendered Here -->
+	<div class="markdown-content">
+		<content.Content />
+	</div>
+</Layout>

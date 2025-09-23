@@ -1,7 +1,3 @@
-<p align="center">
-    <img src="image6.png" style="height: auto;width: 20em;">
-</p>
-
 # About
 
 Lifelong learner and software engineer, passionate about creating educational systems that empower underserved communities.
@@ -60,6 +56,10 @@ Every design decision in my work prioritizes genuine learning over compliance me
 
 # Research Interests
 
+## Cognitive Load Calibration
+
+Creating AI systems that dynamically adjust complexity and pacing of educational content based on individual cognitive capacity, preventing both under-challenge and overwhelming experiences.
+
 ## AI-Powered Accessibility Systems
 
 Using machine learning to automatically adapt educational content for students with learning difficulties and disabilities, moving beyond simple modifications to fundamental cognitive restructuring that genuinely serves diverse learners.
@@ -68,12 +68,12 @@ Using machine learning to automatically adapt educational content for students w
 
 Exploring how AI can amplify human teaching capabilities rather than replacing them, ensuring technology serves as a tool for empowerment rather than a replacement for human connection and understanding.
 
-## Cognitive Load Calibration
-
-Creating AI systems that dynamically adjust complexity and pacing of educational content based on individual cognitive capacity, preventing both under-challenge and overwhelming experiences.
-
 # Mission
 
-My work represents a natural evolution toward solving what I consider the most important problem of our time: making high-quality education accessible, engaging, and effective for every learner. 
+My work represents a natural evolution toward solving what I consider the most important problem of our time: making high-quality education accessible, engaging, and effective for every learner.  -> REWRITE THIS
 
 Having experienced both the failures of poorly designed educational technology and the transformative potential of well-designed systems, I understand how technology can either bridge or widen existing educational gaps.
+
+<p align="center">
+    <img src="image6.png" style="height: auto;width: 20em;">
+</p>
