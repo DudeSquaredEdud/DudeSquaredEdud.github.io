@@ -70,9 +70,9 @@ Exploring how AI can amplify human teaching capabilities rather than replacing t
 
 # Mission
 
-My work represents a natural evolution toward solving what I consider the most important problem of our time: making high-quality education accessible, engaging, and effective for every learner.  -> REWRITE THIS
+My work revolves around solving what I consider to be the most important problem of our time: making high-quality education accessible, engaging, and effective for _every_ student.
 
-Having experienced both the failures of poorly designed educational technology and the transformative potential of well-designed systems, I understand how technology can either bridge or widen existing educational gaps.
+Having experienced the failures of poorly designed educational technology and the transformative potential of a well-designed education system, I understand how technology can either widen educational gaps, or be the driving force to bridging them.
 
 <p align="center">
     <img src="image6.png" style="height: auto;width: 20em;">
