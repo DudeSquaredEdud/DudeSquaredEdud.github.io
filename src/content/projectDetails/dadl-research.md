@@ -1,59 +1,39 @@
 ---
 projectId: "dadl-research"
 title: "AI-Powered Curriculum Learning Research"
-lead: "ULL Data Analysis and Deep Learning Lab"
+lead: "ULL Data Analysis and Deep Learning Lab - Principal Researcher"
 ---
 
-<div class="research-item">
-  <h3>Research Outcome</h3>
-  <ul>
-    <li>principal researcher investigating curriculum learning approaches for CNNs</li>
-    <li>focus on wavelet-based complexity measures</li>
-    <li>presented findings at IBM Thomas J. Watson Laboratory for AICS'24 conference</li>
-    <li>discovered that sorting images by wavelet entropy alone produced poor results</li>
-    <li>led to deeper investigation into complexity-based curriculum learning approaches</li>
-  </ul>
+## Deep Learning Research: Curriculum Learning for Image Classification
 
-  <div class="project-visuals">
-    <div class="image-placeholder large">
-      <p>Training Performance Comparison</p>
-      <span>Graphs showing curriculum vs. standard training results</span>
-    </div>
-    <div class="visual-grid">
-      <div class="image-placeholder">
-        <p>Wavelet Decomposition</p>
-        <span>Visual example of wavelet analysis process</span>
-      </div>
-      <div class="image-placeholder">
-        <p>IBM Presentation</p>
-        <span>Photo from conference presentation</span>
-      </div>
-    </div>
-  </div>
+As principal researcher at the University of Louisiana at Lafayette's Data Analysis and Deep Learning Lab, I conducted independent research investigating how the complexity and ordering of training examples affects CNN learning performance. This work represents my introduction to rigorous academic research methodology and contributed to my growing understanding of the intersection between machine learning and human learning processes.
 
-  <h3>My Technical Contribution</h3>
-  <ul>
-    <li>Implemented wavelet decomposition algorithms for image complexity analysis</li>
-    <li>Designed and executed experiments comparing curriculum learning approaches</li>
-    <li>Developed statistical models to validate training efficiency improvements</li>
-    <li>Authored research paper and presented findings at IBM facility</li>
-  </ul>
+### Research Discovery & Methodology
 
-  <h3>Technical Details</h3>
-  <ul>
-    <li>CNNs trained on CIFAR-10 dataset</li>
-    <li>various curriculum ordering strategies tested</li>
-    <li>wavelet decomposition used to calculate image complexity measures</li>
-    <li>PyTorch implementation</li>
-    <li>custom data loaders for curriculum ordering</li>
-  </ul>
+Key Finding: My research discovered that sorting images by wavelet entropy alone produced poor curriculum learning results, leading to a deeper investigation into multi-factor complexity assessment approaches. This negative result proved valuable in advancing understanding of curriculum learning limitations and opened new research directions.
 
-  <div class="tags">
-    <span class="tag">Machine Learning</span>
-    <span class="tag">Computer Vision</span>
-    <span class="tag">Wavelet Theory</span>
-    <span class="tag">Statistical Analysis</span>
-    <span class="tag">Experimental Design</span>
-    <span class="tag">Academic Writing</span>
-  </div>
-</div>
+Technical Implementation:
+- Advanced wavelet decomposition techniques for image complexity analysis
+- Custom CNN architecture development and training pipeline optimization
+- Statistical analysis and experimental validation of curriculum learning approaches
+- Python-based deep learning implementation with rigorous experimental controls
+
+### IBM Research Presentation
+
+Academic Recognition: Presented research findings at IBM Thomas J. Watson Laboratory during AICS'24, demonstrating the caliber of research recognized by industry leaders. This presentation experience provided valuable exposure to academic communication standards and peer review processes.
+
+Research Impact: The presentation validated both the quality of undergraduate research contributions and the importance of documenting negative results in advancing computational learning research.
+
+### Connection to Human Learning
+
+This research sparked my broader interest in how machine learning patterns might inform educational technology design. The experience of investigating why certain complexity measures fail in curriculum learning deepened my understanding of learning as a complex system that can be modeled, measured, and optimized - but never at the expense of human cognitive diversity.
+
+Future Research Direction: This work established my foundation for graduate research in AI-powered learning systems, particularly exploring how computational approaches to curriculum design might translate into more effective educational technology for diverse learners.
+
+### Research Skills Developed
+
+- Experimental Design: Rigorous methodology for machine learning research validation
+- Statistical Analysis: Advanced techniques for interpreting complex experimental results  
+- Academic Communication: Professional presentation skills validated through IBM laboratory presentation
+- Critical Thinking: Ability to derive meaningful insights from negative experimental results
+- Technical Implementation: Advanced Python programming for deep learning research applications

@@ -5,7 +5,7 @@ interface ProjectItem {
   title: string;
   category: string;
   imageSrc: string;
-  content: string;
+  content: any; // Astro component
   tags: string[];
   link: string;
 }
@@ -16,25 +16,28 @@ const { projects } = Astro.props;
 <section id="projects" class="section">
   <h2>Selected Projects</h2>
   
-  {projects.map(project => (
-    <div class="project-item" data-category={project.category}>
-      <div class="project-grid">
-        <div class="project-image-section">
-          <img src={project.imageSrc} alt={project.title} />
-        </div>
-        <div class="project-content">
-          <h3>{project.title}</h3>
-          <div set:html={project.content} />
-          <div class="tags">
-            {project.tags.map(tag => (
-              <span class="tag">{tag}</span>
-            ))}
+  {projects.map(project => {
+    const Content = project.content;
+    return (
+      <div class="project-item" data-category={project.category}>
+        <div class="project-grid">
+          <div class="project-image-section">
+            <img src={project.imageSrc} alt={project.title} />
           </div>
-          <p>
-            <a href={project.link} class="project-link">View Details →</a>
-          </p>
+          <div class="project-content">
+            <h3>{project.title}</h3>
+            <Content />
+            <div class="tags">
+              {project.tags.map((tag: string) => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+            <p>
+              <a href={project.link} class="project-link">View Details →</a>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-  ))}
+    );
+  })}
 </section>

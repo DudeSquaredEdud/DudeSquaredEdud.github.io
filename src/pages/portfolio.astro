@@ -12,21 +12,31 @@ const bioEntries = await getCollection("bio");
 const bioContent = bioEntries[0]?.body || '';
 
 // Get all portfolio projects from content collection
-const projects = (await getCollection("portfolio")).map(project => ({
-  title: project.data.title,
-  category: project.data.category,
-  imageSrc: project.data.imageSrc,
-  content: project.body,
-  tags: project.data.tags,
-  link: project.data.link
-}));
+const projects = await Promise.all(
+  (await getCollection("portfolio")).map(async project => {
+    const { Content } = await project.render();
+    return {
+      title: project.data.title,
+      category: project.data.category,
+      imageSrc: project.data.imageSrc,
+      content: Content,
+      tags: project.data.tags,
+      link: project.data.link
+    };
+  })
+);
 
-const projectDetails = (await getCollection("projectDetails")).map(project => ({
-  id: project.data.projectId,
-  title: project.data.title,
-  lead: project.data.lead,
-  content: project.body,
-}));
+const projectDetails = await Promise.all(
+  (await getCollection("projectDetails")).map(async project => {
+    const { Content } = await project.render();
+    return {
+      id: project.data.projectId,
+      title: project.data.title,
+      lead: project.data.lead,
+      content: Content,
+    };
+  })
+);
 ---
 
 <Layout

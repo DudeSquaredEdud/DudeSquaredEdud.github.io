@@ -1,73 +1,70 @@
 ---
 projectId: "benakama"
-title: "Human-AI Collaborative Learning Ecosystems"
-lead: "Lead Backend Developer - London-based Startup (BeNakama)"
+title: "BeNakama - International EdTech Systems Architecture"
+lead: "Lead Backend Developer - London-based Startup Serving UK High Schools"
 ---
 
-<div class="project-item">
-  <h3>Socratic AI Implementation</h3>
-  <ul>
-    <li>Lead Backend Developer implementing human-AI collaborative learning systems</li>
-    <li>for London-based startup</li>
-    <li>demonstrates practical application of "Socratic AI" principles</li>
-    <li>AI enhances rather than replaces human learning relationships</li>
-    <li>peer-matching algorithms preserve human agency</li>
-    <li>augments educational interactions</li>
-  </ul>
-  <p><strong>MIT Research Alignment:</strong></p>
-  <ul>
-    <li>real-world implementation of collaborative learning models</li>
-    <li>human-AI partnership paradigms studied in Cyborg Psychology group</li>
-  </ul>
+## International EdTech Leadership: AI-Powered Educational Systems for UK Schools
 
-  <div class="project-visuals">
-    <div class="image-placeholder large">
-      <p>Ascend Game Interface</p>
-      <span>Educational video game screenshots showing learning mechanics</span>
-    </div>
-    <div class="visual-grid">
-      <div class="image-placeholder">
-        <p>Classroom System Dashboard</p>
-        <span>Teacher interface for monitoring student progress</span>
-      </div>
-      <div class="image-placeholder">
-        <p>AI Matching System</p>
-        <span>Diagram of student-question matching algorithm</span>
-      </div>
-    </div>
-  </div>
+As Lead Backend Developer for BeNakama, a London-based EdTech startup, I lead the development of advanced classroom systems and the educational video game Ascend, serving UK high school students. This role represents the intersection of my technical expertise, international collaboration skills, and commitment to educational technology that genuinely serves learners rather than administrative systems.
 
-  <h3>Human-Centered Design Leadership</h3>
-  <ul>
-    <li>Architected human-AI collaborative classroom systems preserving teacher agency</li>
-    <li>Designed peer-matching algorithms that enhance rather than replace social learning</li>
-    <li>Led international deployment of systems prioritizing human relationships over metrics</li>
-    <li>Implemented game mechanics that support intrinsic motivation over compliance</li>
-    <li>Coordinated multidisciplinary team through cyborg psychology principles</li>
-  </ul>
+### AI-Powered Educational Innovation
 
-  <h3>Cyborg Psychology in Practice</h3>
-  <ul>
-    <li>every design decision embodies human-AI partnership principles</li>
-    <li>system functions as cognitive prosthetic</li>
-    <li>enhances human capabilities without compromising autonomy</li>
-    <li>directly contrasts with manipulative EdTech</li>
-    <li>treats users as complex psychological beings</li>
-    <li>not as data points</li>
-  </ul>
-  <p><strong>Research Principle:</strong></p>
-  <ul>
-    <li>technology should augment human intelligence</li>
-    <li>preserve individual agency</li>
-    <li>preserve social learning dynamics</li>
-  </ul>
+Intelligent Student Assessment System:
+- Designing and implementing AI-powered student question system that enables best-fit matching for student academic ability
+- Currently in active development: AI systems specifically focused on empowering students with learning difficulties and disabilities
+- Advanced backend architecture supporting real-time AI-powered educational interventions
+- Secure classroom systems designed for international deployment across UK educational institutions
 
-  <div class="tags">
-    <span class="tag">Socratic AI</span>
-    <span class="tag">Human-AI Partnership</span>
-    <span class="tag">Collaborative Learning</span>
-    <span class="tag">International Scale</span>
-    <span class="tag">Cognitive Prosthetics</span>
-    <span class="tag">Team Leadership</span>
-  </div>
-</div>
+Technical Architecture Leadership:
+- Unique technical responsibility: Only team member with computer science expertise, requiring multidisciplinary leadership across backend systems, AI research, and educational game development
+- Full-stack coordination: React frontend with Mantine UI, Django backend architecture, Python AI integration
+- International deployment management: Remote leadership from Louisiana to UK high school environments
+- Educational game development: Leading technical aspects of "Ascend" gamified learning platform
+
+### International Development Leadership
+
+Cross-Cultural Technical Collaboration:
+- Managing complex international development coordination across time zones and cultural contexts
+- Bridging Louisiana computational expertise with London educational innovation requirements
+- Remote leadership demonstrating ability to maintain high technical standards across international teams
+- Direct impact on UK students through accessibility-focused educational technology deployment
+
+Multidisciplinary Technical Skills:
+- Backend Architecture: Secure, scalable classroom systems for international educational deployment
+- AI System Research: Development of machine learning algorithms for educational assessment and intervention
+- Game Development: Pixel art animation and educational game mechanics for student engagement
+- Project Management: International team coordination and technical milestone delivery
+
+### Anti-Edgenuity Mission Integration
+
+Mission-Driven Technical Decision Making:
+- Every design decision explicitly tested against "does this genuinely support learning or does it create administrative convenience?"
+- Anti-Edgenuity philosophy: Rejecting the compliance-focused design that makes learning unnecessarily difficult and frustrating
+- Prioritizing genuine learning outcomes over metrics that look good to administrators but fail students
+- Accessibility-first approach ensuring technology works for students with learning difficulties
+
+Educational Technology Innovation:
+- Developing AI systems that adapt to individual learning needs rather than forcing students to adapt to technological limitations
+- Focus on empowering rather than replacing human teaching capabilities
+- International perspective on educational equity combining Louisiana and UK educational contexts
+
+### Professional Growth & Leadership Development
+
+Technical Leadership Expansion:
+- Evolved from individual contributor to technical leader managing international educational technology deployment
+- Developed expertise in educational AI systems, international team coordination, and scalable backend architecture
+- Experience balancing multiple technical domains: AI research, backend systems, educational game development, international deployment
+
+Educational Impact Measurement:
+- Direct involvement in systems serving UK high school students across multiple institutions
+- Real-world validation of AI-powered educational technology in active classroom environments
+- International experience providing perspective on educational technology effectiveness across different cultural contexts
+
+### Connection to Graduate Research Vision
+
+Research-to-Practice Pipeline: BeNakama represents the practical application of my research interests in AI-powered educational systems. The experience of developing educational technology for international deployment, combined with my background in curriculum learning research, provides unique insight into what actually scales versus what remains academic theory.
+
+Future Research Integration: This professional experience directly informs my graduate research interests in computational learning systems, particularly exploring how AI can amplify human teaching capabilities while avoiding the compliance-focused design failures that characterize traditional educational technology.
+
+The role demonstrates my ability to translate theoretical understanding of learning systems into scalable technological solutions that serve diverse student populations across international educational contexts.

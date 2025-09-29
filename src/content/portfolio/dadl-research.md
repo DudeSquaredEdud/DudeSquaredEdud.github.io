@@ -1,30 +1,32 @@
 ---
-title: Research in Curriculum Learning
+title: AI-Powered Curriculum Learning Research
 category: research ai
 imageSrc: DADL/poster.png
 tags:
   - Machine Learning
-  - Research Presentation
+  - Curriculum Learning
+  - IBM Research Presentation
+  - Wavelet Analysis
 link: "#dadl-research"
 ---
 
-<ul>
-  <li>principal researcher investigating curriculum learning approaches for CNNs</li>
-  <li>worked at ULL Data Analysis and Deep Learning Lab</li>
-  <li>presented findings at IBM Thomas J. Watson Laboratory (AICS'24)</li>
-  <li>research explores how Image Classification models get a baseline for what something looks like</li>
-  <li>Showed me the research process</li>
-  <li>Sparked ideas for human learning processes</li>
-</ul>
+## Principal researcher investigating curriculum learning approaches for CNNs at ULL Data Analysis and Deep Learning Lab
 
-<p><strong>Research Interest:</strong></p>
-<ul>
-  <li>How human learning patterns compare to machine learning patterns</li>
-  <li>Understanding how data comprehension is strengthened</li>
-</ul>
+- Led independent research on complexity-based training methods for image classification
+- Presented findings at IBM Thomas J. Watson Laboratory (AICS'24)
+- Discovered that sorting images by wavelet entropy alone produced poor results
+- Developed deeper investigation into multi-factor complexity assessment for curriculum learning
+- Advanced technical skills in wavelet decomposition, CNN architectures, and statistical modeling
 
-<p><strong>Relevant Experience:</strong></p>
-<ul>
-  <li>Created custom AI training algorithms and models</li>
-  <li>Understanding signal theory and AI learning</li>
-</ul>
+## Research Impact & Learning:
+- Gained experience with rigorous experimental design and scientific methodology
+- Learned the value of negative results in advancing computational learning research
+- Sparked interest in how machine learning patterns could inform human educational systems
+- Developed foundation for graduate research in AI-powered learning systems
+
+## Technical Skills Applied:
+- Python programming for deep learning research
+- Convolutional Neural Network architecture implementation
+- Wavelet theory and signal processing techniques
+- Statistical analysis and experimental validation
+- Academic presentation and scientific communication

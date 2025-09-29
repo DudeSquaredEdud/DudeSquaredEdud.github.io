@@ -5,14 +5,14 @@ interface Props {
   id: string;
   title: string;
   lead: string;
-  content: string;
+  content: any; // Astro component
 }
 
-const { id, title, lead, content } = Astro.props;
+const { id, title, lead, content: Content } = Astro.props;
 ---
 
 <section id={id} class="section">
   <h2>{title}</h2>
   <p class="lead">{lead}</p>
-  <div set:html={content} />
+  <Content />
 </section>

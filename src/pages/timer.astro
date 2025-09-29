@@ -9,6 +9,8 @@ import Layout from '../layouts/Layout.astro';
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="preconnect">
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="preconnect">
 
+<p>Every now and then I make tools to help me work. This is a timer. It kinda looks like one of those old alarm clocks. Feel free to use it</p>
+
   <!-- Timer Display Section -->
   <section class="timer-section">
     <div class="retro-clock">
@@ -189,9 +191,10 @@ import Layout from '../layouts/Layout.astro';
     pointer-events: none;
   }
 
-  .progress-ring {
-    position: relative;
-    top: -12.5%;
+.progress-ring{
+	position: relative;
+	top: -12.5%;
+	left: 7.5%;
 }
 
   .progress-circle {
@@ -629,7 +632,7 @@ import Layout from '../layouts/Layout.astro';
       const seconds = this.timeRemaining % 60;
       
       this.timeDisplay.textContent = 
-        `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       
       // Update progress circle
       const progress = (this.TOTAL_SECONDS - this.timeRemaining) / this.TOTAL_SECONDS;
