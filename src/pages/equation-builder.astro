@@ -1,0 +1,2466 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="Node-Based Equation Builder - Ashton Andrepont"
+  description="Visual node-based equation builder - drag nodes and connect them to build mathematical relationships"
+>
+  <section class="section">
+    <h2>Node-Based Equation Builder</h2>
+    <p>Drag nodes onto the canvas and connect them to build mathematical equations visually.</p>
+  </section>
+
+  <!-- Node-Based Interface -->
+  <div class="node-editor">
+    <!-- Node Palette -->
+    <div class="node-palette">
+      <h3>Node Library</h3>
+      <div class="palette-section">
+        <h4>Generators</h4>
+        <div class="palette-items">
+          <button class="palette-node" data-node-type="number" data-title="Number">123</button>
+          <button class="palette-node" data-node-type="variable" data-title="Variable">x</button>
+          <button class="palette-node" data-node-type="constant" data-title="Constant">π</button>
+        </div>
+      </div>
+      
+      <div class="palette-section">
+        <h4>Operators</h4>
+        <div class="palette-items">
+          <button class="palette-node" data-node-type="add" data-title="Add">+</button>
+          <button class="palette-node" data-node-type="subtract" data-title="Subtract">−</button>
+          <button class="palette-node" data-node-type="multiply" data-title="Multiply">×</button>
+          <button class="palette-node" data-node-type="divide" data-title="Divide">÷</button>
+          <button class="palette-node" data-node-type="power" data-title="Power">^</button>
+        </div>
+      </div>
+      
+      <div class="palette-section">
+        <h4>Functions</h4>
+        <div class="palette-items">
+          <button class="palette-node" data-node-type="sin" data-title="Sine">sin</button>
+          <button class="palette-node" data-node-type="cos" data-title="Cosine">cos</button>
+          <button class="palette-node" data-node-type="sqrt" data-title="Square Root">√</button>
+        </div>
+      </div>
+      
+      <div class="palette-section">
+        <h4>Output</h4>
+        <div class="palette-items">
+          <button class="palette-node" data-node-type="output" data-title="Output" style="background: #fef3c7; border-color: #f59e0b;">=</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas Area -->
+    <div class="canvas-container">
+            <div class="canvas-controls">
+        <!-- Primary Actions Group -->
+        <div class="control-group primary-actions">
+          <button id="exportEquation" class="control-btn primary">Export Equation</button>
+          <button id="clearCanvas" class="control-btn">Clear Canvas</button>
+        </div>
+        
+        <!-- File Operations Group -->
+        <div class="control-group file-operations">
+          <div class="dropdown">
+            <button id="fileMenuBtn" class="control-btn dropdown-btn">File ▼</button>
+            <div id="fileMenu" class="dropdown-content">
+              <a href="#" id="saveNodeMap">💾 Save Node Map</a>
+              <a href="#" id="loadNodeMap">📂 Load Node Map</a>
+              <hr class="dropdown-divider">
+              <a href="#" id="exportNodeMap">📤 Export to File</a>
+              <a href="#" id="importNodeMapBtn">📥 Import from File</a>
+            </div>
+          </div>
+          
+          <div class="dropdown">
+            <button id="databaseMenuBtn" class="control-btn dropdown-btn">Database ▼</button>
+            <div id="databaseMenu" class="dropdown-content">
+              <a href="#" id="saveToDB">🗄️ Save to Database</a>
+              <a href="#" id="openDBManager">📊 Database Manager</a>
+              <hr class="dropdown-divider">
+              <a href="#" id="quickSaveDB">⚡ Quick Save</a>
+              <a href="#" id="exportDBData">📤 Export All Data</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Canvas Tools Group -->
+        <div class="control-group canvas-tools">
+          <button id="zoomOut" class="control-btn" title="Zoom Out">🔍−</button>
+          <span id="zoomLevel" class="zoom-display">100%</span>
+          <button id="zoomIn" class="control-btn" title="Zoom In">🔍+</button>
+          <button id="zoomFit" class="control-btn" title="Fit to Screen">⏹️</button>
+          <button id="toggleStarSystem" class="control-btn">⭐ Starred</button>
+          <button id="resizeCanvas" class="control-btn" title="Resize Canvas">🔄 Resize</button>
+        </div>
+        
+        <!-- Auto-save Indicator -->
+        <div class="auto-save-indicator">
+          <span id="autoSaveIndicator">Ready to save</span>
+        </div>
+        
+        <input type="file" id="importNodeMap" accept=".json" style="display: none;">
+      </div>
+      <div class="node-canvas" id="nodeCanvas">
+        <div class="canvas-grid"></div>
+        <svg class="connection-layer" id="connectionLayer"></svg>
+      </div>
+    </div>
+
+  <!-- Output Section -->
+      <!-- Equation Output -->
+    <div class="output-section">
+      <h3>Generated Equation</h3>
+      <div id="equationOutput" class="equation-display">
+        <em>Click buttons in the palette to add nodes to the canvas...</em>
+      </div>
+    </div>
+
+  <!-- Node Editor Sidebar -->
+  <div id="nodeEditorSidebar" class="node-editor-sidebar">
+    <div class="sidebar-header">
+      <h3 id="sidebarTitle">Node Editor</h3>
+      <button id="closeSidebar" class="close-btn">&times;</button>
+    </div>
+    <div class="sidebar-content" id="sidebarContent">
+      <p>Select a node to edit its properties.</p>
+    </div>
+  </div>
+</div>
+</Layout>
+
+<style>
+  /* Node-Based Editor Styling */
+  .node-editor {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 1.5rem;
+    margin: 2rem 0;
+    height: calc(100vh - 120px);
+    min-height: 900px;
+    padding: 0 1rem;
+  }
+
+  /* Node Palette */
+  .node-palette {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    overflow-y: auto;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-normal);
+  }
+  
+  .node-palette:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .palette-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .palette-section h4 {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-border-subtle);
+    position: relative;
+  }
+  
+  .palette-section h4::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 2rem;
+    height: 2px;
+    background: var(--color-primary);
+    border-radius: 1px;
+  }
+
+  .palette-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .palette-node {
+    padding: 1rem 0.75rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    cursor: grab;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all var(--transition-normal);
+    user-select: none;
+    box-shadow: var(--shadow-sm);
+    /* Ensure entire button area is draggable */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    -webkit-user-drag: element;
+  }
+  
+
+
+  .palette-node:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background: var(--color-surface-hover);
+  }
+
+  .palette-node:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+  }
+
+  /* Canvas Container */
+  .canvas-container {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-normal);
+  }
+  
+  .canvas-container:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .canvas-controls {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+    background: var(--color-surface);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    backdrop-filter: blur(8px);
+  }
+
+  .control-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding-right: 0.75rem;
+    border-right: 1px solid var(--color-border-subtle, #e5e7eb);
+  }
+
+  .control-group:last-child {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .control-group.primary-actions {
+    order: 1;
+  }
+
+  .control-group.file-operations {
+    order: 2;
+  }
+
+  .control-group.canvas-tools {
+    order: 3;
+    margin-left: auto;
+  }
+
+  .zoom-display {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    font-weight: 500;
+    padding: 0 0.5rem;
+    background: var(--color-bg-subtle);
+    border-radius: 4px;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .canvas-controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+    
+    .control-group {
+      justify-content: center;
+    }
+    
+    .control-group.canvas-tools {
+      margin-left: 0;
+    }
+  }
+
+  .control-btn {
+    padding: 0.625rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .control-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left var(--transition-slow);
+  }
+
+  .control-btn.primary {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .control-btn.primary:hover {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .control-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+  }
+  
+  .control-btn:hover::before {
+    left: 100%;
+  }
+  
+  .control-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Dropdown Styles */
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-btn {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    z-index: 1000;
+    padding: 0.5rem 0;
+    margin-top: 0.25rem;
+  }
+
+  .dropdown-content.show {
+    display: block;
+    animation: dropdownSlide 0.2s ease-out;
+  }
+
+  @keyframes dropdownSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .dropdown-content a {
+    color: var(--color-text);
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    display: block;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+  }
+
+  .dropdown-content a:hover {
+    background-color: var(--color-bg-subtle);
+  }
+
+  .dropdown-divider {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 0.5rem 0;
+  }
+
+  /* Node Canvas */
+  .node-canvas {
+    position: relative;
+    height: calc(100% - 60px);
+    background: 
+      radial-gradient(circle, #ddd 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    overflow: hidden; /* Enable pan/zoom */
+    cursor: grab;
+    transition: transform 0.2s ease;
+  }
+
+  .node-canvas.panning {
+    cursor: grabbing;
+  }
+
+  .node-canvas.zoomed {
+    background-size: calc(20px * var(--zoom-scale, 1)) calc(20px * var(--zoom-scale, 1));
+  }
+
+  .canvas-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .connection-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Nodes on Canvas */
+  .canvas-node {
+    position: absolute;
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1rem;
+    min-width: 100px;
+    cursor: move;
+    user-select: none;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+
+  .canvas-node:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .canvas-node.selected {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  }
+
+  .canvas-node.dragging {
+    transform: rotate(3deg);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    cursor: grabbing;
+  }
+
+  .node-header {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    text-align: center;
+  }
+
+  .node-content {
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-align: center;
+    color: var(--color-accent);
+  }
+
+  /* Input/Output Ports */
+  .node-inputs,
+  .node-outputs {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .node-inputs {
+    left: -8px;
+  }
+
+  .node-outputs {
+    right: -8px;
+  }
+
+  .node-port {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--color-accent);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .node-port:hover {
+    transform: scale(1.3);
+    background: var(--color-accent);
+  }
+
+  .node-port.connected {
+    background: var(--color-accent);
+  }
+
+  /* Connections */
+  .connection {
+    stroke: var(--color-accent);
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  .connection-preview {
+    stroke: var(--color-accent);
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 5,5;
+    opacity: 0.7;
+  }
+
+  /* Output Section */
+  .output-section {
+    margin: 2rem 0;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .equation-output {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    text-align: center;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Node Editor Sidebar */
+  .node-editor-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 350px;
+    height: 100vh;
+    background: white;
+    border-left: 2px solid var(--color-border);
+    box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .node-editor-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sidebar-header h3 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1.2rem;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text-light);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .close-btn:hover {
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .sidebar-content {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  .sidebar-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+  }
+
+  .sidebar-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+  }
+
+  .sidebar-btn.secondary {
+    background: var(--color-border);
+    color: var(--color-text);
+  }
+
+  .sidebar-btn.secondary:hover {
+    background: #d1d5db;
+  }
+
+  .sidebar-btn.danger {
+    background: #dc2626;
+  }
+
+  .sidebar-btn.danger:hover {
+    background: #b91c1c;
+  }
+
+  .color-picker {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .color-option:hover {
+    transform: scale(1.1);
+    border-color: var(--color-accent);
+  }
+
+  .color-option.selected {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .node-editor {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+    
+    .node-palette {
+      order: 2;
+      height: 300px;
+    }
+    
+    .canvas-container {
+      order: 1;
+      height: 400px;
+    }
+    
+    .palette-items {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* Auto-save Indicator */
+  .auto-save-indicator {
+    padding: 0.75rem 1.25rem;
+    text-align: center;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border-subtle);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+  }
+
+  #autoSaveIndicator {
+    color: var(--color-text-secondary);
+    transition: all var(--transition-normal);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  #autoSaveIndicator::before {
+    content: '●';
+    font-size: 0.5rem;
+    transition: color var(--transition-normal);
+  }
+
+  #autoSaveIndicator.saving {
+    color: var(--color-warning);
+  }
+  
+  #autoSaveIndicator.saving::before {
+    color: var(--color-warning);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  #autoSaveIndicator.saved {
+    color: var(--color-success);
+  }
+  
+  #autoSaveIndicator.saved::before {
+    color: var(--color-success);
+  }
+
+  #autoSaveIndicator.error {
+    color: var(--color-danger);
+  }
+  
+  #autoSaveIndicator.error::before {
+    color: var(--color-danger);
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Accessibility */
+  .canvas-node:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .palette-node,
+    .canvas-node,
+    .control-btn,
+    .node-port {
+      transition: none;
+    }
+    
+    .canvas-node:hover,
+    .control-btn:hover {
+      transform: none;
+    }
+  }
+
+  /* Drag and Drop Enhancements */
+  .palette-node {
+    cursor: grab;
+  }
+  
+  .palette-node:active {
+    cursor: grabbing;
+  }
+
+  
+  /* Canvas Drop Target Styling */
+  .node-canvas.drag-over {
+    background: 
+      radial-gradient(circle at 20px 20px, #667eea 2px, transparent 2px),
+      linear-gradient(to right, #e3f2fd 0%, #f3e5f5 100%);
+    border-color: #667eea;
+    box-shadow: inset 0 0 20px rgba(102, 126, 234, 0.2);
+  }
+  
+  .node-canvas.drag-over::before {
+    content: "Drop node here";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #667eea;
+    font-size: 1.2em;
+    font-weight: 600;
+    pointer-events: none;
+    opacity: 0.7;
+    z-index: 10;
+  }
+  
+  /* Panning Mode Styling */
+  .node-canvas.panning-mode {
+    cursor: grab;
+  }
+  
+  .node-canvas.panning-mode::after {
+    content: "Space + Drag to Pan";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    pointer-events: none;
+    z-index: 100;
+  }
+  
+  /* Node Animation Enhancements */
+  @keyframes nodeAppear {
+    0% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+  
+  /* Improved drag feedback */
+  .palette-node.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  
+  /* Canvas node positioning */
+  .canvas-node {
+    position: absolute;
+    z-index: 10;
+  }
+  
+  /* Enhanced dropdown styling for new controls */
+  .dropdown-content {
+    min-width: 180px;
+  }
+  
+  .dropdown-content a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .dropdown-divider {
+    margin: 4px 0;
+    border: none;
+    border-top: 1px solid #e5e5e5;
+  }
+</style>
+
+<script>
+  // Import utility modules for modular architecture
+  import { NODE_TYPES, NODE_COLORS, getNodeColor, isValidVariableName, isValidConstant } from '../lib/equation-builder/utils/NodeTypes.js';
+  import { ValidationResult, validateConstant, validateVariable, validateConnection } from '../lib/equation-builder/utils/ValidationUtils.js';
+  import { NotificationSystem } from '../lib/equation-builder/utils/NotificationSystem.js';
+  import { SidebarEditor } from '../lib/equation-builder/utils/SidebarEditor.js';
+  import { NodeManager } from '../lib/equation-builder/utils/NodeManager.js';
+  import { ConnectionSystem } from '../lib/equation-builder/utils/ConnectionSystem.js';
+  import { EquationGenerator } from '../lib/equation-builder/utils/EquationGenerator.js';
+  import { DragSystem } from '../lib/equation-builder/utils/DragSystem.js';
+  import { DataPersistence } from '../lib/equation-builder/utils/DataPersistence.js';
+  
+  // Enhanced systems - LocalDB, Dynamic Canvas, Star System, Database Management
+  import { LocalDBManager } from '../lib/equation-builder/utils/LocalDBManager.js';
+  import { DynamicCanvasManager } from '../lib/equation-builder/utils/DynamicCanvasManager.js';
+  import { StarSystemManager } from '../lib/equation-builder/utils/StarSystemManager.js';
+  import { DatabaseManager } from '../lib/equation-builder/utils/DatabaseManager.js';
+
+  // Minimal Node-Based Equation Builder - Proof of Concept
+  class NodeEditor {
+    canvas: HTMLElement;
+    equationOutput: HTMLElement;
+    sidebar: HTMLElement;
+    sidebarTitle: HTMLElement;
+    sidebarContent: HTMLElement;
+    closeSidebarBtn: HTMLElement;
+    connectionLayer: SVGElement;
+    currentEditingNode: any;
+    notificationSystem: any;
+    sidebarEditor: any;
+    nodeManager: any;
+    connectionSystem: any;
+    equationGenerator: any;
+    dragSystem: any;
+    dataPersistence: any;
+    
+    // Enhanced systems
+    dynamicCanvasManager: any;
+    starSystemManager: any;
+    databaseManager: any;
+    
+    // Zoom and pan properties
+    zoomLevel: number;
+    minZoom: number;
+    maxZoom: number;
+    zoomStep: number;
+    panX: number;
+    panY: number;
+    isPanning: boolean;
+    
+    // Auto-save properties
+    autoSaveInterval: number;
+    autoSaveTimer: any;
+    lastSaveTime: number;
+    hasUnsavedChanges: boolean;
+
+    constructor() {
+      this.canvas = document.getElementById('nodeCanvas');
+      this.equationOutput = document.getElementById('equationOutput');
+      this.sidebar = document.getElementById('nodeEditorSidebar');
+      this.sidebarTitle = document.getElementById('sidebarTitle');
+      this.sidebarContent = document.getElementById('sidebarContent');
+      this.closeSidebarBtn = document.getElementById('closeSidebar');
+      
+      if (!this.canvas || !this.equationOutput || !this.sidebar) {
+        console.error('Required elements not found');
+        return;
+      }
+      
+
+      this.currentEditingNode = null;
+      
+      // Zoom and pan functionality
+      this.zoomLevel = 1;
+      this.minZoom = 0.25;
+      this.maxZoom = 3;
+      this.zoomStep = 0.25;
+      this.panX = 0;
+      this.panY = 0;
+      this.isPanning = false;
+      
+      // Auto-save functionality
+      this.autoSaveInterval = 30000; // 30 seconds
+      this.autoSaveTimer = null;
+      this.lastSaveTime = 0;
+      this.hasUnsavedChanges = false;
+      
+      // Create SVG layer for connections
+      this.connectionLayer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      this.connectionLayer.style.position = 'absolute';
+      this.connectionLayer.style.top = '0';
+      this.connectionLayer.style.left = '0';
+      this.connectionLayer.style.width = '100%';
+      this.connectionLayer.style.height = '100%';
+      this.connectionLayer.style.pointerEvents = 'none';
+      this.connectionLayer.style.zIndex = '1';
+      
+      this.canvas.appendChild(this.connectionLayer);
+      
+      // Initialize notification system
+      this.notificationSystem = new NotificationSystem();
+      
+      // Initialize drag system early (needed by NodeManager)
+      this.dragSystem = new DragSystem(
+        this.canvas,
+        null, // connectionSystem will be set later
+        {
+          constrainToCanvas: true,
+          showVisualFeedback: true,
+          updateConnections: true
+        }
+      );
+      
+      // Initialize modular node manager with drag system
+      this.nodeManager = new NodeManager(
+        this.canvas,
+        { NODE_TYPES, NODE_COLORS, getNodeColor, isValidVariableName, isValidConstant },
+        { validateConstant, validateVariable, validateConnection },
+        this.notificationSystem,
+        this.dragSystem
+      );
+      
+      // Initialize sidebar editor first (needed by other components)
+      const sidebarElements = {
+        sidebar: this.sidebar,
+        sidebarTitle: this.sidebarTitle,
+        sidebarContent: this.sidebarContent,
+        closeSidebarBtn: this.closeSidebarBtn
+      };
+      
+      this.sidebarEditor = new SidebarEditor(sidebarElements, this, this.notificationSystem);
+      
+      // Initialize modular connection system
+      this.connectionSystem = new ConnectionSystem(
+        this.canvas,
+        this.connectionLayer,
+        this.nodeManager,
+        { validateConstant, validateVariable, validateConnection },
+        this.notificationSystem
+      );
+      
+      // Initialize equation generator
+      this.equationGenerator = new EquationGenerator(
+        this.nodeManager,
+        this.connectionSystem,
+        this.equationOutput
+      );
+      
+      // Update all component dependencies after all components are created
+      this.dragSystem.updateConnectionSystem(this.connectionSystem);
+      this.nodeManager.setConnectionSystem(this.connectionSystem);
+      this.nodeManager.setSidebarEditor(this.sidebarEditor);
+      this.nodeManager.setEquationGenerator(this.equationGenerator);
+      
+      // Initialize data persistence system
+      this.dataPersistence = new DataPersistence(
+        this.nodeManager,
+        this.connectionSystem,
+        this.notificationSystem
+      );
+      
+      // Initialize advanced systems
+      this.dynamicCanvasManager = new DynamicCanvasManager(
+        this.canvas,
+        this.notificationSystem
+      );
+      
+      this.starSystemManager = new StarSystemManager(
+        this.nodeManager,
+        this.notificationSystem
+      );
+      
+      this.databaseManager = new DatabaseManager(
+        this.dataPersistence,
+        this.notificationSystem
+      );
+      
+      // Make sidebar editor globally accessible for onclick handlers
+      window.sidebarEditor = this.sidebarEditor;
+      
+      // Make node editor globally accessible for star system
+      window.nodeEditor = this;
+      
+      // Create default output node for immediate usability
+      this.createDefaultOutputNode();
+      
+      // Setup canvas panning system
+      this.setupCanvasPanning();
+      
+      this.setupPalette();
+      this.setupControls();
+      this.updateEquation();
+      
+      // Setup auto-save system after all components are initialized
+      this.setupAutoSaveHooks();
+      this.initializeAutoSave();
+    }
+    
+    setupSidebar() {
+      // Close sidebar button
+      this.closeSidebarBtn.addEventListener('click', () => {
+        this.closeSidebar();
+      });
+      
+      // Close sidebar when clicking outside
+      document.addEventListener('click', (e) => {
+        if (this.sidebar.classList.contains('open') && 
+            !this.sidebar.contains(e.target) && 
+            !e.target.closest('.canvas-node')) {
+          this.closeSidebar();
+        }
+      });
+    }
+    
+    openSidebar(nodeId) {
+      this.currentEditingNode = nodeId;
+      const nodeData = this.nodeManager.nodes.get(nodeId);
+      if (!nodeData) return;
+      
+      this.sidebarTitle.textContent = `Edit ${nodeData.nodeType.charAt(0).toUpperCase() + nodeData.nodeType.slice(1)} Node`;
+      this.populateSidebarContent(nodeId);
+      this.sidebar.classList.add('open');
+    }
+    
+    closeSidebar() {
+      this.sidebar.classList.remove('open');
+      this.currentEditingNode = null;
+    }
+    
+    populateSidebarContent(nodeId) {
+      const nodeData = this.nodeManager.nodes.get(nodeId);
+      if (!nodeData) return;
+      
+      let content = '';
+      
+      switch (nodeData.nodeType) {
+        case 'constant':
+          content = this.createConstantEditor(nodeId, nodeData);
+          break;
+        case 'variable':
+          content = this.createVariableEditor(nodeId, nodeData);
+          break;
+        case 'output':
+          content = this.createOutputNodeInfo(nodeId, nodeData);
+          break;
+        default:
+          content = this.createOperatorEditor(nodeId, nodeData);
+          break;
+      }
+      
+      this.sidebarContent.innerHTML = content;
+      this.bindSidebarEvents(nodeId);
+    }
+    
+    createConstantEditor(nodeId, nodeData) {
+      const isNumber = !isNaN(parseFloat(nodeData.content));
+      return `
+        <div class="form-group">
+          <label>Constant Type:</label>
+          <select id="constantType" onchange="nodeEditor.updateConstantType('${nodeId}')">
+            <option value="number" ${isNumber ? 'selected' : ''}>Number</option>
+            <option value="pi" ${nodeData.content === 'π' ? 'selected' : ''}>Pi (π)</option>
+            <option value="e" ${nodeData.content === 'e' ? 'selected' : ''}>Euler's number (e)</option>
+            <option value="custom" ${!isNumber && nodeData.content !== 'π' && nodeData.content !== 'e' ? 'selected' : ''}>Custom</option>
+          </select>
+        </div>
+        
+        <div class="form-group" id="numberGroup" style="display: ${isNumber ? 'block' : 'none'}">
+          <label>Value:</label>
+          <input type="number" id="numberValue" value="${isNumber ? nodeData.content : '1'}" step="any">
+        </div>
+        
+        <div class="form-group" id="customGroup" style="display: ${!isNumber && nodeData.content !== 'π' && nodeData.content !== 'e' ? 'block' : 'none'}">
+          <label>Custom Constant:</label>
+          <input type="text" id="customValue" value="${!isNumber && nodeData.content !== 'π' && nodeData.content !== 'e' ? nodeData.content : ''}">
+        </div>
+        
+        <button class="sidebar-btn" onclick="nodeEditor.applyConstantChanges('${nodeId}')">Apply Changes</button>
+        <button class="sidebar-btn secondary" onclick="nodeEditor.resetNodeToDefault('${nodeId}')">Reset to Default</button>
+        ${this.createColorPicker(nodeId)}
+        <button class="sidebar-btn danger" onclick="nodeEditor.deleteNodeFromSidebar('${nodeId}')">Delete Node</button>
+      `;
+    }
+    
+    createVariableEditor(nodeId, nodeData) {
+      return `
+        <div class="form-group">
+          <label>Variable Name:</label>
+          <input type="text" id="variableName" value="${nodeData.content}" placeholder="x">
+          <small style="color: #666; font-size: 0.8rem;">Common: x, y, z, t, n, θ (theta)</small>
+        </div>
+        
+        <div class="form-group">
+          <label>Quick Select:</label>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+            ${['x', 'y', 'z', 't', 'n', 'θ', 'α', 'β'].map(v => 
+              `<button class="sidebar-btn secondary" style="flex: 0 0 auto; padding: 0.25rem 0.5rem;" onclick="document.getElementById('variableName').value='${v}'">${v}</button>`
+            ).join('')}
+          </div>
+        </div>
+        
+        <button class="sidebar-btn" onclick="nodeEditor.applyVariableChanges('${nodeId}')">Apply Changes</button>
+        ${this.createColorPicker(nodeId)}
+        <button class="sidebar-btn danger" onclick="nodeEditor.deleteNodeFromSidebar('${nodeId}')">Delete Node</button>
+      `;
+    }
+    
+    createOutputNodeInfo(nodeId, nodeData) {
+      return `
+        <div style="text-align: center; padding: 1rem; background: #fef3c7; border-radius: 6px; margin-bottom: 1rem;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #d97706;">🎯 Output Node</h4>
+          <p style="margin: 0; font-size: 0.9rem; color: #92400e;">This node generates the final equation from connected inputs.</p>
+        </div>
+        
+        <div class="form-group">
+          <label>Generated Equation:</label>
+          <div style="padding: 0.75rem; background: #f3f4f6; border-radius: 4px; font-family: monospace; border: 1px solid #d1d5db;">
+            ${this.generateEquationFromNode(nodeId) || '(no input connected)'}
+          </div>
+        </div>
+        
+        ${this.createColorPicker(nodeId)}
+        <button class="sidebar-btn danger" onclick="nodeEditor.deleteNodeFromSidebar('${nodeId}')">Delete Node</button>
+      `;
+    }
+    
+    createOperatorEditor(nodeId, nodeData) {
+      return `
+        <div style="text-align: center; padding: 1rem; background: #e0e7ff; border-radius: 6px; margin-bottom: 1rem;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #3730a3;">⚙️ ${nodeData.nodeType.charAt(0).toUpperCase() + nodeData.nodeType.slice(1)} Node</h4>
+          <p style="margin: 0; font-size: 0.9rem; color: #4338ca;">This node performs ${nodeData.content} operations.</p>
+        </div>
+        
+        <div class="form-group">
+          <label>Symbol:</label>
+          <input type="text" id="operatorSymbol" value="${nodeData.content}" readonly style="background: #f9fafb;">
+          <small style="color: #666; font-size: 0.8rem;">Operator symbols cannot be changed.</small>
+        </div>
+        
+        ${this.createColorPicker(nodeId)}
+        <button class="sidebar-btn danger" onclick="nodeEditor.deleteNodeFromSidebar('${nodeId}')">Delete Node</button>
+      `;
+    }
+    
+    createColorPicker(nodeId) {
+      const colors = [
+        { name: 'Blue', bg: '#e0e7ff', border: '#3b82f6' },
+        { name: 'Green', bg: '#d1fae5', border: '#10b981' },
+        { name: 'Red', bg: '#fee2e2', border: '#ef4444' },
+        { name: 'Yellow', bg: '#fef3c7', border: '#f59e0b' },
+        { name: 'Purple', bg: '#e9d5ff', border: '#8b5cf6' },
+        { name: 'Pink', bg: '#fce7f3', border: '#ec4899' }
+      ];
+      
+      const nodeData = this.nodeManager.nodes.get(nodeId);
+      const currentBg = nodeData?.element.style.backgroundColor || '#e0e7ff';
+      
+      return `
+        <div class="form-group">
+          <label>Node Color:</label>
+          <div class="color-picker">
+            ${colors.map(color => 
+              `<div class="color-option ${currentBg === color.bg ? 'selected' : ''}"
+                    style="background-color: ${color.bg}; border-color: ${color.border};"
+                    onclick="nodeEditor.changeNodeColorFromSidebar('${nodeId}', '${color.bg}', '${color.border}')"
+                    title="${color.name}"></div>`
+            ).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    bindSidebarEvents(nodeId) {
+      // Real-time updates for inputs
+      const inputs = this.sidebarContent.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        if (input.type === 'number') {
+          input.addEventListener('input', () => this.updateNodeFromSidebar(nodeId));
+        } else if (input.type === 'text') {
+          input.addEventListener('blur', () => this.updateNodeFromSidebar(nodeId));
+          input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              this.updateNodeFromSidebar(nodeId);
+            }
+          });
+        }
+      });
+    }
+    
+    updateNodeFromSidebar(nodeId) {
+      const nodeData = this.nodeManager.nodes.get(nodeId);
+      if (!nodeData) return;
+      
+      // Auto-update based on current inputs in sidebar
+      if (nodeData.nodeType === 'constant') {
+        const typeSelect = document.getElementById('constantType') as HTMLSelectElement;
+        const numberInput = document.getElementById('numberValue') as HTMLInputElement;
+        const customInput = document.getElementById('customValue') as HTMLInputElement;
+        
+        if (typeSelect) {
+          switch (typeSelect.value) {
+            case 'number':
+              if (numberInput && numberInput.value !== '') {
+                nodeData.content = numberInput.value;
+                nodeData.element.querySelector('.node-content').textContent = numberInput.value;
+              }
+              break;
+            case 'pi':
+              nodeData.content = 'π';
+              nodeData.element.querySelector('.node-content').textContent = 'π';
+              break;
+            case 'e':
+              nodeData.content = 'e';
+              nodeData.element.querySelector('.node-content').textContent = 'e';
+              break;
+            case 'custom':
+              if (customInput && customInput.value !== '') {
+                nodeData.content = customInput.value;
+                nodeData.element.querySelector('.node-content').textContent = customInput.value;
+              }
+              break;
+          }
+        }
+      } else if (nodeData.nodeType === 'variable') {
+        const nameInput = document.getElementById('variableName') as HTMLInputElement;
+        if (nameInput && nameInput.value !== '') {
+          nodeData.content = nameInput.value;
+          nodeData.element.querySelector('.node-content').textContent = nameInput.value;
+        }
+      }
+      
+      this.updateEquationOutput();
+    }
+    
+    updateConstantType(nodeId) {
+      const typeSelect = document.getElementById('constantType');
+      const numberGroup = document.getElementById('numberGroup');
+      const customGroup = document.getElementById('customGroup');
+      
+      if (typeSelect && numberGroup && customGroup) {
+        switch (typeSelect.value) {
+          case 'number':
+            numberGroup.style.display = 'block';
+            customGroup.style.display = 'none';
+            break;
+          case 'custom':
+            numberGroup.style.display = 'none';
+            customGroup.style.display = 'block';
+            break;
+          default:
+            numberGroup.style.display = 'none';
+            customGroup.style.display = 'none';
+            break;
+        }
+      }
+      
+      this.updateNodeFromSidebar(nodeId);
+    }
+    
+    applyConstantChanges(nodeId) {
+      this.updateNodeFromSidebar(nodeId);
+      this.showNotification('Constant updated successfully!', 'success');
+    }
+    
+    applyVariableChanges(nodeId) {
+      this.updateNodeFromSidebar(nodeId);
+      this.showNotification('Variable updated successfully!', 'success');
+    }
+    
+    changeNodeColorFromSidebar(nodeId, backgroundColor, borderColor) {
+      const nodeData = this.nodeManager.nodes.get(nodeId);
+      if (!nodeData) return;
+      
+      nodeData.element.style.backgroundColor = backgroundColor;
+      nodeData.element.style.borderColor = borderColor;
+      
+      // Update color picker visual state
+      const colorOptions = this.sidebarContent.querySelectorAll('.color-option');
+      colorOptions.forEach(option => option.classList.remove('selected'));
+      
+      const selectedOption = this.sidebarContent.querySelector(`[style*="${backgroundColor}"]`);
+      if (selectedOption) {
+        selectedOption.classList.add('selected');
+      }
+      
+      this.showNotification('Node color updated!', 'success');
+    }
+    
+    deleteNodeFromSidebar(nodeId) {
+      if (confirm('Are you sure you want to delete this node? This will also remove all its connections.')) {
+        this.deleteNode(nodeId);
+        this.closeSidebar();
+        this.showNotification('Node deleted!', 'success');
+      }
+    }
+    
+    showNotification(message: string, type = 'info') {
+      // Use modular notification system
+      this.notificationSystem.show(message, type);
+    }
+    
+    createDefaultOutputNode() {
+      // Add the existing output node from the palette to the canvas by default
+      // This uses the same system as clicking the "=" button in the palette
+      const outputNodeId = this.addNode('=');
+      
+      if (outputNodeId) {
+        // Position the default output node in center-right of canvas
+        const outputElement = document.getElementById(outputNodeId);
+        if (outputElement) {
+          const canvasRect = this.canvas.getBoundingClientRect();
+          const defaultX = canvasRect.width * 0.7; // 70% from left edge
+          const defaultY = canvasRect.height * 0.3; // 30% from top edge
+          
+          outputElement.style.left = `${defaultX}px`;
+          outputElement.style.top = `${defaultY}px`;
+          
+          // Add visual distinction for the default output node
+          outputElement.classList.add('default-output-node');
+          outputElement.style.border = '3px solid var(--color-accent)';
+          outputElement.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        }
+        
+        this.showNotification('Default output node added to canvas', 'success');
+        
+        // Ensure equation output display is updated immediately
+        this.updateEquation();
+      }
+    }
+    
+    setupCanvasPanning() {
+      // Initialize panning state
+      this.isPanning = false;
+      this.panStartX = 0;
+      this.panStartY = 0;
+      this.canvasTransformX = 0;
+      this.canvasTransformY = 0;
+      
+      // Direct canvas panning - no space key required
+      this.canvas.addEventListener('mousedown', (e) => {
+        // Only pan on empty canvas areas (not on nodes or controls)
+        if (!e.target.closest('.canvas-node') && !e.target.closest('.control-btn') && !e.target.closest('.canvas-controls')) {
+          e.preventDefault();
+          this.isPanning = true;
+          this.panStartX = e.clientX - this.canvasTransformX;
+          this.panStartY = e.clientY - this.canvasTransformY;
+          this.canvas.style.cursor = 'grabbing';
+          
+          // Prevent text selection during panning
+          document.body.style.userSelect = 'none';
+        }
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (this.isPanning) {
+          e.preventDefault();
+          this.canvasTransformX = e.clientX - this.panStartX;
+          this.canvasTransformY = e.clientY - this.panStartY;
+          
+          // Apply transform to all canvas content
+          this.canvas.style.transform = `translate(${this.canvasTransformX}px, ${this.canvasTransformY}px)`;
+        }
+      });
+      
+      document.addEventListener('mouseup', (e) => {
+        if (this.isPanning) {
+          e.preventDefault();
+          this.isPanning = false;
+          this.canvas.style.cursor = 'default';
+          
+          // Re-enable text selection
+          document.body.style.userSelect = '';
+        }
+      });
+      
+      // Show grab cursor when hovering over empty canvas areas
+      this.canvas.addEventListener('mousemove', (e) => {
+        if (!this.isPanning && !e.target.closest('.canvas-node') && !e.target.closest('.control-btn') && !e.target.closest('.canvas-controls')) {
+          this.canvas.style.cursor = 'grab';
+        } else if (!this.isPanning) {
+          this.canvas.style.cursor = 'default';
+        }
+      });
+      
+      console.log('Canvas panning system initialized - Direct drag to pan (no space key required)');
+    }
+    
+    setupAutoSaveHooks() {
+      // Hook into node changes for auto-save
+      const originalCreateNode = this.nodeManager.createNode.bind(this.nodeManager);
+      this.nodeManager.createNode = (...args) => {
+        const result = originalCreateNode(...args);
+        this.dataPersistence.markChanges();
+        return result;
+      };
+      
+      const originalUpdateNodeContent = this.nodeManager.updateNodeContent.bind(this.nodeManager);
+      this.nodeManager.updateNodeContent = (...args) => {
+        const result = originalUpdateNodeContent(...args);
+        this.dataPersistence.markChanges();
+        return result;
+      };
+      
+      // Hook into connection changes for auto-save
+      const originalCreateConnection = this.connectionSystem.createConnection.bind(this.connectionSystem);
+      this.connectionSystem.createConnection = (...args) => {
+        const result = originalCreateConnection(...args);
+        if (result) this.dataPersistence.markChanges();
+        return result;
+      };
+      
+      const originalDeleteConnection = this.connectionSystem.deleteConnection.bind(this.connectionSystem);
+      this.connectionSystem.deleteConnection = (...args) => {
+        const result = originalDeleteConnection(...args);
+        this.dataPersistence.markChanges();
+        return result;
+      };
+      
+      console.log('Auto-save hooks established - Changes will be automatically saved');
+    }
+    
+    setupPalette() {
+      const paletteNodes = document.querySelectorAll('.palette-node');
+      paletteNodes.forEach((btn) => {
+        // Make palette nodes draggable
+        btn.draggable = true;
+        
+        // Handle drag start
+        btn.addEventListener('dragstart', (e) => {
+          const nodeType = btn.dataset.nodeType;
+          const nodeContent = btn.textContent.trim();
+          
+          // Store data for drop
+          e.dataTransfer.setData('text/plain', JSON.stringify({
+            type: nodeType,
+            content: nodeContent,
+            title: btn.dataset.title
+          }));
+          
+          e.dataTransfer.effectAllowed = 'copy';
+          
+          // Visual feedback
+          btn.style.opacity = '0.5';
+          
+          // Create drag image
+          const dragImage = btn.cloneNode(true);
+          dragImage.style.background = '#667eea';
+          dragImage.style.color = 'white';
+          dragImage.style.transform = 'scale(0.9)';
+          document.body.appendChild(dragImage);
+          e.dataTransfer.setDragImage(dragImage, 25, 25);
+          
+          // Remove drag image after a moment
+          setTimeout(() => {
+            document.body.removeChild(dragImage);
+          }, 0);
+        });
+        
+        // Handle drag end
+        btn.addEventListener('dragend', (e) => {
+          btn.style.opacity = '1';
+        });
+        
+        // Also keep click functionality for accessibility
+        btn.addEventListener('click', () => {
+          const nodeContent = btn.textContent.trim();
+          // Place at a default position, but make it obvious it should be dragged
+          const nodeId = this.addNodeAtPosition(nodeContent, 100, 100);
+          
+          // Highlight the new node briefly
+          const newNode = document.getElementById(nodeId);
+          if (newNode) {
+            newNode.style.animation = 'pulse 1s ease-in-out';
+            newNode.style.border = '3px dashed #667eea';
+            
+            setTimeout(() => {
+              newNode.style.animation = '';
+              newNode.style.border = '';
+            }, 1000);
+          }
+          
+          this.notificationSystem?.show('Tip: Drag nodes from palette to canvas for precise positioning!', 'info');
+        });
+      });
+      
+      // Setup canvas as drop target
+      this.setupCanvasDropTarget();
+    }
+    
+    setupCanvasDropTarget() {
+      // Prevent default drag behaviors on canvas
+      this.canvas.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        
+        // Visual feedback - highlight drop zone
+        this.canvas.classList.add('drag-over');
+      });
+      
+      this.canvas.addEventListener('dragleave', (e) => {
+        // Only remove highlight if we're actually leaving the canvas
+        if (!this.canvas.contains(e.relatedTarget)) {
+          this.canvas.classList.remove('drag-over');
+        }
+      });
+      
+      this.canvas.addEventListener('drop', (e) => {
+        e.preventDefault();
+        this.canvas.classList.remove('drag-over');
+        
+        try {
+          const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+          
+          // Get drop position relative to canvas
+          const canvasRect = this.canvas.getBoundingClientRect();
+          const x = e.clientX - canvasRect.left - this.canvasTransformX;
+          const y = e.clientY - canvasRect.top - this.canvasTransformY;
+          
+          // Create node at drop position
+          const nodeId = this.addNodeAtPosition(data.content, x, y);
+          
+          // Success feedback
+          this.notificationSystem?.show(`${data.title} added to canvas`, 'success');
+          
+          // Brief highlight animation
+          const newNode = document.getElementById(nodeId);
+          if (newNode) {
+            newNode.style.animation = 'nodeAppear 0.3s ease-out';
+          }
+          
+        } catch (error) {
+          console.error('Failed to parse drop data:', error);
+          this.notificationSystem?.show('Failed to add node', 'error');
+        }
+      });
+    }
+    
+    addNodeAtPosition(content, x, y) {
+      // Create node using existing system
+      const nodeId = this.addNode(content);
+      
+      // Position the node at specified coordinates
+      const nodeElement = document.getElementById(nodeId);
+      if (nodeElement) {
+        nodeElement.style.position = 'absolute';
+        nodeElement.style.left = `${x}px`;
+        nodeElement.style.top = `${y}px`;
+        
+        // Ensure it's within canvas bounds
+        const canvasRect = this.canvas.getBoundingClientRect();
+        const nodeRect = nodeElement.getBoundingClientRect();
+        
+        // Adjust if node would be outside canvas
+        if (x + nodeRect.width > canvasRect.width) {
+          nodeElement.style.left = `${canvasRect.width - nodeRect.width - 10}px`;
+        }
+        if (y + nodeRect.height > canvasRect.height) {
+          nodeElement.style.top = `${canvasRect.height - nodeRect.height - 10}px`;
+        }
+        
+        // Ensure minimum distance from edges
+        if (x < 10) nodeElement.style.left = '10px';
+        if (y < 10) nodeElement.style.top = '10px';
+      }
+      
+      return nodeId;
+    }
+    
+    setupControls() {
+      const clearBtn = document.getElementById('clearCanvas');
+      const exportBtn = document.getElementById('exportEquation');
+      
+      // File dropdown controls
+      const fileMenuBtn = document.getElementById('fileMenuBtn');
+      const fileMenu = document.getElementById('fileMenu');
+      const saveBtn = document.getElementById('saveNodeMap');
+      const loadBtn = document.getElementById('loadNodeMap');
+      const exportMapBtn = document.getElementById('exportNodeMap');
+      const importInput = document.getElementById('importNodeMap');
+      const importBtn = document.getElementById('importNodeMapBtn');
+      
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => this.clearCanvas());
+      }
+      
+      if (exportBtn) {
+        exportBtn.addEventListener('click', () => this.exportEquation());
+      }
+      
+      // Setup dropdown functionality
+      if (fileMenuBtn && fileMenu) {
+        fileMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          fileMenu.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+          fileMenu.classList.remove('show');
+        });
+        
+        // Prevent dropdown from closing when clicking inside
+        fileMenu.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+      
+      if (saveBtn) {
+        saveBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.saveNodeMap();
+          fileMenu.classList.remove('show');
+        });
+      }
+      
+      if (loadBtn) {
+        loadBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.loadNodeMap();
+          fileMenu.classList.remove('show');
+        });
+      }
+      
+      if (exportMapBtn) {
+        exportMapBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.exportNodeMap();
+          fileMenu.classList.remove('show');
+        });
+      }
+      
+      if (importBtn && importInput) {
+        importBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          importInput.click();
+          fileMenu.classList.remove('show');
+        });
+        importInput.addEventListener('change', (e) => this.importNodeMap(e));
+      }
+      
+      // Enhanced system controls
+      this.setupEnhancedSystemControls();
+    }
+    
+    /**
+     * Setup event handlers for enhanced system controls
+     */
+    setupEnhancedSystemControls() {
+      // Database menu controls
+      const databaseMenuBtn = document.getElementById('databaseMenuBtn');
+      const databaseMenu = document.getElementById('databaseMenu');
+      
+      if (databaseMenuBtn && databaseMenu) {
+        databaseMenuBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          databaseMenu.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+          databaseMenu.classList.remove('show');
+        });
+        
+        databaseMenu.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+        
+        // Database menu actions
+        const saveToDB = document.getElementById('saveToDB');
+        const openDBManager = document.getElementById('openDBManager');
+        const quickSaveDB = document.getElementById('quickSaveDB');
+        const exportDBData = document.getElementById('exportDBData');
+        
+        if (saveToDB) {
+          saveToDB.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const name = prompt('Enter a name for this equation:');
+            if (name) {
+              await this.saveToDatabase(name);
+            }
+            databaseMenu.classList.remove('show');
+          });
+        }
+        
+        if (openDBManager) {
+          openDBManager.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openDatabaseManager();
+            databaseMenu.classList.remove('show');
+          });
+        }
+        
+        if (quickSaveDB) {
+          quickSaveDB.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await this.saveToDatabase(`Quick Save ${new Date().toLocaleString()}`);
+            databaseMenu.classList.remove('show');
+          });
+        }
+        
+        if (exportDBData) {
+          exportDBData.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+              if (this.databaseManager) {
+                await this.databaseManager.exportAllData();
+              }
+            } catch (error) {
+              console.error('Export database data failed:', error);
+              this.notificationSystem?.show('Export failed', 'error');
+            }
+            databaseMenu.classList.remove('show');
+          });
+        }
+      }
+      
+      // Star system toggle
+      const toggleStarSystem = document.getElementById('toggleStarSystem');
+      if (toggleStarSystem) {
+        toggleStarSystem.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.toggleStarSystem();
+        });
+      }
+      
+      // Canvas resize button
+      const resizeCanvas = document.getElementById('resizeCanvas');
+      if (resizeCanvas) {
+        resizeCanvas.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.resizeCanvas();
+          this.notificationSystem?.show('Canvas resized to fit content', 'success');
+        });
+      }
+      
+      // Zoom controls
+      const zoomInBtn = document.getElementById('zoomIn');
+      const zoomOutBtn = document.getElementById('zoomOut');
+      const zoomFitBtn = document.getElementById('zoomFit');
+      
+      if (zoomInBtn) {
+        zoomInBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.zoomIn();
+        });
+      }
+      
+      if (zoomOutBtn) {
+        zoomOutBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.zoomOut();
+        });
+      }
+      
+      if (zoomFitBtn) {
+        zoomFitBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.zoomToFit();
+        });
+      }
+      
+      // Mouse wheel zoom
+      this.canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -this.zoomStep : this.zoomStep;
+        this.zoom(this.zoomLevel + delta, e.clientX, e.clientY);
+      });
+    }
+    
+    addNode(content) {
+      // Delegate to modular NodeManager component
+      const nodeId = this.nodeManager.createNode(content);
+      this.updateEquation();
+      return nodeId;
+    }
+    
+    getNodeTypeFromContent(content) {
+      const typeMap = {
+        '+': 'add',
+        '-': 'subtract', 
+        '×': 'multiply',
+        '*': 'multiply',
+        '÷': 'divide',
+        '/': 'divide',
+        '^': 'power',
+        'sin': 'sin',
+        'cos': 'cos',
+        'tan': 'tan',
+        '√': 'sqrt',
+        'log': 'log',
+        'ln': 'ln',
+        'x': 'variable',
+        'y': 'variable',
+        'π': 'constant',
+        'e': 'constant',
+        'OUTPUT': 'output',
+        'Output': 'output',
+        '=': 'output'
+      };
+      
+      return typeMap[content] || (isNaN(parseFloat(content)) ? 'variable' : 'constant');
+    }
+    
+
+    
+    // NodeManager interface methods for SidebarEditor
+    // NodeManager interface methods - delegate to NodeManager component
+    getNode(nodeId) {
+      return this.nodeManager.getNode(nodeId);
+    }
+
+    updateNodeContent(nodeId, content) {
+      return this.nodeManager.updateNodeContent(nodeId, content);
+    }
+
+    changeNodeColor(nodeId, backgroundColor, borderColor) {
+      return this.nodeManager.changeNodeColor(nodeId, backgroundColor, borderColor);
+    }
+
+    resetNodeToDefault(nodeId) {
+      return this.nodeManager.resetNodeToDefault(nodeId);
+    }
+
+    // Dynamic input configuration methods - delegate to NodeManager
+    addInputPort(nodeId) {
+      return this.nodeManager.addInputPort(nodeId);
+    }
+
+    removeInputPort(nodeId) {
+      return this.nodeManager.removeInputPort(nodeId);
+    }
+
+    // Constraint management delegation methods
+    getNodeConstraintSummary(nodeId) {
+      return this.nodeManager.getNodeConstraintSummary(nodeId);
+    }
+
+    hasConstraintViolations(nodeId) {
+      return this.nodeManager.hasConstraintViolations(nodeId);
+    }
+
+    addConstraintToNode(nodeId, constraintType, constraintData) {
+      return this.nodeManager.addConstraintToNode(nodeId, constraintType, constraintData);
+    }
+
+    removeConstraintFromNode(nodeId, constraintId) {
+      return this.nodeManager.removeConstraintFromNode(nodeId, constraintId);
+    }
+
+    clearNodeConstraints(nodeId) {
+      return this.nodeManager.clearNodeConstraints(nodeId);
+    }
+
+    getDefaultContentForNodeType(nodeType) {
+      const defaults = {
+        'constant': '1',
+        'variable': 'x',
+        'add': '+',
+        'subtract': '-',
+        'multiply': '×',
+        'divide': '÷',
+        'power': '^',
+        'sin': 'sin',
+        'cos': 'cos',
+        'tan': 'tan',
+        'sqrt': '√',
+        'log': 'log',
+        'ln': 'ln',
+        'output': '='
+      };
+      return defaults[nodeType] || nodeType;
+    }
+
+    addContextMenu(nodeElement, nodeId) {
+      nodeElement.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        this.sidebarEditor.openSidebar(nodeId);
+      });
+      
+      // Also allow double-click to open sidebar
+      nodeElement.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        this.sidebarEditor.openSidebar(nodeId);
+      });
+    }
+    
+
+    
+
+    
+
+    
+    deleteNode(nodeId) {
+      // Remove connections involving this node first using ConnectionSystem
+      this.connectionSystem.deleteConnectionsForNode(nodeId);
+      
+      // Delegate to NodeManager for node deletion
+      const success = this.nodeManager.deleteNode(nodeId);
+      
+      if (success) {
+        this.updateEquation();
+      }
+      
+      return success;
+    }
+    
+
+    
+    // Connection methods - delegate to ConnectionSystem component
+    setupPortEvents(port, nodeId, portType) {
+      return this.connectionSystem.setupPortEvents(port, nodeId, portType);
+    }
+    
+    startConnection(port, nodeId, portType) {
+      return this.connectionSystem.startConnection(port, nodeId, portType);
+    }
+    
+    handleConnectionPreview(e) {
+      return this.connectionSystem.handleConnectionPreview(e);
+    }
+    
+    endConnection(e) {
+      return this.connectionSystem.endConnection(e);
+    }
+    
+    getPortPosition(port) {
+      return this.connectionSystem.getPortPosition(port);
+    }
+    
+    createConnection(fromNodeId, toNodeId, fromPortIndex = 0, toPortIndex = 0) {
+      const success = this.connectionSystem.createConnection(fromNodeId, toNodeId, fromPortIndex, toPortIndex);
+      if (success) {
+        this.updateEquation();
+      }
+      return success;
+    }
+    
+    // EquationGenerator interface methods - delegate to EquationGenerator component
+    updateEquation() {
+      return this.equationGenerator.updateEquation();
+    }
+    
+    updateEquationOutput() {
+      return this.equationGenerator.updateEquationOutput();
+    }
+    
+    generateEquationFromNode(nodeId) {
+      return this.equationGenerator.generateEquationFromNode(nodeId);
+    }
+    
+    getNodeInputs(nodeId) {
+      return this.equationGenerator.getNodeInputs(nodeId);
+    }
+    
+    getInputCountForNodeType(nodeType) {
+      return this.equationGenerator.getInputCountForNodeType(nodeType);
+    }
+    
+    exportEquation() {
+      return this.equationGenerator.exportEquationToClipboard().then(result => {
+        if (result.success) {
+          alert(result.message);
+        } else {
+          alert(result.message);
+        }
+      });
+    }
+    
+    saveNodeMap() {
+      // For now, save to default slot - can be enhanced with slot selection UI
+      this.dataPersistence.saveToLocalStorage();
+    }
+    
+    loadNodeMap() {
+      // For now, load from default slot - can be enhanced with slot selection UI
+      this.dataPersistence.loadFromLocalStorage();
+    }
+    
+    exportNodeMap() {
+      this.dataPersistence.exportToFile();
+    }
+    
+    importNodeMap(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.dataPersistence.importFromFile(file);
+        // Reset the input so the same file can be imported again if needed
+        event.target.value = '';
+      }
+    }
+    
+    // DragSystem interface methods - delegate to DragSystem component
+    makeDraggable(element, options) {
+      return this.dragSystem.makeDraggable(element, options);
+    }
+    
+    drawConnections() {
+      return this.connectionSystem.renderConnections();
+    }
+    
+
+    
+
+    
+    clearCanvas() {
+      this.nodeManager.nodes.clear();
+      this.connectionSystem.clearAllConnections();
+      this.canvas.querySelectorAll('.canvas-node').forEach((node) => node.remove());
+      this.equationGenerator.clearEquationOutput();
+    }
+    
+    // Zoom and Pan Methods
+    
+    /**
+     * Apply zoom and pan transform to canvas
+     */
+    applyCanvasTransform() {
+      this.canvas.style.transform = `scale(${this.zoomLevel}) translate(${this.panX}px, ${this.panY}px)`;
+      this.canvas.style.setProperty('--zoom-scale', this.zoomLevel.toString());
+      
+      // Update zoom display
+      const zoomDisplay = document.getElementById('zoomLevel');
+      if (zoomDisplay) {
+        zoomDisplay.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+      }
+    }
+    
+    /**
+     * Zoom in by one step
+     */
+    zoomIn() {
+      this.zoom(Math.min(this.zoomLevel + this.zoomStep, this.maxZoom));
+    }
+    
+    /**
+     * Zoom out by one step
+     */
+    zoomOut() {
+      this.zoom(Math.max(this.zoomLevel - this.zoomStep, this.minZoom));
+    }
+    
+    /**
+     * Set zoom level
+     */
+    zoom(newZoom, centerX = null, centerY = null) {
+      const oldZoom = this.zoomLevel;
+      this.zoomLevel = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
+      
+      // If center point provided, adjust pan to zoom towards that point
+      if (centerX !== null && centerY !== null) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = centerX - rect.left;
+        const y = centerY - rect.top;
+        
+        const zoomRatio = this.zoomLevel / oldZoom;
+        this.panX = x - (x - this.panX) * zoomRatio;
+        this.panY = y - (y - this.panY) * zoomRatio;
+      }
+      
+      this.applyCanvasTransform();
+      this.connectionSystem.renderConnections(); // Update connections
+    }
+    
+    /**
+     * Zoom to fit all nodes in view
+     */
+    zoomToFit() {
+      const nodes = this.canvas.querySelectorAll('.canvas-node');
+      if (nodes.length === 0) {
+        this.zoomLevel = 1;
+        this.panX = 0;
+        this.panY = 0;
+        this.applyCanvasTransform();
+        return;
+      }
+      
+      // Calculate bounding box of all nodes
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      
+      nodes.forEach(node => {
+        const rect = node.getBoundingClientRect();
+        const canvasRect = this.canvas.getBoundingClientRect();
+        const x = rect.left - canvasRect.left;
+        const y = rect.top - canvasRect.top;
+        
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x + rect.width);
+        maxY = Math.max(maxY, y + rect.height);
+      });
+      
+      // Add padding
+      const padding = 50;
+      const contentWidth = maxX - minX + padding * 2;
+      const contentHeight = maxY - minY + padding * 2;
+      
+      // Calculate zoom to fit
+      const canvasRect = this.canvas.getBoundingClientRect();
+      const scaleX = canvasRect.width / contentWidth;
+      const scaleY = canvasRect.height / contentHeight;
+      const scale = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 100%
+      
+      this.zoomLevel = Math.max(scale, this.minZoom);
+      
+      // Center the content
+      this.panX = (canvasRect.width / this.zoomLevel - (maxX + minX)) / 2;
+      this.panY = (canvasRect.height / this.zoomLevel - (maxY + minY)) / 2;
+      
+      this.applyCanvasTransform();
+      this.connectionSystem.renderConnections();
+      this.notificationSystem?.show(`Zoomed to fit (${Math.round(this.zoomLevel * 100)}%)`, 'success');
+    }
+    
+    // Auto-Save Methods
+    
+    /**
+     * Initialize auto-save system
+     */
+    initializeAutoSave() {
+      // Start auto-save timer
+      this.startAutoSaveTimer();
+      
+      // Listen for changes to mark unsaved changes
+      this.setupChangeDetection();
+    }
+    
+    /**
+     * Start the auto-save timer
+     */
+    startAutoSaveTimer() {
+      if (this.autoSaveTimer) {
+        clearInterval(this.autoSaveTimer);
+      }
+      
+      this.autoSaveTimer = setInterval(() => {
+        if (this.hasUnsavedChanges) {
+          this.performAutoSave();
+        }
+      }, this.autoSaveInterval);
+    }
+    
+    /**
+     * Setup change detection for auto-save
+     */
+    setupChangeDetection() {
+      // Listen to node changes
+      if (this.nodeManager) {
+        const originalCreateNode = this.nodeManager.createNode.bind(this.nodeManager);
+        this.nodeManager.createNode = (...args) => {
+          const result = originalCreateNode(...args);
+          this.markUnsavedChanges();
+          return result;
+        };
+        
+        // Note: Additional change detection can be added here for other operations
+      }
+      
+      // Listen to connection changes
+      if (this.connectionSystem) {
+        const originalCreateConnection = this.connectionSystem.createConnection.bind(this.connectionSystem);
+        this.connectionSystem.createConnection = (...args) => {
+          const result = originalCreateConnection(...args);
+          this.markUnsavedChanges();
+          return result;
+        };
+      }
+    }
+    
+    /**
+     * Mark that there are unsaved changes
+     */
+    markUnsavedChanges() {
+      this.hasUnsavedChanges = true;
+      this.updateAutoSaveIndicator();
+    }
+    
+    /**
+     * Perform auto-save operation
+     */
+    async performAutoSave() {
+      try {
+        if (!this.dataPersistence) {
+          return;
+        }
+        
+        // Generate auto-save name with timestamp
+        const now = new Date();
+        const timestamp = now.toLocaleString('en-US', {
+          month: 'short',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+        const autoSaveName = `Auto-save ${timestamp}`;
+        
+        // Save to database
+        const success = await this.saveToDatabase(autoSaveName);
+        
+        if (success) {
+          this.hasUnsavedChanges = false;
+          this.lastSaveTime = Date.now();
+          this.updateAutoSaveIndicator();
+        }
+      } catch (error) {
+        // Silently handle auto-save errors to not interrupt user workflow
+      }
+    }
+    
+    /**
+     * Update auto-save indicator in UI
+     */
+    updateAutoSaveIndicator() {
+      const indicator = document.getElementById('autoSaveIndicator');
+      if (indicator) {
+        if (this.hasUnsavedChanges) {
+          indicator.textContent = '● Unsaved changes';
+          indicator.style.color = '#f59e0b';
+        } else {
+          const timeAgo = Math.round((Date.now() - this.lastSaveTime) / 1000);
+          indicator.textContent = timeAgo < 60 ? 'Saved just now' : `Saved ${Math.round(timeAgo/60)}m ago`;
+          indicator.style.color = '#10b981';
+        }
+      }
+    }
+    
+    /**
+     * Stop auto-save timer (for cleanup)
+     */
+    stopAutoSave() {
+      if (this.autoSaveTimer) {
+        clearInterval(this.autoSaveTimer);
+        this.autoSaveTimer = null;
+      }
+    }
+    
+    // Enhanced System Interface Methods
+    
+    /**
+     * Open database manager interface
+     */
+    openDatabaseManager() {
+      if (this.databaseManager) {
+        this.databaseManager.show();
+      }
+    }
+    
+    /**
+     * Toggle star system sidebar
+     */
+    toggleStarSystem() {
+      if (this.starSystemManager) {
+        this.starSystemManager.toggleSidebar();
+      }
+    }
+    
+    /**
+     * Star/unstar a node for quick editing
+     */
+    toggleNodeStar(nodeId) {
+      if (this.starSystemManager) {
+        this.starSystemManager.toggleNodeStar(nodeId);
+      }
+    }
+    
+    /**
+     * Force canvas resize (useful after major layout changes)
+     */
+    resizeCanvas() {
+      if (this.dynamicCanvasManager) {
+        this.dynamicCanvasManager.forceResize();
+      }
+    }
+    
+    /**
+     * Save equation to database with name
+     */
+    async saveToDatabase(name: string | null = null) {
+      if (this.dataPersistence) {
+        try {
+          const equationId = await this.dataPersistence.saveToDatabase(name);
+          return equationId;
+        } catch (error) {
+          console.error('Save to database failed:', error);
+          return null;
+        }
+      }
+    }
+    
+    /**
+     * Load equation from database
+     */
+    async loadFromDatabase(equationId) {
+      if (this.dataPersistence) {
+        try {
+          return await this.dataPersistence.loadFromDatabase(equationId);
+        } catch (error) {
+          console.error('Load from database failed:', error);
+          return false;
+        }
+      }
+    }
+    
+    /**
+     * Get enhanced system status
+     */
+    getSystemStatus() {
+      return {
+        database: this.dataPersistence?.dbInitialized || false,
+        dynamicCanvas: !!this.dynamicCanvasManager,
+        starSystem: !!this.starSystemManager,
+        databaseManager: !!this.databaseManager,
+        canvasState: this.dynamicCanvasManager?.getCanvasState() || null,
+        starredNodesCount: this.starSystemManager?.starredNodes?.size || 0
+      };
+    }
+
+  }
+  
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('Initializing NodeEditor...');
+    new NodeEditor();
+  });
+</script>

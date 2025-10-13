@@ -1,99 +1,433 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const projectDetails = await getCollection('projectDetails');
 ---
 
-<Layout title="Projects - Ashton Andrepont">
-	<section class="section">
-		<h2>Projects</h2>
-		<p>
-			A selection of projects I've worked on during my undergraduate studies, demonstrating 
-			experience in software development, machine learning, and educational technology. 
-			These projects reflect my growing interest in how technology can support learning.
-		</p>
-	</section>
+<Layout 
+  title="Projects & Tools - Ashton Andrepont" 
+  description="Featured projects, research work, and productivity tools including a focus timer"
+>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="preconnect">
 
-	<section class="section">
-		<div class="project-item">
-			<h3>Educational Software Development</h3>
-			<p>
-				I contributed to the development of educational software with a focus on accessibility 
-				and inclusive design. This project involved creating user interfaces and implementing 
-				features to support students with diverse learning needs.
-			</p>
-			<p><strong>Technologies:</strong> Python, Django, JavaScript, HTML/CSS</p>
-			<p><strong>Focus:</strong> Accessibility features and user-centered design</p>
-			<div class="tags">
-				<span class="tag">Web Development</span>
-				<span class="tag">Accessibility</span>
-				<span class="tag">Python</span>
-				<span class="tag">Team Project</span>
-			</div>
-		</div>
+  <section class="section">
+    <h2>Projects & Tools</h2>
+    <p>
+      A collection of my featured projects, research work, and productivity tools.
+    </p>
+  </section>
 
-		<div class="project-item">
-			<h3>Machine Learning Research Project</h3>
-			<p>
-				As part of my undergraduate research experience, I worked on exploring curriculum 
-				learning approaches for neural networks. This project gave me hands-on experience 
-				with machine learning frameworks and research methodologies.
-			</p>
-			<p><strong>Technologies:</strong> Python, TensorFlow/PyTorch, Jupyter Notebooks</p>
-			<p><strong>Learning:</strong> Research methods, experimental design, data analysis</p>
-			<div class="tags">
-				<span class="tag">Machine Learning</span>
-				<span class="tag">Research</span>
-				<span class="tag">Python</span>
-				<span class="tag">Data Analysis</span>
-			</div>
-		</div>
+  <!-- Featured Projects from Content Collection -->
+  <section class="section">
+    <h3>Featured Projects</h3>
+    <div class="projects-grid">
+      {projectDetails.map((project) => (
+        <a href={`/projects/${project.data.projectId}`} class="project-card-link">
+          <div class="project-card">
+            <h4>{project.data.title}</h4>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
 
-		<div class="project-item">
-			<h3>Academic Coursework Projects</h3>
-			<p>
-				Throughout my computer science program, I completed various projects that helped 
-				develop my technical skills and understanding of software development principles. 
-				These included web applications, data analysis projects, and algorithmic challenges.
-			</p>
-			<p><strong>Technologies:</strong> Java, C++, Python, SQL, Git</p>
-			<p><strong>Skills Developed:</strong> Problem solving, debugging, software design patterns</p>
-			<div class="tags">
-				<span class="tag">Academic Projects</span>
-				<span class="tag">Multiple Languages</span>
-				<span class="tag">Software Design</span>
-				<span class="tag">Problem Solving</span>
-			</div>
-		</div>
-	</section>
-
-	<section class="section">
-		<h2>Skills & Technologies</h2>
-		<div class="project-item">
-			<h3>Programming Languages</h3>
-			<p>
-				Through coursework and projects, I have gained experience with multiple programming 
-				languages and development frameworks, with particular strength in Python for both 
-				web development and data analysis.
-			</p>
-			<div class="tags">
-				<span class="tag">Python</span>
-				<span class="tag">JavaScript</span>
-				<span class="tag">Java</span>
-				<span class="tag">C++</span>
-			</div>
-		</div>
-
-		<div class="project-item">
-			<h3>Areas of Interest</h3>
-			<p>
-				My project experiences have helped me identify key areas I'd like to explore further 
-				in graduate study, particularly the intersection of human learning and computer science.
-			</p>
-			<div class="tags">
-				<span class="tag">Educational Technology</span>
-				<span class="tag">Machine Learning</span>
-				<span class="tag">Accessibility</span>
-				<span class="tag">Human-Computer Interaction</span>
-			</div>
-		</div>
-	</section>
+  <!-- Tools -->
+  <section class="section">
+    <h3>Tools</h3>
+    <div class="projects-grid">
+      <a href="/timer" class="project-card-link">
+        <div class="project-card">
+          <h4>4-Hour Focus Timer</h4>
+        </div>
+      </a>
+      
+      <a href="/equation-builder" class="project-card-link">
+        <div class="project-card">
+          <h4>Equation Builder</h4>
+        </div>
+      </a>
+    </div>
+  </section>
 </Layout>
+
+<style>
+  /* Enhanced Project Card Layout */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .project-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .project-card {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 2rem;
+    background: var(--color-bg-subtle);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-accent);
+    background: var(--color-bg);
+  }
+
+  .project-card h4 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+
+  .project-card-link:hover .project-card h4 {
+    color: var(--color-accent);
+  }
+
+  /* Responsive Design */
+  .timer-section {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .projects-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    .project-card {
+      padding: 1.5rem;
+      min-height: 100px;
+    }
+    
+    .project-card h4 {
+      font-size: 1.125rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  class FocusTimer {
+    constructor() {
+      // Timer configuration
+      this.TOTAL_SECONDS = 4 * 60 * 60; // 4 hours in seconds
+      this.CIRCLE_CIRCUMFERENCE = 754.0; // 2 * π * 120
+      
+      // Timer state
+      this.timeRemaining = this.TOTAL_SECONDS;
+      this.isRunning = false;
+      this.isPaused = false;
+      this.timerInterval = null;
+      this.startTime = null;
+      this.pausedTime = 0;
+      this.pauseStartTime = null;
+      this.streak = 0;
+      this.lastCompletedDate = null;
+      
+      // DOM elements
+      this.timeDisplay = document.getElementById('timeDisplay');
+      this.progressCircle = document.getElementById('progressCircle');
+      this.statusIndicator = document.getElementById('statusIndicator');
+      this.sessionDate = document.getElementById('sessionDate');
+      this.streakNumber = document.getElementById('streakNumber');
+      this.lastCompleted = document.getElementById('lastCompleted');
+      this.todayProgress = document.getElementById('todayProgress');
+      
+      this.startBtn = document.getElementById('startBtn');
+      this.pauseBtn = document.getElementById('pauseBtn');
+      
+      // Bind event listeners
+      this.bindEvents();
+      
+      // Initialize timer
+      this.init();
+    }
+    
+    init() {
+      this.checkDailyReset();
+      this.loadTimerState();
+      this.loadStreakData();
+      this.updateDisplay();
+      this.updateSessionDate();
+    }
+    
+    bindEvents() {
+      this.startBtn.addEventListener('click', () => this.start());
+      this.pauseBtn.addEventListener('click', () => this.pause());
+      
+      // Save state when page is closed
+      window.addEventListener('beforeunload', () => this.saveTimerState());
+      
+      // Handle visibility change (tab switching)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && this.isRunning) {
+          this.syncTime();
+        }
+      });
+    }
+    
+    checkDailyReset() {
+      const today = new Date().toDateString();
+      const lastSessionDate = localStorage.getItem('focusTimer_lastSession');
+      
+      if (lastSessionDate !== today) {
+        // New day - reset timer but check streak
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        if (lastSessionDate !== yesterday.toDateString()) {
+          // Missed a day - reset streak
+          this.resetStreak();
+        }
+        
+        // Reset timer for new day
+        this.resetDailyTimer();
+        localStorage.setItem('focusTimer_lastSession', today);
+      }
+    }
+    
+    resetDailyTimer() {
+      this.timeRemaining = this.TOTAL_SECONDS;
+      this.isRunning = false;
+      this.isPaused = false;
+      this.startTime = null;
+      this.pausedTime = 0;
+      localStorage.removeItem('focusTimer_timeRemaining');
+      localStorage.removeItem('focusTimer_startTime');
+      localStorage.removeItem('focusTimer_pausedTime');
+      localStorage.removeItem('focusTimer_isRunning');
+    }
+    
+    loadTimerState() {
+      const savedTimeRemaining = localStorage.getItem('focusTimer_timeRemaining');
+      const savedStartTime = localStorage.getItem('focusTimer_startTime');
+      const savedPausedTime = localStorage.getItem('focusTimer_pausedTime');
+      const savedIsRunning = localStorage.getItem('focusTimer_isRunning') === 'true';
+      
+      if (savedTimeRemaining !== null) {
+        this.timeRemaining = parseInt(savedTimeRemaining);
+      }
+      
+      if (savedStartTime && savedIsRunning) {
+        this.startTime = parseInt(savedStartTime);
+        this.pausedTime = savedPausedTime ? parseInt(savedPausedTime) : 0;
+        this.isRunning = true;
+        this.syncTime();
+        this.startTimer();
+      } else if (savedPausedTime && !savedIsRunning) {
+        this.pausedTime = parseInt(savedPausedTime);
+        this.isPaused = true;
+      }
+    }
+    
+    syncTime() {
+      if (this.isRunning && this.startTime) {
+        const now = Date.now();
+        const elapsed = Math.floor((now - this.startTime - this.pausedTime) / 1000);
+        this.timeRemaining = Math.max(0, this.TOTAL_SECONDS - elapsed);
+        
+        if (this.timeRemaining <= 0) {
+          this.complete();
+        }
+      }
+    }
+    
+    loadStreakData() {
+      const streak = localStorage.getItem('focusTimer_streak');
+      const lastCompleted = localStorage.getItem('focusTimer_lastCompleted');
+      
+      this.streak = streak ? parseInt(streak) : 0;
+      this.lastCompletedDate = lastCompleted || null;
+    }
+    
+    saveTimerState() {
+      localStorage.setItem('focusTimer_timeRemaining', this.timeRemaining.toString());
+      localStorage.setItem('focusTimer_isRunning', this.isRunning.toString());
+      
+      if (this.startTime) {
+        localStorage.setItem('focusTimer_startTime', this.startTime.toString());
+      }
+      
+      if (this.isPaused) {
+        localStorage.setItem('focusTimer_pausedTime', this.pausedTime.toString());
+      }
+    }
+    
+    start() {
+      if (!this.isRunning) {
+        this.isRunning = true;
+        this.isPaused = false;
+        
+        if (!this.startTime) {
+          this.startTime = Date.now();
+          this.pausedTime = 0;
+        } else {
+          // Resuming from pause
+          this.pausedTime += Date.now() - this.pauseStartTime;
+        }
+        
+        this.startTimer();
+      }
+    }
+    
+    pause() {
+      if (this.isRunning) {
+        this.isRunning = false;
+        this.isPaused = true;
+        this.pauseStartTime = Date.now();
+        this.stopTimer();
+      }
+    }
+    
+    reset() {
+      this.isRunning = false;
+      this.isPaused = false;
+      this.timeRemaining = this.TOTAL_SECONDS;
+      this.startTime = null;
+      this.pausedTime = 0;
+      this.stopTimer();
+      this.updateDisplay();
+      this.saveTimerState();
+    }
+    
+    startTimer() {
+      this.stopTimer(); // Clear any existing interval
+      
+      this.timerInterval = setInterval(() => {
+        if (this.timeRemaining > 0) {
+          this.timeRemaining--;
+          this.updateDisplay();
+        } else {
+          this.complete();
+        }
+      }, 1000);
+      
+      this.updateDisplay();
+    }
+    
+    stopTimer() {
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+      }
+      this.updateDisplay();
+    }
+    
+    complete() {
+      this.isRunning = false;
+      this.isPaused = false;
+      this.timeRemaining = 0;
+      this.stopTimer();
+      
+      // Update streak
+      this.streak++;
+      this.lastCompletedDate = new Date().toDateString();
+      localStorage.setItem('focusTimer_streak', this.streak.toString());
+      localStorage.setItem('focusTimer_lastCompleted', this.lastCompletedDate);
+      
+      // Show completion
+      this.statusIndicator.textContent = 'Session Complete!';
+      this.statusIndicator.style.color = '#ff3300';
+      
+      this.updateDisplay();
+      this.saveTimerState();
+      
+      // Optional: Show notification
+      this.showCompletionNotification();
+    }
+    
+    resetStreak() {
+      this.streak = 0;
+      localStorage.setItem('focusTimer_streak', '0');
+    }
+    
+    showCompletionNotification() {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Focus Session Complete!', {
+          body: `Congratulations! You've completed your 4-hour focus session. Streak: ${this.streak} days`,
+          icon: '/favicon.svg'
+        });
+      }
+    }
+    
+    updateDisplay() {
+      // Update time display
+      const hours = Math.floor(this.timeRemaining / 3600);
+      const minutes = Math.floor((this.timeRemaining % 3600) / 60);
+      const seconds = this.timeRemaining % 60;
+      
+      this.timeDisplay.textContent = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Update progress circle
+      const progress = (this.TOTAL_SECONDS - this.timeRemaining) / this.TOTAL_SECONDS;
+      const offset = this.CIRCLE_CIRCUMFERENCE - (progress * this.CIRCLE_CIRCUMFERENCE);
+      this.progressCircle.style.strokeDashoffset = offset;
+      
+      // Update status
+      if (this.timeRemaining === 0) {
+        this.statusIndicator.textContent = 'Session Complete!';
+        this.statusIndicator.style.color = '#ff3300';
+      } else if (this.isRunning) {
+        this.statusIndicator.textContent = 'Focus Time Active';
+        this.statusIndicator.style.color = '#fff';
+      } else if (this.isPaused) {
+        this.statusIndicator.textContent = 'Paused';
+        this.statusIndicator.style.color = '#ff9500';
+      } else {
+        this.statusIndicator.textContent = 'Ready to Start';
+        this.statusIndicator.style.color = '#afa;';
+      }
+      
+      // Update button states
+      this.startBtn.disabled = this.isRunning || this.timeRemaining === 0;
+      this.pauseBtn.disabled = !this.isRunning;
+      
+      // Update streak display
+      this.streakNumber.textContent = this.streak;
+      this.lastCompleted.textContent = this.lastCompletedDate || 'Never';
+      
+      // Update today's progress
+      const todayProgressPercent = Math.round(((this.TOTAL_SECONDS - this.timeRemaining) / this.TOTAL_SECONDS) * 100);
+      this.todayProgress.textContent = `${todayProgressPercent}%`;
+    }
+    
+    updateSessionDate() {
+      const today = new Date();
+      this.sessionDate.textContent = today.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+  }
+  
+  // Initialize timer when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    const timer = new FocusTimer();
+    
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  });
+</script>

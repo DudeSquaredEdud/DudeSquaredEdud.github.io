@@ -24,14 +24,53 @@ const { title, description = "Ashton Andrepont - Computer Science Research" } = 
 		
 		<style is:global>
 			:root {
-				--color-text: #1a1a1a;
-				--color-text-light: #4a5568;
-				--color-accent: #2563eb;
+				/* Core Colors */
+				--color-text: #1e293b;
+				--color-text-light: #64748b;
+				--color-text-secondary: #94a3b8;
+				--color-accent: #3b82f6;
+				--color-accent-hover: #2563eb;
 				--color-border: #e2e8f0;
+				--color-border-subtle: #f1f5f9;
 				--color-bg: #ffffff;
 				--color-bg-subtle: #f8fafc;
+				--color-bg-elevated: #ffffff;
+				
+				/* Professional Color Palette */
+				--color-primary: #3b82f6;
+				--color-primary-hover: #2563eb;
+				--color-success: #10b981;
+				--color-success-hover: #059669;
+				--color-warning: #f59e0b;
+				--color-warning-hover: #d97706;
+				--color-danger: #ef4444;
+				--color-danger-hover: #dc2626;
+				
+				/* Surface Colors */
+				--color-surface: #ffffff;
+				--color-surface-hover: #f8fafc;
+				--color-surface-elevated: #ffffff;
+				
+				/* Shadow System */
+				--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+				--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+				--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+				--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+				
+				/* Typography */
 				--font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 				--font-mono: 'JetBrains Mono', Monaco, Consolas, monospace;
+				
+				/* Border Radius */
+				--radius-sm: 0.375rem;
+				--radius-md: 0.5rem;
+				--radius-lg: 0.75rem;
+				--radius-xl: 1rem;
+				
+				/* Transitions */
+				--transition-fast: 150ms ease;
+				--transition-normal: 200ms ease;
+				--transition-slow: 300ms ease;
 			}
 
 			* {
@@ -251,11 +290,9 @@ const { title, description = "Ashton Andrepont - Computer Science Research" } = 
 				<p class="lead">Educational Technology Research • Accessibility • Human-AI Collaboration</p>
 				<nav>
 					<a href="/">Home</a>
-					<a href="/research">Research</a>
 					<a href="/projects">Projects</a>
 					<a href="/portfolio">Portfolio</a>
 					<a href="/cv">CV</a>
-					<a href="/timer">Timer</a>
 					<a href="/random">Random</a>
 				</nav>
 			</header>

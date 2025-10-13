@@ -1,0 +1,221 @@
+---
+title: 'Educational Equation Builder Demo'
+description: 'Interactive step-by-step equation solving for educational purposes'
+layout: '../layouts/BaseLayout.astro'
+---
+
+<div id="educational-demo">
+  <div class="demo-header">
+    <h1>🎓 Educational Equation Builder</h1>
+    <p class="demo-description">
+      Experience step-by-step equation solving with interactive guidance. 
+      Perfect for students learning algebra and teachers creating educational content.
+    </p>
+  </div>
+
+  <div id="equation-builder-container">
+    <!-- Educational equation builder will be initialized here -->
+  </div>
+
+  <div class="demo-features">
+    <div class="quick-start">
+      <h2>🚀 Quick Start</h2>
+      <ol>
+        <li>Click "📚 Equation Library" to browse available equations</li>
+        <li>Select an equation by difficulty level or topic</li>
+        <li>Use navigation controls to step through the solution</li>
+        <li>Click "💡 Hint" if you need help understanding a step</li>
+        <li>Try auto-play mode with the ▶️ button</li>
+      </ol>
+    </div>
+
+    <div class="sample-equations">
+      <h2>📖 Sample Equations</h2>
+      <div class="equation-samples">
+        <button class="sample-btn" data-equation="lin_001">
+          <span class="equation">x + 3 = 7</span>
+          <span class="difficulty beginner">Beginner</span>
+        </button>
+        <button class="sample-btn" data-equation="lin_005">
+          <span class="equation">2x + 5 = 13</span>
+          <span class="difficulty intermediate">Intermediate</span>
+        </button>
+        <button class="sample-btn" data-equation="quad_001">
+          <span class="equation">x² = 16</span>
+          <span class="difficulty intermediate">Intermediate</span>
+        </button>
+        <button class="sample-btn" data-equation="sys_001">
+          <span class="equation">x + y = 5<br>2x - y = 1</span>
+          <span class="difficulty advanced">Advanced</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .demo-header {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-bottom: 30px;
+  }
+
+  .demo-header h1 {
+    margin: 0 0 15px 0;
+    font-size: 2.5em;
+  }
+
+  .demo-description {
+    font-size: 1.2em;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  #equation-builder-container {
+    min-height: 600px;
+    margin-bottom: 40px;
+  }
+
+  .demo-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .quick-start, .sample-equations {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .quick-start h2, .sample-equations h2 {
+    margin: 0 0 20px 0;
+    color: #333;
+  }
+
+  .quick-start ol {
+    line-height: 1.8;
+    color: #555;
+  }
+
+  .quick-start li {
+    margin-bottom: 10px;
+  }
+
+  .equation-samples {
+    display: grid;
+    gap: 15px;
+  }
+
+  .sample-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .sample-btn:hover {
+    border-color: #4CAF50;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .sample-btn .equation {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #333;
+    white-space: pre-line;
+  }
+
+  .sample-btn .difficulty {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .difficulty.beginner {
+    background: #4CAF50;
+    color: white;
+  }
+
+  .difficulty.intermediate {
+    background: #FF9800;
+    color: white;
+  }
+
+  .difficulty.advanced {
+    background: #F44336;
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .demo-features {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    .demo-header h1 {
+      font-size: 2em;
+    }
+    
+    .demo-description {
+      font-size: 1.1em;
+    }
+  }
+</style>
+
+<script>
+  import EducationalEquationBuilder from '../lib/equation-builder/components/EducationalEquationBuilder.js';
+  import { NotificationSystem } from '../lib/equation-builder/utils/NotificationSystem.js';
+
+  // Initialize the educational equation builder
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      // Create notification system
+      const notificationSystem = new NotificationSystem();
+      
+      // Initialize educational equation builder
+      const container = document.getElementById('equation-builder-container');
+      const educationalBuilder = new EducationalEquationBuilder(container, notificationSystem);
+      
+      // Bind sample equation buttons
+      const sampleButtons = document.querySelectorAll('.sample-btn');
+      sampleButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const equationId = button.getAttribute('data-equation');
+          educationalBuilder.loadEducationalEquation(equationId);
+        });
+      });
+
+      // Welcome message
+      setTimeout(() => {
+        notificationSystem.show('Welcome to the Educational Equation Builder! Click any sample equation below or browse the library to get started.', 'info');
+      }, 1000);
+
+    } catch (error) {
+      console.error('Failed to initialize educational equation builder:', error);
+      
+      // Fallback message
+      const container = document.getElementById('equation-builder-container');
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #666;">
+          <h3>Loading Educational Features...</h3>
+          <p>If this message persists, please refresh the page.</p>
+        </div>
+      `;
+    }
+  });
+</script>

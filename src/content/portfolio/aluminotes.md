@@ -1,42 +1,27 @@
 ---
-title: Aluminotes - AI-Powered Accessibility App
+title: Aluminotes - Accessibility Note-Taking App
 category: accessibility edtech
 imageSrc: Aluminotes/homescreen.png
 tags:
-  - AI-Powered Accessibility
+  - Accessibility
   - Educational Technology
   - Competition Winner
   - Team Leadership
 link: "#aluminotes"
 ---
 
-## 1st Place Inn-eaux-vate Competition Winner - AI-leveraging note-taking app for students with disabilities
+**Overview:**  
+Aluminotes is an app designed to help students with disabilities, particularly those with ADHD, by reformatting notes for easier comprehension. Our project won 1st place in the Inn-Eaux-Vate pitch competition.
 
-## Tech Lead & Project Leadership:
-I was the leader and creative lead of a three-person dev team, creating a note reformatting cool to help students with ADHD make sense of their notes. 
+**Role and Leadership:**  
+I served as the tech lead and creative lead for a three-person development team. We built the app using Django, integrating a specially trained Google Gemini AI model to assist in restructuring notes. Our motivation came from personal experience - our own notes were often fragmented or difficult to read due to the speed we had to take notes down to understand the lectures.
 
-- Led 3-person development team creating accessibility-focused educational technology
-- Full-stack development: Django backend, HTML, JavaScript frontend, Python AI integration
-- Mission-driven approach: reformatting and rewording text to assist students with disabilities
-- Won competitive validation through 1st place finish in pitch competition
+**Technical Innovation:**  
+- Streamlined the process of note re-comprehension and reshaping for clarity  
+- Developed an early version of a prompt library for enhanced AI interaction  
+- Focused specifically on supporting students with ADHD and learning difficulties through user testing
 
-## Technical Innovation:
-Streamlined the text comprehension process
-
-
-- AI-powered text processing for cognitive accessibility
-- Accessibility-first design philosophy: when technology works for most vulnerable learners, it works better for everyone
-- Django framework implementation for scalable educational applications
-- Focus on genuine learning support rather than compliance metrics
-
-## Team Coordination Breakthrough:
-Extensively communicated abt stuff
-
-- Overcame initial code conflicts through intensive communication protocols
-- Developed highly efficient coordination systems that prevented future development bottlenecks
-- Demonstrated how technical challenges are often secondary to team dynamics in successful project delivery
-
-## Anti-Edgenuity Philosophy:
-- Every design decision tested against "does this genuinely help students with learning difficulties?"
-- Explicit rejection of systems that frustrate learners like traditional educational technology failures
-- Accessibility as innovation driver, not afterthought
+**Team Coordination:**  
+- Initially faced challenges in coordinating tasks and avoiding overlap within the team  
+- Established a custom organization system to improve collaboration  
+- Learned that managing team dynamics was as crucial as overcoming technical hurdles in project success

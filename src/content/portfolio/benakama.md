@@ -1,36 +1,37 @@
 ---
-title: BeNakama - International EdTech Leadership
+title: BeNakama - EdTech Development
 category: edtech international
 imageSrc: Ascend/combat.png
 tags:
-  - Lead Backend Developer
-  - International EdTech
-  - AI-Powered Systems
-  - UK Schools Deployment
+  - Backend Developer
+  - EdTech
+  - UK Schools
 link: "#benakama"
 ---
 
-## Lead Backend Developer for London-based EdTech startup serving UK high schools
+## Educational Technology Development
 
-## AI-Powered Educational Systems:
-- Designing and implementing AI-powered student question system for best-fit academic ability matching
-- Leading development of secure classroom systems for "Ascend" gamified learning platform
-- Currently in development: intelligent technology specifically empowering students with learning difficulties and disabilities
-- International deployment from Louisiana to UK high school environments
+Backend developer for UK-based EdTech startup developing educational systems for schools.
 
-## Technical Leadership & Architecture:
-- Full technical responsibility as only team member with computer science expertise
-- Balancing backend architecture, AI system research, and international development coordination
-- Blazor frontend, ASP .NET backend for scalable educational applications
-- Multidisciplinary skills: backend systems, pixel art animation, pedagogical research, team management
+Working remotely from Louisiana on international team.
 
-## Mission-Driven Development:
-- Anti-Edgenuity design philosophy: every feature prioritizes genuine learning over compliance metrics
-- Direct impact on UK students through accessibility-focused educational technology
-- International experience bridging Louisiana computational expertise with London educational innovation
+Focus on educational technology that helps students with learning difficulties.
+
+## Technical Work:
+- Backend development using ASP.NET
+- Working on systems that match students to appropriate learning materials
+- Contributing to features designed for accessibility
+
+## Mission:
+
+Building educational technology that prioritizes genuine learning over compliance metrics.
+
+All students deserve to learn, so we make sure to design the systems in ways to keep things accessible.
+
 - Remote leadership demonstrating cross-cultural technical collaboration capabilities
 
 ## Professional Growth:
+
 - Managing international development responsibilities across time zones
 - Leading technical architecture for systems serving diverse student populations
 - Translating educational research insights into scalable technological solutions
