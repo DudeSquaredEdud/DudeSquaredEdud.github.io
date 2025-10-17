@@ -1,8 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
+// import { getCollection } from 'astro:content';
 
-const projectDetails = await getCollection('projectDetails');
+// const projectDetails = await getCollection('projectDetails');
 ---
 
 <Layout 
@@ -20,7 +20,7 @@ const projectDetails = await getCollection('projectDetails');
   </section>
 
   <!-- Featured Projects from Content Collection -->
-  <section class="section">
+  <!-- <section class="section">
     <h3>Featured Projects</h3>
     <div class="projects-grid">
       {projectDetails.map((project) => (
@@ -31,7 +31,7 @@ const projectDetails = await getCollection('projectDetails');
         </a>
       ))}
     </div>
-  </section>
+  </section> -->
 
   <!-- Tools -->
   <section class="section">
