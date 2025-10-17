@@ -1,0 +1,136 @@
+---
+// Error Boundary Component
+const { 
+  title = 'Something went wrong',
+  message = 'An unexpected error occurred. Please try refreshing the page.',
+  showReload = true,
+  type = 'error' // 'error', 'warning', 'info'
+} = Astro.props;
+
+const iconMap = {
+  error: '⚠️',
+  warning: '⚠️', 
+  info: 'ℹ️'
+};
+---
+
+<div class={`error-boundary error-boundary--${type}`} role="alert" aria-live="assertive">
+  <div class="error-content">
+    <div class="error-icon" aria-hidden="true">
+      {iconMap[type]}
+    </div>
+    <div class="error-details">
+      <h3 class="error-title">{title}</h3>
+      <p class="error-message">{message}</p>
+      {showReload && (
+        <div class="error-actions">
+          <button class="btn btn-primary" onclick="window.location.reload()" 
+                  aria-label="Reload page to try again">
+            Reload Page
+          </button>
+          <button class="btn btn-secondary" onclick="history.back()" 
+                  aria-label="Go back to previous page">
+            Go Back
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-boundary {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    margin: 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .error-boundary--error {
+    border-color: #ef4444;
+    background: #fef2f2;
+  }
+
+  .error-boundary--warning {
+    border-color: #f59e0b;
+    background: #fffbeb;
+  }
+
+  .error-boundary--info {
+    border-color: #3b82f6;
+    background: #eff6ff;
+  }
+
+  .error-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .error-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .error-details {
+    flex: 1;
+  }
+
+  .error-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: var(--color-text);
+  }
+
+  .error-message {
+    color: var(--color-text-subtle);
+    margin: 0 0 1.5rem 0;
+    line-height: 1.5;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-primary-hover);
+  }
+
+  .btn-secondary {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-surface-hover);
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+</style>

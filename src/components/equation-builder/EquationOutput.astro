@@ -1,0 +1,61 @@
+---
+// Equation Output Component - Display generated mathematical equations
+const { className = '' } = Astro.props;
+---
+
+<div class={`output-section ${className}`}>
+  <h3>Generated Equation</h3>
+  <div id="equationOutput" class="equation-display">
+    <em>Click buttons in the palette to add nodes to the canvas...</em>
+  </div>
+</div>
+
+<style>
+  /* Output Section */
+  .output-section {
+    margin: 2rem 0;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .output-section h3 {
+    margin: 0 0 1rem 0;
+    color: var(--color-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .equation-display {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    text-align: center;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+  }
+
+  .equation-display:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .equation-display em {
+    color: var(--color-text-light);
+    font-style: italic;
+  }
+
+  /* Enhanced equation display for actual equations */
+  .equation-display:not(:has(em)) {
+    font-weight: 600;
+    color: var(--color-text);
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  }
+</style>

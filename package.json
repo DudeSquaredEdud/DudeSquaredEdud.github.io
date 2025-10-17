@@ -19,8 +19,10 @@
     "pre-commit": "npm run lint && npm run format:check && npm run test:run"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.4",
     "astro": "^5.13.9",
-    "katex": "^0.16.22"
+    "katex": "^0.16.22",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

@@ -6,29 +6,10 @@ import Layout from '../layouts/Layout.astro';
   title="Equation Builder - Ashton Andrepont"
   description="Clean, simple visual equation builder - drag and connect nodes to create mathematical expressions"
 >
-  <!-- KaTeX CSS and JS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
   <section class="section">
     <h2>Visual Equation Builder</h2>
     <p>A clean, simple approach to visual equation building. Click nodes to add them, then click and drag to connect and build mathematical expressions.</p>
   </section>
-
-  <!-- Toolbar -->
-  <div class="equation-toolbar">
-    <button class="toolbar-btn" id="show-tables-btn" title="Show Variables & Equations Tables">Show Tables</button>
-    <div class="toolbar-divider"></div>
-    <button class="toolbar-btn export-btn" id="export-session-btn" title="Export Session as File">Export</button>
-    <button class="toolbar-btn import-btn" id="import-session-btn" title="Import Session from File">Import</button>
-    <button class="toolbar-btn clear-btn" id="clear-canvas-btn" title="Clear Canvas">Clear</button>
-    <div class="auto-save-indicator" id="auto-save-indicator">
-      <span class="auto-save-dot"></span>
-      <span class="auto-save-text">Auto-saved</span>
-    </div>
-  </div>
-  
-  <!-- Hidden file input for imports -->
-  <input type="file" id="import-file-input" accept=".json" style="display: none;">
 
   <!-- Clean equation builder interface -->
   <div class="equation-builder">
@@ -40,17 +21,11 @@ import Layout from '../layouts/Layout.astro';
           <button class="page-btn" id="prev-page">‹</button>
           <span class="page-indicator" id="page-indicator">1 / 4</span>
           <button class="page-btn" id="next-page">›</button>
-
         </div>
       </div>
       
       <div class="palette-content" id="palette-content">
         <!-- Pages will be dynamically generated -->
-      </div>
-      
-      <!-- Help Button at bottom of sidebar -->
-      <div class="palette-footer">
-        <button class="help-button" id="help-button" title="Node Reference Manual">?</button>
       </div>
     </div>
 
@@ -75,79 +50,6 @@ import Layout from '../layouts/Layout.astro';
       Select a node to edit its properties
     </div>
   </div>
-
-
-
-  <!-- Help Modal -->
-  <div class="help-modal" id="help-modal">
-    <div class="help-content">
-      <div class="help-header">
-        <h2>Node Reference Manual</h2>
-        <div class="help-nav">
-          <div class="help-page-controls">
-            <button class="help-page-btn" id="help-prev-page">‹</button>
-            <span class="help-page-indicator" id="help-page-indicator">1 / 6</span>
-            <button class="help-page-btn" id="help-next-page">›</button>
-          </div>
-          <button class="close-btn" id="close-help">×</button>
-        </div>
-      </div>
-      <div class="help-body" id="help-body">
-        <!-- Help content will be populated by JavaScript -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Tables Sidebar -->
-  <div class="tables-sidebar" id="tables-sidebar">
-    <div class="tables-sidebar-header">
-      <h3>Variables & Equations</h3>
-      <button class="close-btn" id="close-tables-sidebar">×</button>
-    </div>
-    
-    <!-- Variables Section -->
-    <div class="table-section">
-      <div class="section-header">
-        <h4>Variables</h4>
-        <button class="section-toggle" id="toggle-variables">−</button>
-      </div>
-      <div class="section-content" id="variables-section">
-        <table class="variables-table">
-          <thead>
-            <tr>
-              <th>Variable</th>
-              <th>Value</th>
-            </tr>
-          </thead>
-          <tbody id="variables-tbody">
-            <!-- Variables will be populated by JavaScript -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-    
-    <!-- Equations Section -->
-    <div class="table-section">
-      <div class="section-header">
-        <h4>Equations</h4>
-        <button class="section-toggle" id="toggle-equations">−</button>
-      </div>
-      <div class="section-content" id="equations-section">
-        <table class="equations-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Equation</th>
-              <th>Output</th>
-            </tr>
-          </thead>
-          <tbody id="equations-tbody">
-            <!-- Equations will be populated by JavaScript -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 </Layout>
 
 <script>
@@ -162,10 +64,6 @@ import Layout from '../layouts/Layout.astro';
       this.nodeCounter = 0;
       this.isEditingComponent = false;
       this.currentComponentId = null;
-      
-      // Global variable and output management
-      this.globalVariables = new Map(); // variable name -> {value, isSet, inTable}
-      this.globalOutputs = new Map(); // output node id -> {name, equation, result, inTable}
       this.originalNodePages = null;
       this.originalCurrentPage = 0;
       this.currentPage = 0;
@@ -183,8 +81,6 @@ import Layout from '../layouts/Layout.astro';
     init() {
       this.setupPalette();
       this.setupEventListeners();
-      this.setupHelpModal();
-      this.setupTables();
     }
     
     setupPalette() {
@@ -223,10 +119,8 @@ import Layout from '../layouts/Layout.astro';
         {
           title: 'Constants',
           nodes: [
-            { type: 'constant_pi', label: 'π' },
-            { type: 'constant_e', label: 'e' },
-            { type: 'constant_phi', label: 'φ' },
-            { type: 'constant_sqrt2', label: '√2' }
+            { type: 'pi', label: 'π' },
+            { type: 'e', label: 'e' }
           ]
         },
         {
@@ -244,9 +138,7 @@ import Layout from '../layouts/Layout.astro';
           title: 'Advanced',
           nodes: [
             { type: 'component', label: 'Component' },
-            { type: 'conditional', label: 'Conditional' },
-            { type: 'multiplexer', label: 'Multiplexer' },
-            { type: 'splitter', label: 'Splitter' }
+            { type: 'conditional', label: 'If/Then' }
           ]
         }
       ];
@@ -362,219 +254,6 @@ import Layout from '../layouts/Layout.astro';
       document.addEventListener('mouseup', this.handleMouseUp.bind(this));
     }
 
-    // Help Modal Management
-    setupHelpModal() {
-      this.currentHelpPage = 0;
-      this.helpPages = this.createHelpPages();
-
-      const helpButton = document.getElementById('help-button');
-      const helpModal = document.getElementById('help-modal');
-      const closeHelp = document.getElementById('close-help');
-      const helpPrevBtn = document.getElementById('help-prev-page');
-      const helpNextBtn = document.getElementById('help-next-page');
-
-      helpButton.addEventListener('click', () => {
-        // Sync help page with current palette page
-        this.currentHelpPage = this.currentPage;
-        // Ensure we don't exceed help page bounds
-        if (this.currentHelpPage >= this.helpPages.length) {
-          this.currentHelpPage = 0;
-        }
-        this.renderHelpPage();
-        helpModal.classList.add('active');
-      });
-
-      closeHelp.addEventListener('click', () => {
-        helpModal.classList.remove('active');
-      });
-
-      helpModal.addEventListener('click', (e) => {
-        if (e.target === helpModal) {
-          helpModal.classList.remove('active');
-        }
-      });
-
-      helpPrevBtn.addEventListener('click', () => {
-        if (this.currentHelpPage > 0) {
-          this.currentHelpPage--;
-          this.renderHelpPage();
-        }
-      });
-
-      helpNextBtn.addEventListener('click', () => {
-        if (this.currentHelpPage < this.helpPages.length - 1) {
-          this.currentHelpPage++;
-          this.renderHelpPage();
-        }
-      });
-    }
-
-    createHelpPages() {
-      return [
-        {
-          title: 'Basic',
-          content: `
-            <div class="help-section">
-              <h3>Arithmetic Operators</h3>
-              <div class="node-family">
-                <p>Standard math operators with two inputs, one output:</p>
-                <ul class="node-list">
-                  <li><strong>+, -, ×, ÷</strong> - Basic arithmetic operations</li>
-                </ul>
-              </div>
-              
-              <h3>Input/Output</h3>
-              <div class="node-family">
-                <ul class="node-list">
-                  <li><strong>Number</strong> - Configurable numeric value</li>
-                  <li><strong>Variable</strong> - Named placeholder (x, y, etc.)</li>
-                  <li><strong>Output</strong> - Shows equation output</li>
-                </ul>
-                <div class="help-tip">
-                  <strong>Workflow:</strong> Add nodes from palette → connect output ports (right) to input ports (left) → click nodes to configure → add Output to see results.
-                </div>
-              </div>
-            </div>
-          `
-        },
-        {
-          title: 'Advanced Operations',
-          content: `
-            <div class="help-section">
-              <h3>Power & Root</h3>
-              <div class="node-family">
-                <ul class="node-list">
-                  <li><strong>^ (Power)</strong> - Exponentiation</li>
-                  <li><strong>% (Modulo)</strong> - Remainder division</li>
-                  <li><strong>√ (Square Root)</strong> - Root calculation</li>
-                  <li><strong>|x| (Absolute)</strong> - Absolute value</li>
-                </ul>
-              </div>
-              
-              <h3>Logarithms</h3>
-              <div class="node-family">
-                <ul class="node-list">
-                  <li><strong>ln (Natural Log)</strong> - Base e logarithm</li>
-                  <li><strong>log</strong> - Configurable base logarithm</li>
-                </ul>
-              </div>
-            </div>
-          `
-        },
-        {
-          title: 'Trigonometry',
-          content: `
-            <div class="help-section">
-              <h3>Trig Functions</h3>
-              <div class="node-family">
-                <p>All angles in radians:</p>
-                <ul class="node-list">
-                  <li><strong>sin, cos, tan</strong> - Basic trigonometric functions</li>
-                  <li><strong>asin, acos, atan</strong> - Inverse functions (return angles)</li>
-                </ul>
-              </div>
-            </div>
-          `
-        },
-        {
-          title: 'Constants',
-          content: `
-            <div class="help-section">
-              <h3>Mathematical Constants</h3>
-              <div class="node-family">
-                <ul class="node-list">
-                  <li><strong>π (Pi)</strong> - 3.14159...</li>
-                  <li><strong>e (Euler)</strong> - 2.71828...</li>
-                  <li><strong>φ (Golden Ratio)</strong> - 1.61803...</li>
-                  <li><strong>√2 (Square Root of 2)</strong> - 1.41421...</li>
-                </ul>
-              </div>
-            </div>
-          `
-        },
-        {
-          title: 'Comparison',
-          content: `
-            <div class="help-section">
-              <h3>Comparison Operators</h3>
-              <div class="node-family">
-                <p>Return 1 (true) or 0 (false):</p>
-                <ul class="node-list">
-                  <li><strong>&gt;, &lt;, =</strong> - Greater than, less than, equals</li>
-                </ul>
-              </div>
-              
-              <h3>Conditional Logic</h3>
-              <div class="node-family">
-                <ul class="node-list">
-                  <li><strong>Conditional</strong> - Rule-based decision making</li>
-                </ul>
-                <div class="help-tip">
-                  <strong>Rules:</strong> Greater/less than, equals, range, negative/positive/zero checks, plus default fallback. Configure in sidebar.
-                </div>
-              </div>
-            </div>
-          `
-        },
-        {
-          title: 'Advanced',
-          content: `
-            <div class="help-section">
-              <h3>Data Routing</h3>
-              <div class="node-family">
-                <ul class="node-list">
-                  <li><strong>Multiplexer</strong> - Select one input from many based on choice</li>
-                  <li><strong>Splitter</strong> - Copy one input to multiple outputs</li>
-                </ul>
-                <div class="help-tip">
-                  <strong>Configuration:</strong> Both support 2-10 ports. Click to configure in sidebar.
-                </div>
-              </div>
-              
-              <h3>Components</h3>
-              <div class="node-family">
-                <ul class="node-list">
-                  <li><strong>Component</strong> - Reusable sub-equation with custom inputs/outputs</li>
-                  <li><strong>Component Input/Output</strong> - Define component interface</li>
-                </ul>
-                <div class="help-tip">
-                  <strong>Components:</strong> Double-click to edit internal workspace. Use Component Input/Output nodes to define external interface. Changes are saved automatically.
-                </div>
-              </div>
-              
-              <h3>Pro Tips</h3>
-              <div class="node-family">
-                <ul class="node-list">
-                  <li>Components create reusable calculation modules</li>
-                  <li>Use conditionals for complex logic branching</li>
-                  <li>Splitters eliminate duplicate connections</li>
-                  <li>Chain multiplexers for sophisticated routing</li>
-                </ul>
-              </div>
-            </div>
-          `
-        }
-      ];
-    }
-
-    renderHelpPage() {
-      const helpBody = document.getElementById('help-body');
-      const helpPageIndicator = document.getElementById('help-page-indicator');
-      const helpPrevBtn = document.getElementById('help-prev-page');
-      const helpNextBtn = document.getElementById('help-next-page');
-
-      // Update content
-      const currentPage = this.helpPages[this.currentHelpPage];
-      helpBody.innerHTML = currentPage.content;
-
-      // Update page indicator
-      helpPageIndicator.textContent = `${this.currentHelpPage + 1} / ${this.helpPages.length}`;
-
-      // Update button states
-      helpPrevBtn.disabled = this.currentHelpPage === 0;
-      helpNextBtn.disabled = this.currentHelpPage === this.helpPages.length - 1;
-    }
-
     generateId() {
       return `node-${++this.nodeCounter}-${Date.now()}`;
     }
@@ -588,8 +267,6 @@ import Layout from '../layouts/Layout.astro';
         variable: { label: 'x', variable: 'x', inputs: [], outputs: ['out'] },
         constant_pi: { label: 'π', value: Math.PI, inputs: [], outputs: ['out'] },
         constant_e: { label: 'e', value: Math.E, inputs: [], outputs: ['out'] },
-        constant_phi: { label: 'φ', value: (1 + Math.sqrt(5)) / 2, inputs: [], outputs: ['out'] }, // Golden ratio
-        constant_sqrt2: { label: '√2', value: Math.sqrt(2), inputs: [], outputs: ['out'] },
         
         // Basic Operators
         add: { label: '+', inputs: ['in1', 'in2'], outputs: ['out'] },
@@ -621,9 +298,7 @@ import Layout from '../layouts/Layout.astro';
         
         // Advanced Components
         component: { label: 'Component', inputs: [], outputs: [], customizable: true },
-        conditional: { label: 'Conditional', inputs: ['value'], outputs: ['result'] },
-        multiplexer: { label: 'Multiplexer', inputs: ['choice0', 'choice1', 'selector'], outputs: ['output'], customizable: true },
-        splitter: { label: 'Splitter', inputs: ['input'], outputs: ['output0', 'output1'], customizable: true },
+        conditional: { label: 'If/Then', inputs: ['value', 'condition', 'min', 'max'], outputs: ['true', 'false'] },
         
         // Output
         output: { label: 'Result', inputs: ['in'], outputs: [] }
@@ -666,10 +341,6 @@ import Layout from '../layouts/Layout.astro';
         nodeEl.classList.add('node-component-input');
       } else if (node.type === 'componentOutput') {
         nodeEl.classList.add('node-component-output');
-      } else if (node.type === 'multiplexer') {
-        nodeEl.classList.add('node-multiplexer');
-      } else if (node.type === 'splitter') {
-        nodeEl.classList.add('node-splitter');
       }
       
       // Explicit positioning and base styles to ensure visibility
@@ -808,35 +479,12 @@ import Layout from '../layouts/Layout.astro';
         // Advanced Components
         component: { out: 'Component Output' },
         conditional: { 
-          value: 'Input Value to Check', 
-          result: 'Result Based on Rules'
-        },
-        multiplexer: {
-          selector: 'Selector (bottom port: 0, 1, 2, etc.)',
-          choice0: 'Choice 0 (when selector=0)',
-          choice1: 'Choice 1 (when selector=1)',
-          choice2: 'Choice 2 (when selector=2)',
-          choice3: 'Choice 3 (when selector=3)',
-          choice4: 'Choice 4 (when selector=4)',
-          choice5: 'Choice 5 (when selector=5)',
-          choice6: 'Choice 6 (when selector=6)',
-          choice7: 'Choice 7 (when selector=7)',
-          choice8: 'Choice 8 (when selector=8)',
-          choice9: 'Choice 9 (when selector=9)',
-          output: 'Selected Choice Value'
-        },
-        splitter: {
-          input: 'Input Value to Split',
-          output0: 'Copy 0 of Input',
-          output1: 'Copy 1 of Input', 
-          output2: 'Copy 2 of Input',
-          output3: 'Copy 3 of Input',
-          output4: 'Copy 4 of Input',
-          output5: 'Copy 5 of Input',
-          output6: 'Copy 6 of Input',
-          output7: 'Copy 7 of Input',
-          output8: 'Copy 8 of Input',
-          output9: 'Copy 9 of Input'
+          value: 'Value to Check', 
+          condition: 'Condition Type', 
+          min: 'Minimum Range', 
+          max: 'Maximum Range', 
+          true: 'If Condition Met', 
+          false: 'If Condition Failed' 
         }
       };
       
@@ -942,10 +590,8 @@ import Layout from '../layouts/Layout.astro';
         {
           title: 'Constants',
           nodes: [
-            { type: 'constant_pi', label: 'π' },
-            { type: 'constant_e', label: 'e' },
-            { type: 'constant_phi', label: 'φ' },
-            { type: 'constant_sqrt2', label: '√2' }
+            { type: 'pi', label: 'π' },
+            { type: 'e', label: 'e' }
           ]
         },
         {
@@ -1090,22 +736,6 @@ import Layout from '../layouts/Layout.astro';
       
       // Clear connections
       this.connectionsSvg.innerHTML = '';
-      
-      // Clear data structures for full reset (used by session management)
-      if (arguments.length > 0 && arguments[0] === 'full') {
-        this.nodes.clear();
-        this.connections = [];
-        this.globalVariables.clear();
-        this.globalOutputs.clear();
-        
-        // Clear tables
-        this.updateVariablesTable();
-        this.updateEquationsTable();
-        
-        // Reset drag and connection states
-        this.dragState = { isDragging: false, nodeId: null, startX: 0, startY: 0 };
-        this.connecting = { from: null, isConnecting: false };
-      }
     }
 
     loadComponentNodes(nodeId) {
@@ -1211,45 +841,20 @@ import Layout from '../layouts/Layout.astro';
     positionPortsEvenly(nodeEl, node) {
       const nodeRect = nodeEl.getBoundingClientRect();
       const nodeHeight = nodeRect.height;
-      const nodeWidth = nodeRect.width;
       
-      // Special handling for multiplexer
-      if (node.type === 'multiplexer') {
-        const inputPorts = nodeEl.querySelectorAll('.input-port');
-        const selectorPort = Array.from(inputPorts).find(port => port.dataset.port === 'selector');
-        const choicePorts = Array.from(inputPorts).filter(port => port.dataset.port !== 'selector');
-        
-        // Position choice ports along left side
-        choicePorts.forEach((port, i) => {
-          const totalChoices = choicePorts.length;
-          if (totalChoices === 1) {
-            port.style.top = `${nodeHeight / 2 - 6}px`;
-          } else {
-            const spacing = nodeHeight / (totalChoices + 1);
-            port.style.top = `${(i + 1) * spacing - 6}px`;
-          }
-        });
-        
-        // Position selector port at bottom center
-        if (selectorPort) {
-          selectorPort.style.left = `${nodeWidth / 2 - 6}px`; // Center horizontally
-          selectorPort.style.top = `${nodeHeight - 7}px`; // Bottom edge
+      // Position input ports evenly along left side
+      const inputPorts = nodeEl.querySelectorAll('.input-port');
+      inputPorts.forEach((port, i) => {
+        const totalPorts = inputPorts.length;
+        if (totalPorts === 1) {
+          port.style.top = `${nodeHeight / 2 - 6}px`; // Center single port (6px = half port height)
+        } else {
+          const spacing = nodeHeight / (totalPorts + 1);
+          port.style.top = `${(i + 1) * spacing - 6}px`; // Evenly space ports
         }
-      } else {
-        // Standard positioning for all other nodes
-        const inputPorts = nodeEl.querySelectorAll('.input-port');
-        inputPorts.forEach((port, i) => {
-          const totalPorts = inputPorts.length;
-          if (totalPorts === 1) {
-            port.style.top = `${nodeHeight / 2 - 6}px`; // Center single port (6px = half port height)
-          } else {
-            const spacing = nodeHeight / (totalPorts + 1);
-            port.style.top = `${(i + 1) * spacing - 6}px`; // Evenly space ports
-          }
-        });
-      }
+      });
       
-      // Position output ports evenly along right side (same for all nodes)
+      // Position output ports evenly along right side
       const outputPorts = nodeEl.querySelectorAll('.output-port');
       outputPorts.forEach((port, i) => {
         const totalPorts = outputPorts.length;
@@ -1329,7 +934,8 @@ import Layout from '../layouts/Layout.astro';
         if (isOutput) {
           this.connecting.from = portKey;
           this.showConnectionFeedback();
-        }
+
+
       } else if (this.connecting.from !== portKey) {
         // Complete connection to input port only
         if (!isOutput) {
@@ -1410,11 +1016,6 @@ import Layout from '../layouts/Layout.astro';
       
       this.updateConnections();
       this.updateEquation();
-      
-      // Trigger auto-save after connection changes
-      if (this.autoSaveCallback) {
-        this.autoSaveCallback();
-      }
     }
 
     selectNode(nodeId) {
@@ -1459,106 +1060,61 @@ import Layout from '../layouts/Layout.astro';
           </p>
         `;
       } else if (node.type === 'variable') {
-        const variableName = node.variable || 'x';
-        const globalVar = this.globalVariables.get(variableName) || {value: '', isSet: false, inTable: false};
-        
         content = `
           <div class="input-group">
             <label>Variable name:</label>
-            <input type="text" id="node-variable" value="${variableName}" maxlength="5">
+            <input type="text" id="node-variable" value="${node.variable || 'x'}" maxlength="5">
           </div>
-          <div class="input-group">
-            <label>Value (optional):</label>
-            <input type="number" id="variable-value" value="${globalVar.value}" placeholder="Leave empty for symbolic">
-          </div>
-          <div class="input-group">
-            <label>
-              <input type="checkbox" id="variable-in-table" ${globalVar.inTable ? 'checked' : ''}>
-              Show in variables table
-            </label>
-          </div>
-          <p style="font-size: 12px; color: #666; margin-top: 10px;">
-            Set a value to use this variable as a constant, or leave empty to keep it symbolic.
-          </p>
         `;
-      } else if (node.type === 'output') {
-        const globalOutput = this.globalOutputs.get(nodeId) || {name: '', equation: '', result: '', inTable: false};
+      } else if (node.type === 'conditional') {
+        const currentInputs = node.inputs || ['value', 'condition', 'min', 'max'];
+        const currentOutputs = node.outputs || ['true', 'false'];
         
         content = `
           <div class="input-group">
-            <label>Output Name:</label>
-            <input type="text" id="output-name" value="${globalOutput.name || node.label || 'Output'}" maxlength="20">
+            <label>Condition Type:</label>
+            <select id="condition-type">
+              <option value="range" ${(node.conditionType || 'range') === 'range' ? 'selected' : ''}>Range (min ≤ x ≤ max)</option>
+              <option value="greater" ${node.conditionType === 'greater' ? 'selected' : ''}>Greater than (x > min)</option>
+              <option value="less" ${node.conditionType === 'less' ? 'selected' : ''}>Less than (x < max)</option>
+              <option value="equal" ${node.conditionType === 'equal' ? 'selected' : ''}>Equal to (x = min)</option>
+              <option value="custom" ${node.conditionType === 'custom' ? 'selected' : ''}>Custom conditions</option>
+            </select>
           </div>
+          
           <div class="input-group">
-            <label>
-              <input type="checkbox" id="output-in-table" ${globalOutput.inTable ? 'checked' : ''}>
-              Show in equations table
-            </label>
-          </div>
-          <p style="font-size: 12px; color: #666; margin-top: 10px;">
-            This output will show the final result of connected calculations.<br>
-            Check the box to include this equation in the equations table.
-          </p>
-        `;
-      } else if (node.type === 'conditional') {
-        // Initialize rules if they don't exist
-        if (!node.rules) {
-          node.rules = [
-            { type: 'greater', value: 0, returnValue: 1, enabled: true, name: 'Rule 1' },
-            { type: 'default', returnValue: 0, enabled: true, name: 'Default' }
-          ];
-        }
-
-        content = `
-          <div class="input-group">
-            <label>Rules (evaluated in order):</label>
-            <div id="rules-container" style="max-height: 300px; overflow-y: auto;">
-              ${node.rules.map((rule, index) => `
-                <div class="rule-item" data-rule-index="${index}" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 8px; margin: 4px 0;">
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <input type="checkbox" data-rule-index="${index}" data-field="enabled" ${rule.enabled ? 'checked' : ''}>
-                    <input type="text" data-rule-index="${index}" data-field="name" value="${rule.name || `Rule ${index + 1}`}" 
-                           style="background: transparent; border: none; font-weight: 600; color: #475569; font-size: 12px; flex: 1;">
-                    <button class="delete-rule-btn" data-rule-index="${index}" style="background: #ef4444; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Delete</button>
-                  </div>
-                  
-                  <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-                    <span style="font-size: 11px;">If value is</span>
-                    <select data-rule-index="${index}" data-field="type" style="flex: 1; padding: 2px; font-size: 11px;">
-                      <option value="greater" ${rule.type === 'greater' ? 'selected' : ''}>greater than</option>
-                      <option value="less" ${rule.type === 'less' ? 'selected' : ''}>less than</option>
-                      <option value="equals" ${rule.type === 'equals' ? 'selected' : ''}>equals</option>
-                      <option value="range" ${rule.type === 'range' ? 'selected' : ''}>in range</option>
-                      <option value="negative" ${rule.type === 'negative' ? 'selected' : ''}>negative</option>
-                      <option value="positive" ${rule.type === 'positive' ? 'selected' : ''}>positive</option>
-                      <option value="zero" ${rule.type === 'zero' ? 'selected' : ''}>zero</option>
-                      <option value="default" ${rule.type === 'default' ? 'selected' : ''}>default (catch-all)</option>
-                    </select>
-                  </div>
-                  
-                  ${rule.type !== 'negative' && rule.type !== 'positive' && rule.type !== 'zero' && rule.type !== 'default' ? `
-                    <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-                      <input type="number" data-rule-index="${index}" data-field="value" value="${rule.value || 0}" step="0.1" style="width: 60px; padding: 2px; font-size: 11px;">
-                      ${rule.type === 'range' ? `
-                        <span style="font-size: 11px;">to</span>
-                        <input type="number" data-rule-index="${index}" data-field="maxValue" value="${rule.maxValue || 10}" step="0.1" style="width: 60px; padding: 2px; font-size: 11px;">
-                      ` : ''}
-                    </div>
-                  ` : ''}
-                  
-                  <div style="display: flex; align-items: center; gap: 4px;">
-                    <span style="font-size: 11px;">return</span>
-                    <input type="number" data-rule-index="${index}" data-field="returnValue" value="${rule.returnValue || 0}" step="0.1" style="width: 60px; padding: 2px; font-size: 11px;">
-                  </div>
+            <label>Input Ports:</label>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+              <button id="remove-input" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer;">−</button>
+              <span id="input-count">${currentInputs.length} inputs</span>
+              <button id="add-input" style="background: #10b981; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer;">+</button>
+            </div>
+            <div id="input-list" style="margin-top: 8px;">
+              ${currentInputs.map((input, i) => `
+                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
+                  <input type="text" value="${input}" data-input-index="${i}" style="flex: 1; padding: 4px; border: 1px solid #d1d5db; border-radius: 3px; font-size: 12px;">
                 </div>
               `).join('')}
             </div>
-            
-            <div style="margin-top: 8px;">
-              <button id="add-rule-btn" style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 4px;">+ Add Rule</button>
-              <button id="add-preset-btn" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Presets</button>
+          </div>
+          
+          <div class="input-group">
+            <label>Output Ports:</label>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+              <button id="remove-output" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer;">−</button>
+              <span id="output-count">${currentOutputs.length} outputs</span>
+              <button id="add-output" style="background: #10b981; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer;">+</button>
+            </div>
+            <div id="output-list" style="margin-top: 8px;">
+              ${currentOutputs.map((output, i) => `
+                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
+                  <input type="text" value="${output}" data-output-index="${i}" style="flex: 1; padding: 4px; border: 1px solid #d1d5db; border-radius: 3px; font-size: 12px;">
+                </div>
+              `).join('')}
             </div>
           </div>
+          
+          <button id="update-conditional" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 12px;">Update Node</button>
         `;
       } else if (node.type === 'component') {
         const currentInputs = node.inputs || [];
@@ -1573,33 +1129,6 @@ import Layout from '../layouts/Layout.astro';
           
           
           <button id="edit-component-logic" style="background: #9333ea; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 12px;">Edit Component Logic</button>
-        `;
-      } else if (node.type === 'multiplexer') {
-        const choiceCount = (node.inputs || []).length - 1; // Subtract 1 for selector input
-        
-        content = `
-          <div class="input-group">
-            <label>Number of Choices:</label>
-            <input type="number" id="choice-count" value="${Math.max(2, choiceCount)}" min="2" max="10" style="width: 60px; padding: 4px; margin-top: 4px;">
-            <p style="font-size: 12px; color: #666; margin-top: 8px;">
-              The multiplexer selects one choice based on the selector value.<br>
-              Choices are at the top, selector at the bottom.<br>
-              Selector 0 = first choice, 1 = second choice, etc.
-            </p>
-          </div>
-        `;
-      } else if (node.type === 'splitter') {
-        const outputCount = (node.outputs || []).length;
-        
-        content = `
-          <div class="input-group">
-            <label>Number of Outputs:</label>
-            <input type="number" id="output-count" value="${Math.max(2, outputCount)}" min="2" max="10" style="width: 60px; padding: 4px; margin-top: 4px;">
-            <p style="font-size: 12px; color: #666; margin-top: 8px;">
-              The splitter copies the input value to all outputs.<br>
-              Useful for sending one value to multiple calculation paths.
-            </p>
-          </div>
         `;
       }
       
@@ -1631,98 +1160,10 @@ import Layout from '../layouts/Layout.astro';
       const variableInput = document.getElementById('node-variable');
       if (variableInput) {
         variableInput.addEventListener('input', (e) => {
-          const oldVariable = node.variable || 'x';
-          const newVariable = e.target.value || 'x';
-          
-          // Update the node
-          node.variable = newVariable;
-          node.label = newVariable;
+          node.variable = e.target.value || 'x';
+          node.label = node.variable;
           document.querySelector(`#${nodeId} .node-content`).textContent = node.label;
-          
-          // If variable name changed, update global variables map
-          if (oldVariable !== newVariable) {
-            const oldData = this.globalVariables.get(oldVariable);
-            if (oldData) {
-              this.globalVariables.delete(oldVariable);
-              this.globalVariables.set(newVariable, oldData);
-            }
-          }
-          
           this.updateEquation();
-        });
-      }
-
-      const variableValueInput = document.getElementById('variable-value');
-      if (variableValueInput) {
-        variableValueInput.addEventListener('input', (e) => {
-          const variableName = node.variable || 'x';
-          const value = e.target.value;
-          
-          if (!this.globalVariables.has(variableName)) {
-            this.globalVariables.set(variableName, {value: '', isSet: false, inTable: false});
-          }
-          
-          const globalVar = this.globalVariables.get(variableName);
-          globalVar.value = value;
-          globalVar.isSet = value !== '';
-          
-          this.updateEquation();
-        });
-      }
-
-      const variableTableCheckbox = document.getElementById('variable-in-table');
-      if (variableTableCheckbox) {
-        variableTableCheckbox.addEventListener('change', (e) => {
-          const variableName = node.variable || 'x';
-          
-          if (!this.globalVariables.has(variableName)) {
-            this.globalVariables.set(variableName, {value: '', isSet: false, inTable: false});
-          }
-          
-          const globalVar = this.globalVariables.get(variableName);
-          globalVar.inTable = e.target.checked;
-          
-          // Update table immediately if sidebar is open
-          const tablesSidebar = document.getElementById('tables-sidebar');
-          if (tablesSidebar && tablesSidebar.classList.contains('open')) {
-            this.updateTables();
-          }
-        });
-      }
-
-      const outputNameInput = document.getElementById('output-name');
-      if (outputNameInput) {
-        outputNameInput.addEventListener('input', (e) => {
-          const outputName = e.target.value || 'Output';
-          
-          if (!this.globalOutputs.has(nodeId)) {
-            this.globalOutputs.set(nodeId, {name: '', equation: '', result: '', inTable: false});
-          }
-          
-          const globalOutput = this.globalOutputs.get(nodeId);
-          globalOutput.name = outputName;
-          
-          // Update node label
-          node.label = outputName;
-          document.querySelector(`#${nodeId} .node-content`).textContent = outputName;
-        });
-      }
-
-      const outputTableCheckbox = document.getElementById('output-in-table');
-      if (outputTableCheckbox) {
-        outputTableCheckbox.addEventListener('change', (e) => {
-          if (!this.globalOutputs.has(nodeId)) {
-            this.globalOutputs.set(nodeId, {name: '', equation: '', latexEquation: '', result: '', inTable: false});
-          }
-          
-          const globalOutput = this.globalOutputs.get(nodeId);
-          globalOutput.inTable = e.target.checked;
-          
-          // Update table immediately if sidebar is open
-          const tablesSidebar = document.getElementById('tables-sidebar');
-          if (tablesSidebar && tablesSidebar.classList.contains('open')) {
-            this.updateTables();
-          }
         });
       }
 
@@ -1735,100 +1176,82 @@ import Layout from '../layouts/Layout.astro';
         });
       }
 
-      // Rule Engine conditional node - dynamic rule management
+      // Conditional node controls
       if (node.type === 'conditional') {
-        // Add new rule
-        document.getElementById('add-rule-btn')?.addEventListener('click', () => {
-          if (!node.rules) node.rules = [];
-          const ruleNumber = node.rules.length + 1;
-          node.rules.push({ type: 'greater', value: 0, returnValue: 1, enabled: true, name: `Rule ${ruleNumber}` });
-          this.openSidebar(nodeId); // Refresh sidebar
-        });
+        // Add input button
+        const addInputBtn = document.getElementById('add-input');
+        if (addInputBtn) {
+          addInputBtn.addEventListener('click', () => {
+            const currentInputs = node.inputs || ['value', 'condition', 'min', 'max'];
+            currentInputs.push(`input${currentInputs.length + 1}`);
+            node.inputs = currentInputs;
+            this.openSidebar(node); // Refresh sidebar
+            this.rerenderNode(node);
+          });
+        }
 
-        // Preset rules
-        document.getElementById('add-preset-btn')?.addEventListener('click', () => {
-          const presets = [
-            'Positive/Negative/Zero Classification',
-            'Range Categories (0-25, 26-50, 51-75, 76-100)',
-            'Simple True/False (>0 = true, ≤0 = false)',
-            'Grade Categories (A/B/C/D/F based on score)'
-          ];
-          
-          const choice = prompt('Choose a preset:\n' + presets.map((p, i) => `${i+1}. ${p}`).join('\n'));
-          const index = parseInt(choice) - 1;
-          
-          if (index >= 0 && index < presets.length) {
-            switch(index) {
-              case 0: // Positive/Negative/Zero
-                node.rules = [
-                  { type: 'positive', returnValue: 1, enabled: true, name: 'Positive' },
-                  { type: 'negative', returnValue: -1, enabled: true, name: 'Negative' },
-                  { type: 'zero', returnValue: 0, enabled: true, name: 'Zero' }
-                ];
-                break;
-              case 1: // Range categories
-                node.rules = [
-                  { type: 'range', value: 0, maxValue: 25, returnValue: 1, enabled: true, name: 'Low (0-25)' },
-                  { type: 'range', value: 26, maxValue: 50, returnValue: 2, enabled: true, name: 'Medium (26-50)' },
-                  { type: 'range', value: 51, maxValue: 75, returnValue: 3, enabled: true, name: 'High (51-75)' },
-                  { type: 'range', value: 76, maxValue: 100, returnValue: 4, enabled: true, name: 'Very High (76-100)' },
-                  { type: 'default', returnValue: 0, enabled: true, name: 'Out of Range' }
-                ];
-                break;
-              case 2: // True/False
-                node.rules = [
-                  { type: 'greater', value: 0, returnValue: 1, enabled: true, name: 'True (>0)' },
-                  { type: 'default', returnValue: 0, enabled: true, name: 'False (≤0)' }
-                ];
-                break;
-              case 3: // Grade categories
-                node.rules = [
-                  { type: 'greater', value: 89, returnValue: 4, enabled: true, name: 'A (90-100)' },
-                  { type: 'greater', value: 79, returnValue: 3, enabled: true, name: 'B (80-89)' },
-                  { type: 'greater', value: 69, returnValue: 2, enabled: true, name: 'C (70-79)' },
-                  { type: 'greater', value: 59, returnValue: 1, enabled: true, name: 'D (60-69)' },
-                  { type: 'default', returnValue: 0, enabled: true, name: 'F (<60)' }
-                ];
-                break;
+        // Remove input button
+        const removeInputBtn = document.getElementById('remove-input');
+        if (removeInputBtn) {
+          removeInputBtn.addEventListener('click', () => {
+            const currentInputs = node.inputs || ['value', 'condition', 'min', 'max'];
+            if (currentInputs.length > 2) { // Keep at least 2 inputs
+              currentInputs.pop();
+              node.inputs = currentInputs;
+              this.openSidebar(node); // Refresh sidebar
+              this.rerenderNode(node);
             }
-            this.openSidebar(nodeId); // Refresh sidebar
-          }
-        });
+          });
+        }
 
-        // Handle rule changes
-        document.querySelectorAll('[data-rule-index]').forEach(element => {
-          const ruleIndex = parseInt(element.dataset.ruleIndex);
-          const field = element.dataset.field;
+        // Add output button
+        const addOutputBtn = document.getElementById('add-output');
+        if (addOutputBtn) {
+          addOutputBtn.addEventListener('click', () => {
+            const currentOutputs = node.outputs || ['true', 'false'];
+            currentOutputs.push(`output${currentOutputs.length + 1}`);
+            node.outputs = currentOutputs;
+            this.openSidebar(node); // Refresh sidebar
+            this.rerenderNode(node);
+          });
+        }
 
-          if (element.classList.contains('delete-rule-btn')) {
-            element.addEventListener('click', () => {
-              node.rules.splice(ruleIndex, 1);
-              this.openSidebar(nodeId); // Refresh sidebar
-            });
-          } else {
-            element.addEventListener('change', () => {
-              if (!node.rules[ruleIndex]) return;
-              
-              if (field === 'enabled') {
-                node.rules[ruleIndex].enabled = element.checked;
-              } else if (field === 'type') {
-                node.rules[ruleIndex].type = element.value;
-                // Reset values when type changes
-                if (element.value === 'range') {
-                  node.rules[ruleIndex].maxValue = 10;
-                }
-                this.openSidebar(nodeId); // Refresh for dynamic fields
-              } else if (field === 'name') {
-                node.rules[ruleIndex].name = element.value;
-              } else {
-                const value = parseFloat(element.value) || 0;
-                node.rules[ruleIndex][field] = value;
-              }
-              
-              this.updateEquation(); // Update calculations
-            });
-          }
-        });
+        // Remove output button
+        const removeOutputBtn = document.getElementById('remove-output');
+        if (removeOutputBtn) {
+          removeOutputBtn.addEventListener('click', () => {
+            const currentOutputs = node.outputs || ['true', 'false'];
+            if (currentOutputs.length > 1) { // Keep at least 1 output
+              currentOutputs.pop();
+              node.outputs = currentOutputs;
+              this.openSidebar(node); // Refresh sidebar
+              this.rerenderNode(node);
+            }
+          });
+        }
+
+        // Update conditional button
+        const updateConditionalBtn = document.getElementById('update-conditional');
+        if (updateConditionalBtn) {
+          updateConditionalBtn.addEventListener('click', () => {
+            const conditionType = document.getElementById('condition-type').value;
+            
+            // Update input names from text inputs
+            const inputElements = document.querySelectorAll('#input-list input');
+            const newInputs = Array.from(inputElements).map(input => input.value.trim() || 'input');
+            
+            // Update output names from text inputs
+            const outputElements = document.querySelectorAll('#output-list input');
+            const newOutputs = Array.from(outputElements).map(output => output.value.trim() || 'output');
+            
+            node.conditionType = conditionType;
+            node.inputs = newInputs;
+            node.outputs = newOutputs;
+            
+            this.rerenderNode(node);
+            this.updateEquation();
+          });
+        }
       }
 
       // Component node controls
@@ -1843,49 +1266,6 @@ import Layout from '../layouts/Layout.astro';
         }
 
         // Component name can be updated when saving
-      }
-      
-      // Multiplexer node controls
-      if (node.type === 'multiplexer') {
-        const choiceCountInput = document.getElementById('choice-count');
-        if (choiceCountInput) {
-          choiceCountInput.addEventListener('change', () => {
-            const count = parseInt(choiceCountInput.value) || 2;
-            const clampedCount = Math.max(2, Math.min(10, count));
-            
-            // Update node configuration - choices at top, selector at bottom
-            node.inputs = [];
-            for (let i = 0; i < clampedCount; i++) {
-              node.inputs.push(`choice${i}`);
-            }
-            node.inputs.push('selector');
-            
-            // Re-render node
-            this.rerenderNode(node);
-            this.updateEquation();
-          });
-        }
-      }
-      
-      // Splitter node controls  
-      if (node.type === 'splitter') {
-        const outputCountInput = document.getElementById('output-count');
-        if (outputCountInput) {
-          outputCountInput.addEventListener('change', () => {
-            const count = parseInt(outputCountInput.value) || 2;
-            const clampedCount = Math.max(2, Math.min(10, count));
-            
-            // Update node configuration
-            node.outputs = [];
-            for (let i = 0; i < clampedCount; i++) {
-              node.outputs.push(`output${i}`);
-            }
-            
-            // Re-render node
-            this.rerenderNode(node);
-            this.updateEquation();
-          });
-        }
       }
       
       this.sidebar.classList.add('open');
@@ -2203,16 +1583,9 @@ import Layout from '../layouts/Layout.astro';
               case 'number':
                 inputValue = parseFloat(externalSourceNode.value) || 0;
                 break;
-              case 'variable': {
-                const variableName = externalSourceNode.variable || 'x';
-                const globalVar = this.globalVariables.get(variableName);
-                if (globalVar && globalVar.isSet) {
-                  inputValue = parseFloat(globalVar.value) || 0;
-                } else {
-                  inputValue = NaN; // Variable not set
-                }
+              case 'variable':
+                inputValue = 2; // Demo value
                 break;
-              }
               case 'component':
                 inputValue = this.calculateComponentResult(sourceNodeId, sourcePortId);
                 break;
@@ -2378,28 +1751,6 @@ import Layout from '../layouts/Layout.astro';
           return left / right;
         }
         
-        // Mathematical constants
-        case 'constant_pi':
-          return Math.PI; // π ≈ 3.14159
-        case 'constant_e':
-          return Math.E; // e ≈ 2.71828
-        case 'constant_phi':
-          return (1 + Math.sqrt(5)) / 2; // φ (golden ratio) ≈ 1.618
-        case 'constant_sqrt2':
-          return Math.sqrt(2); // √2 ≈ 1.414
-
-        case 'variable': {
-          const variableName = node.variable || 'x';
-          if (this.globalVariables && this.globalVariables.has(variableName)) {
-            const globalVar = this.globalVariables.get(variableName);
-            if (globalVar && globalVar.isSet) {
-              const value = parseFloat(globalVar.value);
-              return isNaN(value) ? '?' : value;
-            }
-          }
-          return '?';
-        }
-        
         default:
           return node.value || 0;
       }
@@ -2525,34 +1876,6 @@ import Layout from '../layouts/Layout.astro';
           const input = this.getComponentNodeInput(nodeId, 'in', componentData);
           if (input === '?') return '?';
           return Math.tan(input);
-        }
-        
-        // Mathematical constants
-        case 'constant_pi':
-          return Math.PI; // π ≈ 3.14159
-        case 'constant_e':
-          return Math.E; // e ≈ 2.71828
-        case 'constant_phi':
-          return (1 + Math.sqrt(5)) / 2; // φ (golden ratio) ≈ 1.618
-        case 'constant_sqrt2':
-          return Math.sqrt(2); // √2 ≈ 1.414
-
-        case 'variable': {
-          console.log('🔤 Variable node in component:', node.variable);
-          const variableName = node.variable || 'x';
-          
-          // Access global variable system from main canvas
-          if (this.globalVariables && this.globalVariables.has(variableName)) {
-            const globalVar = this.globalVariables.get(variableName);
-            if (globalVar && globalVar.isSet) {
-              const value = parseFloat(globalVar.value);
-              console.log('🔤 Variable', variableName, 'resolved to:', value);
-              return isNaN(value) ? '?' : value;
-            }
-          }
-          
-          console.log('🔤 Variable', variableName, 'not set globally, returning ?');
-          return '?';
         }
         
         default:
@@ -2807,58 +2130,21 @@ import Layout from '../layouts/Layout.astro';
       // Update each output node individually
       outputNodes.forEach(outputNode => {
         const equation = this.buildEquation(outputNode.id, 'in');
-        const latexEquation = this.buildLatexEquation(outputNode.id, 'in');
         const result = this.calculateResult(outputNode.id, 'in');
         
-        // Store in global outputs for table display
-        if (!this.globalOutputs.has(outputNode.id)) {
-          this.globalOutputs.set(outputNode.id, {
-            name: outputNode.label || 'Output',
-            equation: '',
-            latexEquation: '',
-            result: '',
-            inTable: false
-          });
-        }
-        
-        const globalOutput = this.globalOutputs.get(outputNode.id);
-        globalOutput.equation = equation || '';
-        globalOutput.latexEquation = latexEquation || '';
-        
-        // Show equation instead of NaN/undefined for non-numeric results
-        if (result === null || result === undefined || isNaN(result)) {
-          globalOutput.result = equation || 'undefined';
-        } else {
-          globalOutput.result = result.toString();
-        }
-        
-        // Update the Output node itself to show the computed value
+        // Update the Result node itself to show the computed value
         const outputNodeEl = document.getElementById(outputNode.id);
         if (outputNodeEl) {
           const contentEl = outputNodeEl.querySelector('.node-content');
           if (contentEl) {
             if (equation) {
-              // Show equation instead of NaN for non-numeric results
-              const displayResult = (result === null || result === undefined || isNaN(result)) ? 
-                equation : result;
-              contentEl.textContent = `Output: ${displayResult}`;
+              contentEl.textContent = `Result: ${result}`;
             } else {
-              contentEl.textContent = globalOutput.name || 'Output';
+              contentEl.textContent = 'Output';
             }
           }
-          
-          // Add click listener to make this output's equation the main display
-          outputNodeEl.addEventListener('click', () => {
-            this.setMainEquationDisplay(outputNode.id, equation, result);
-          });
         }
       });
-
-      // Update tables if sidebar is visible
-      const tablesSidebar = document.getElementById('tables-sidebar');
-      if (tablesSidebar && tablesSidebar.classList.contains('open')) {
-        this.updateTables();
-      }
 
       // Update the main equation display with the first output node (for backward compatibility)
       const firstOutputNode = outputNodes[0];
@@ -2866,10 +2152,8 @@ import Layout from '../layouts/Layout.astro';
       const result = this.calculateResult(firstOutputNode.id, 'in');
       
       if (equation) {
-        // Show equation instead of NaN for non-numeric results
-        const displayResult = (result === null || result === undefined || isNaN(result)) ? 
-          equation : result;
-        this.equationDisplay.textContent = `${equation} = ${displayResult}`;
+        // Update equation display
+        this.equationDisplay.textContent = `${equation} = ${result}`;
         this.equationDisplay.style.color = '#1e293b';
       } else {
         this.equationDisplay.textContent = 'Connect nodes to the Output to generate equation...';
@@ -2912,22 +2196,12 @@ import Layout from '../layouts/Layout.astro';
         // Generators
         case 'number':
           return parseFloat(sourceNode.value) || 0;
-        case 'variable': {
-          const variableName = sourceNode.variable || 'x';
-          const globalVar = this.globalVariables.get(variableName);
-          if (globalVar && globalVar.isSet) {
-            return parseFloat(globalVar.value) || 0;
-          }
-          return NaN; // Variable not set
-        }
+        case 'variable':
+          return 2; // Demo: x = 2
         case 'constant_pi':
           return Math.PI;
         case 'constant_e':
           return Math.E;
-        case 'constant_phi':
-          return (1 + Math.sqrt(5)) / 2; // Golden ratio
-        case 'constant_sqrt2':
-          return Math.sqrt(2);
           
         // Basic Operators
         case 'add': {
@@ -3045,58 +2319,27 @@ import Layout from '../layouts/Layout.astro';
           return this.calculateComponentResult(sourceNode.id, componentOutputPort);
         }
         case 'conditional': {
-          // Rule engine logic: evaluate rules in order and return first match
-          const inputValue = this.calculateResult(sourceNode.id, 'value');
-          if (inputValue === '?') return '?';
+          const value = this.calculateResult(sourceNode.id, 'value');
+          const condition = this.calculateResult(sourceNode.id, 'condition') || 'range'; // Default to range check
+          const min = this.calculateResult(sourceNode.id, 'min') || 0;
+          const max = this.calculateResult(sourceNode.id, 'max') || 100;
           
-          // Get rules from node (default to simple > 0 check if none exist)
-          const rules = sourceNode.rules || [
-            { type: 'greater', value: 0, returnValue: 1, enabled: true },
-            { type: 'default', returnValue: 0, enabled: true }
-          ];
+          if (value === '?') return '?';
           
-          // Evaluate rules in order
-          for (const rule of rules) {
-            if (!rule.enabled) continue;
-            
-            let matches = false;
-            switch (rule.type) {
-              case 'greater':
-                matches = inputValue > (rule.value || 0);
-                break;
-              case 'less':
-                matches = inputValue < (rule.value || 0);
-                break;
-              case 'equals':
-                matches = inputValue === (rule.value || 0);
-                break;
-              case 'range': {
-                const min = rule.value || 0;
-                const max = rule.maxValue || 10;
-                matches = inputValue >= min && inputValue <= max;
-                break;
-              }
-              case 'negative':
-                matches = inputValue < 0;
-                break;
-              case 'positive':
-                matches = inputValue > 0;
-                break;
-              case 'zero':
-                matches = inputValue === 0;
-                break;
-              case 'default':
-                matches = true; // Always matches (catch-all)
-                break;
-            }
-            
-            if (matches) {
-              return rule.returnValue || 0;
-            }
+          // Check condition based on type
+          let conditionMet = false;
+          if (condition === 'range' || condition === 'between') {
+            conditionMet = (value >= min && value <= max);
+          } else if (condition === 'greater') {
+            conditionMet = (value > min);
+          } else if (condition === 'less') {
+            conditionMet = (value < max);
+          } else if (condition === 'equal') {
+            conditionMet = (value === min);
           }
           
-          // If no rule matched (shouldn't happen with default rule), return 0
-          return 0;
+          // For calculation purposes, return 1 if condition met, 0 if not
+          return conditionMet ? 1 : 0;
         }
 
         // Component I/O nodes
@@ -3108,31 +2351,6 @@ import Layout from '../layouts/Layout.astro';
         case 'componentOutput': {
           // Component output nodes pass through their input value
           const input = this.calculateResult(sourceNode.id, 'in');
-          return input !== '?' ? input : 0;
-        }
-        
-        // Multiplexer node - select between choice inputs based on selector value  
-        case 'multiplexer': {
-          const selector = this.calculateResult(sourceNode.id, 'selector');
-          if (selector === '?') return '?';
-          
-          // Round selector to nearest integer and use as choice index
-          const choiceIndex = Math.round(selector);
-          const choicePort = `choice${choiceIndex}`;
-          
-          // Check if the choice port exists on this node
-          if (sourceNode.inputs && sourceNode.inputs.includes(choicePort)) {
-            const selectedChoice = this.calculateResult(sourceNode.id, choicePort);
-            return selectedChoice !== '?' ? selectedChoice : 0;
-          } else {
-            // If choice index is out of range, return 0
-            return 0;
-          }
-        }
-        
-        // Splitter node - pass input value to all outputs
-        case 'splitter': {
-          const input = this.calculateResult(sourceNode.id, 'input');
           return input !== '?' ? input : 0;
         }
         
@@ -3177,10 +2395,6 @@ import Layout from '../layouts/Layout.astro';
           return 'π';
         case 'constant_e':
           return 'e';
-        case 'constant_phi':
-          return 'φ'; // φ (golden ratio)
-        case 'constant_sqrt2':
-          return '√2'; // √2
           
         // Binary Operators
         case 'add':
@@ -3270,34 +2484,22 @@ import Layout from '../layouts/Layout.astro';
           return this.buildComponentEquation(sourceNodeId, sourcePortId);
         }
         case 'conditional': {
-          // Rule engine equation building
-          const inputEquation = this.buildEquation(sourceNode.id, 'value');
-          if (!inputEquation) return '';
+          const value = this.buildEquation(sourceNode.id, 'value');
+          const condition = this.buildEquation(sourceNode.id, 'condition');
+          const min = this.buildEquation(sourceNode.id, 'min');
+          const max = this.buildEquation(sourceNode.id, 'max');
           
-          const rules = sourceNode.rules || [
-            { type: 'greater', value: 0, returnValue: 1, enabled: true },
-            { type: 'default', returnValue: 0, enabled: true }
-          ];
+          if (!value) return '';
           
-          // Build a readable rule description
-          const activeRules = rules.filter(r => r.enabled);
-          if (activeRules.length === 0) return 'RULES()';
-          
-          const ruleDescriptions = activeRules.map(rule => {
-            switch (rule.type) {
-              case 'greater': return `${inputEquation} > ${rule.value} → ${rule.returnValue}`;
-              case 'less': return `${inputEquation} < ${rule.value} → ${rule.returnValue}`;
-              case 'equals': return `${inputEquation} = ${rule.value} → ${rule.returnValue}`;
-              case 'range': return `${rule.value} ≤ ${inputEquation} ≤ ${rule.maxValue} → ${rule.returnValue}`;
-              case 'negative': return `${inputEquation} < 0 → ${rule.returnValue}`;
-              case 'positive': return `${inputEquation} > 0 → ${rule.returnValue}`;
-              case 'zero': return `${inputEquation} = 0 → ${rule.returnValue}`;
-              case 'default': return `default → ${rule.returnValue}`;
-              default: return `${rule.type} → ${rule.returnValue}`;
-            }
-          });
-          
-          return `RULES(${ruleDescriptions.join('; ')})`;
+          if (min && max) {
+            return `IF(${value} ∈ [${min}, ${max}])`;
+          } else if (condition === 'greater' && min) {
+            return `IF(${value} > ${min})`;
+          } else if (condition === 'less' && max) {
+            return `IF(${value} < ${max})`;
+          } else {
+            return `IF(${value})`;
+          }
         }
 
         // Component I/O nodes
@@ -3309,502 +2511,9 @@ import Layout from '../layouts/Layout.astro';
           return input || 'Output';
         }
         
-        // Multiplexer node - shows selector and choice count
-        case 'multiplexer': {
-          const selector = this.buildEquation(sourceNode.id, 'selector');
-          if (!selector) return 'MUX(?)';
-          
-          const choiceCount = (sourceNode.inputs || []).length - 1; // Subtract selector port
-          return `MUX[${choiceCount}](${selector})`;
-        }
-        
-        // Splitter node - shows input being split to multiple outputs
-        case 'splitter': {
-          const input = this.buildEquation(sourceNode.id, 'input');
-          const outputCount = (sourceNode.outputs || []).length;
-          return input ? `SPLIT[${outputCount}](${input})` : `SPLIT[${outputCount}](?)`;
-        }
-        
         default:
           return '';
       }
-    }
-
-    setupTables() {
-      const showTablesBtn = document.getElementById('show-tables-btn');
-      const tablesSidebar = document.getElementById('tables-sidebar');
-      
-      // Show/hide tables sidebar
-      showTablesBtn.addEventListener('click', () => {
-        if (tablesSidebar.classList.contains('open')) {
-          // Close sidebar if already open
-          tablesSidebar.classList.remove('open');
-          showTablesBtn.textContent = 'Show Tables';
-        } else {
-          // Open sidebar
-          tablesSidebar.classList.add('open');
-          showTablesBtn.textContent = 'Hide Tables';
-          this.updateTables();
-        }
-      });
-
-      // Close sidebar via close button
-      document.getElementById('close-tables-sidebar').addEventListener('click', () => {
-        tablesSidebar.classList.remove('open');
-        showTablesBtn.textContent = 'Show Tables';
-      });
-
-      // Section toggles
-      document.getElementById('toggle-variables').addEventListener('click', () => {
-        const section = document.getElementById('variables-section');
-        const button = document.getElementById('toggle-variables');
-        section.classList.toggle('collapsed');
-        button.textContent = section.classList.contains('collapsed') ? '+' : '−';
-      });
-
-      document.getElementById('toggle-equations').addEventListener('click', () => {
-        const section = document.getElementById('equations-section');
-        const button = document.getElementById('toggle-equations');
-        section.classList.toggle('collapsed');
-        button.textContent = section.classList.contains('collapsed') ? '+' : '−';
-      });
-    }
-
-
-
-    updateTables() {
-      this.updateVariablesTable();
-      this.updateEquationsTable();
-    }
-
-    updateVariablesTable() {
-      const tbody = document.getElementById('variables-tbody');
-      tbody.innerHTML = '';
-
-      for (const [varName, varData] of this.globalVariables.entries()) {
-        if (varData.inTable) {
-          const row = document.createElement('tr');
-          const nameCell = document.createElement('td');
-          const valueCell = document.createElement('td');
-          
-          nameCell.textContent = varName;
-          
-          // Create editable input for value
-          const valueInput = document.createElement('input');
-          valueInput.type = 'number';
-          valueInput.step = '0.1';
-          valueInput.value = varData.isSet ? varData.value : '';
-          valueInput.placeholder = 'symbolic';
-          valueInput.style.cssText = 'width: 100%; border: none; background: transparent; padding: 4px;';
-          
-          // Add event listener to update global variable
-          valueInput.addEventListener('input', (e) => {
-            const value = e.target.value;
-            varData.value = value;
-            varData.isSet = value !== '';
-            this.updateEquation(); // Recalculate equations
-          });
-          
-          // Add focus styles
-          valueInput.addEventListener('focus', () => {
-            valueInput.style.background = '#f0f9ff';
-            valueInput.style.border = '1px solid #3b82f6';
-          });
-          
-          valueInput.addEventListener('blur', () => {
-            valueInput.style.background = 'transparent';
-            valueInput.style.border = 'none';
-          });
-          
-          valueCell.appendChild(valueInput);
-          
-          row.appendChild(nameCell);
-          row.appendChild(valueCell);
-          tbody.appendChild(row);
-        }
-      }
-    }
-
-    updateEquationsTable() {
-      const tbody = document.getElementById('equations-tbody');
-      tbody.innerHTML = '';
-
-      for (const [outputId, outputData] of this.globalOutputs.entries()) {
-        if (outputData.inTable) {
-          const row = document.createElement('tr');
-          const latexCell = document.createElement('td');
-          latexCell.className = 'latex-cell';
-          
-          row.innerHTML = `
-            <td>${outputData.name}</td>
-            <td>${outputData.result}</td>
-          `;
-          
-          // Insert LaTeX cell at position 1 (between name and result)
-          const nameCell = row.children[0];
-          const resultCell = row.children[1];
-          row.insertBefore(latexCell, resultCell);
-          
-          // Render LaTeX for equation
-          const latexEquation = outputData.latexEquation || this.convertToLatex(outputData.equation);
-          this.renderLatex(latexCell, latexEquation);
-          
-          tbody.appendChild(row);
-        }
-      }
-    }
-
-    renderLatex(element, latexString) {
-      // Wait for KaTeX to be available
-      if (typeof katex !== 'undefined') {
-        try {
-          katex.render(latexString, element, {
-            throwOnError: false,
-            displayMode: false
-          });
-        } catch (error) {
-          console.warn('LaTeX rendering error:', error);
-          element.textContent = latexString;
-        }
-      } else {
-        // Fallback if KaTeX isn't loaded yet
-        element.textContent = latexString;
-        // Try again after a brief delay
-        setTimeout(() => {
-          if (typeof katex !== 'undefined') {
-            try {
-              katex.render(latexString, element, {
-                throwOnError: false,
-                displayMode: false
-              });
-            } catch (error) {
-              console.warn('LaTeX rendering error:', error);
-            }
-          }
-        }, 100);
-      }
-    }
-
-    setMainEquationDisplay(outputNodeId, equation, result) {
-      if (!equation) return;
-      
-      // Show equation instead of NaN for non-numeric results
-      const displayResult = (result === null || result === undefined || isNaN(result)) ? 
-        equation : result;
-      
-      this.equationDisplay.textContent = `${equation} = ${displayResult}`;
-      this.equationDisplay.style.color = '#1e293b';
-    }
-
-    buildLatexEquation(nodeId, portId) {
-      const connection = this.connections.find(conn => conn.to === `${nodeId}-${portId}`);
-      if (!connection) return '';
-      
-      // Parse source node ID properly
-      const fromParts = connection.from.split('-');
-      fromParts.pop(); // Remove port id
-      const sourceNodeId = fromParts.join('-');
-      
-      const sourceNode = this.nodes.get(sourceNodeId);
-      if (!sourceNode) return '';
-
-      switch (sourceNode.type) {
-        // Generators
-        case 'number':
-          return sourceNode.value?.toString() || '0';
-        case 'variable':
-          return sourceNode.variable || 'x';
-        case 'constant_pi':
-          return '\\pi';
-        case 'constant_e':
-          return 'e';
-        case 'constant_phi':
-          return '\\phi'; // φ (golden ratio)
-        case 'constant_sqrt2':
-          return '\\sqrt{2}'; // √2
-          
-        // Binary Operators
-        case 'add':
-        case 'subtract': {
-          const left = this.buildLatexEquation(sourceNode.id, 'in1');
-          const right = this.buildLatexEquation(sourceNode.id, 'in2');
-          if (!left || !right) return '';
-          
-          const op = sourceNode.type === 'add' ? '+' : '-';
-          return `${left} ${op} ${right}`;
-        }
-        
-        case 'multiply': {
-          const left = this.buildLatexEquation(sourceNode.id, 'in1');
-          const right = this.buildLatexEquation(sourceNode.id, 'in2');
-          if (!left || !right) return '';
-          return `${left} \\cdot ${right}`;
-        }
-        
-        case 'divide': {
-          const left = this.buildLatexEquation(sourceNode.id, 'in1');
-          const right = this.buildLatexEquation(sourceNode.id, 'in2');
-          if (!left || !right) return '';
-          return `\\frac{${left}}{${right}}`;
-        }
-        
-        case 'power': {
-          const base = this.buildLatexEquation(sourceNode.id, 'base');
-          const exp = this.buildLatexEquation(sourceNode.id, 'exp');
-          if (!base || !exp) return '';
-          return `${base}^{${exp}}`;
-        }
-        
-        // Unary Operators  
-        case 'sqrt': {
-          const value = this.buildLatexEquation(sourceNode.id, 'value');
-          const root = this.buildLatexEquation(sourceNode.id, 'root');
-          
-          if (!value) return '';
-          
-          if (root && root !== '2') {
-            return `\\sqrt[${root}]{${value}}`;
-          } else {
-            return `\\sqrt{${value}}`;
-          }
-        }
-        
-        case 'log': {
-          const value = this.buildLatexEquation(sourceNode.id, 'value');
-          const base = this.buildLatexEquation(sourceNode.id, 'base');
-          
-          if (!value) return '';
-          
-          if (base && base !== '10') {
-            return `\\log_{${base}}\\left(${value}\\right)`;
-          } else {
-            return `\\log\\left(${value}\\right)`;
-          }
-        }
-        
-        case 'ln': {
-          const input = this.buildLatexEquation(sourceNode.id, 'in');
-          if (!input) return '';
-          return `\\ln\\left(${input}\\right)`;
-        }
-        
-        case 'abs': {
-          const input = this.buildLatexEquation(sourceNode.id, 'in');
-          if (!input) return '';
-          return `\\left|${input}\\right|`;
-        }
-        
-        case 'sin':
-        case 'cos':
-        case 'tan': {
-          const input = this.buildLatexEquation(sourceNode.id, 'in');
-          if (!input) return '';
-          return `\\${sourceNode.type}\\left(${input}\\right)`;
-        }
-        
-        case 'modulo': {
-          const left = this.buildLatexEquation(sourceNode.id, 'in1');
-          const right = this.buildLatexEquation(sourceNode.id, 'in2');
-          if (!left || !right) return '';
-          return `${left} \\bmod ${right}`;
-        }
-        
-        default:
-          return '';
-      }
-    }
-
-    convertToLatex(equation) {
-      // This method is now simplified since we have buildLatexEquation
-      if (!equation) return '';
-      
-      // Basic fallback conversion for any missed cases
-      return equation
-        .replace(/π/g, '\\pi')
-        .replace(/\*/g, ' \\cdot ')
-        .replace(/sqrt\(/g, '\\sqrt{')
-        .replace(/\|([^|]+)\|/g, '\\left|$1\\right|');
-    }
-
-    // Session Management Methods
-    exportSession() {
-      try {
-        const sessionData = {
-          timestamp: new Date().toISOString(),
-          version: '1.0',
-          appName: 'Visual Equation Builder',
-          data: {
-            nodes: Array.from(this.nodes.entries()).map(([id, node]) => [id, {
-              ...node,
-              element: null, // Don't serialize DOM elements
-              // Ensure inputs/outputs are preserved
-              inputs: node.inputs || [],
-              outputs: node.outputs || []
-            }]),
-            connections: [...this.connections],
-            globalVariables: Array.from(this.globalVariables.entries()),
-            globalOutputs: Array.from(this.globalOutputs.entries())
-          }
-        };
-
-        // Create downloadable file
-        const jsonString = JSON.stringify(sessionData, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        
-        // Create download link
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `equation-builder-session-${new Date().toISOString().slice(0, 16).replace(/:/g, '-')}.json`;
-        
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        
-        return true;
-      } catch (error) {
-        console.error('Failed to export session:', error);
-        alert('Failed to export session. Please try again.');
-        return false;
-      }
-    }
-
-    // Separate auto-save method for localStorage
-    autoSave() {
-      try {
-        const sessionData = {
-          timestamp: new Date().toISOString(),
-          version: '1.0',
-          data: {
-            nodes: Array.from(this.nodes.entries()).map(([id, node]) => [id, {
-              ...node,
-              element: null, // Don't serialize DOM elements
-              // Ensure inputs/outputs are preserved
-              inputs: node.inputs || [],
-              outputs: node.outputs || []
-            }]),
-            connections: [...this.connections],
-            globalVariables: Array.from(this.globalVariables.entries()),
-            globalOutputs: Array.from(this.globalOutputs.entries())
-          }
-        };
-
-        localStorage.setItem('equation_builder_autosave', JSON.stringify(sessionData));
-        this.showAutoSaveIndicator();
-        return true;
-      } catch (error) {
-        console.warn('Auto-save failed:', error);
-        return false;
-      }
-    }
-
-    importSession(fileContent) {
-      try {
-        const sessionData = JSON.parse(fileContent);
-        
-        // Validate session data structure
-        if (!sessionData.data || !sessionData.version) {
-          throw new Error('Invalid session file format');
-        }
-
-        // Clear current state
-        this.clearCanvas('full');
-
-        // Restore data
-        const { nodes, connections, globalVariables, globalOutputs } = sessionData.data;
-        
-        // Restore nodes
-        this.nodes = new Map(nodes.map(([id, nodeData]) => {
-          // Create actual DOM element for the node
-          const position = { x: nodeData.x, y: nodeData.y };
-          this.addNode(nodeData.type, position);
-          const newNode = Array.from(this.nodes.values()).find(n => n.type === nodeData.type && Math.abs(n.x - nodeData.x) < 10);
-          if (newNode) {
-            // Carefully restore saved data while preserving critical properties
-            const restoredNode = {
-              ...newNode, // Keep the properly initialized node
-              ...nodeData, // Apply saved data
-              inputs: nodeData.inputs || newNode.inputs || [], // Ensure inputs exist
-              outputs: nodeData.outputs || newNode.outputs || [], // Ensure outputs exist
-              id: id // Ensure ID matches
-            };
-            return [id, restoredNode];
-          }
-          return null;
-        }).filter(Boolean));
-
-        // Restore connections
-        this.connections = [...connections];
-        
-        // Restore global state
-        this.globalVariables = new Map(globalVariables);
-        this.globalOutputs = new Map(globalOutputs);
-
-        // Update visual state
-        this.updateConnections();
-        this.updateVariablesTable();
-        this.updateEquationsTable();
-
-        alert(`Session imported successfully! (${new Date(sessionData.timestamp).toLocaleString()})`);
-        return true;
-      } catch (error) {
-        console.error('Failed to import session:', error);
-        alert('Failed to import session. The file may be corrupted or invalid.');
-        return false;
-      }
-    }
-
-    // Load auto-save from localStorage
-    loadAutoSave() {
-      try {
-        const sessionData = JSON.parse(localStorage.getItem('equation_builder_autosave'));
-        if (!sessionData) {
-          alert('No auto-saved session found.');
-          return false;
-        }
-
-        // Use the same import logic
-        return this.importSession(JSON.stringify(sessionData));
-      } catch (error) {
-        console.error('Failed to load auto-save:', error);
-        alert('Failed to load auto-saved session.');
-        return false;
-      }
-    }
-
-    hasAutoSave() {
-      return localStorage.getItem('equation_builder_autosave') !== null;
-    }
-
-    showAutoSaveIndicator() {
-      const indicator = document.getElementById('auto-save-indicator');
-      indicator.classList.add('show');
-      setTimeout(() => {
-        indicator.classList.remove('show');
-      }, 3000);
-    }
-
-    // Auto-save functionality with debouncing
-    setupAutoSave() {
-      let autoSaveTimeout;
-      const triggerAutoSave = () => {
-        clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(() => {
-          if (this.nodes.size > 0 || this.connections.length > 0) {
-            this.autoSave();
-          }
-        }, 2000); // Auto-save after 2 seconds of inactivity
-      };
-
-      // Auto-save on canvas changes
-      const canvas = document.getElementById('equation-canvas');
-      const observer = new MutationObserver(triggerAutoSave);
-      observer.observe(canvas, { childList: true, subtree: true });
-
-      // Auto-save on connection changes (we'll call this manually when connections change)
-      this.autoSaveCallback = triggerAutoSave;
     }
   }
 
@@ -3812,38 +2521,6 @@ import Layout from '../layouts/Layout.astro';
   let equationBuilder;
   document.addEventListener('DOMContentLoaded', () => {
     equationBuilder = new CleanEquationBuilder();
-    
-    // Set up auto-save
-    equationBuilder.setupAutoSave();
-    
-    // Session Management Event Listeners
-    document.getElementById('export-session-btn').addEventListener('click', () => {
-      equationBuilder.exportSession();
-    });
-
-    document.getElementById('import-session-btn').addEventListener('click', () => {
-      document.getElementById('import-file-input').click();
-    });
-
-    // Handle file import
-    document.getElementById('import-file-input').addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          equationBuilder.importSession(e.target.result);
-        };
-        reader.readAsText(file);
-      }
-      // Reset the input so the same file can be selected again
-      event.target.value = '';
-    });
-
-    document.getElementById('clear-canvas-btn').addEventListener('click', () => {
-      if (confirm('Are you sure you want to clear the entire canvas? This cannot be undone.')) {
-        equationBuilder.clearCanvas('full');
-      }
-    });
     
     // Handle window resize
     window.addEventListener('resize', () => {
@@ -4060,15 +2737,8 @@ import Layout from '../layouts/Layout.astro';
   }
 
   :global(.node-conditional) {
-    background: #8b5cf6 !important;
+    background: #ec4899 !important;
     color: white !important;
-    border: 2px solid #7c3aed !important;
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
-  }
-  
-  :global(.node-conditional:hover) {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4) !important;
   }
 
   :global(.node-component-input) {
@@ -4083,30 +2753,6 @@ import Layout from '../layouts/Layout.astro';
     color: white !important;
     border: 2px solid #d97706 !important;
     font-weight: 600 !important;
-  }
-
-  :global(.node-multiplexer) {
-    background: #14b8a6 !important;
-    color: white !important;
-    border: 2px solid #0d9488 !important;
-    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3) !important;
-  }
-  
-  :global(.node-multiplexer:hover) {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 16px rgba(20, 184, 166, 0.4) !important;
-  }
-
-  :global(.node-splitter) {
-    background: #f97316 !important;
-    color: white !important;
-    border: 2px solid #ea580c !important;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3) !important;
-  }
-  
-  :global(.node-splitter:hover) {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4) !important;
   }
 
   .canvas {
@@ -4310,232 +2956,6 @@ import Layout from '../layouts/Layout.astro';
     color: #1e293b;
   }
 
-  /* Tables Sidebar */
-  .tables-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 380px;
-    height: 100vh;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-right: 2px solid #e5e7eb;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    overflow-y: auto;
-    display: none;
-  }
-
-  .tables-sidebar.open {
-    display: block;
-    transform: translateX(0);
-  }
-
-  .tables-sidebar-header {
-    background: #f3f4f6;
-    padding: 16px;
-    border-bottom: 2px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .tables-sidebar-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #374151;
-  }
-
-  .table-section {
-    border-bottom: 1px solid #f3f4f6;
-  }
-
-  .section-header {
-    background: #f9fafb;
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  .section-header:hover {
-    background: #f3f4f6;
-  }
-
-  .section-header h4 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #374151;
-  }
-
-  .section-toggle {
-    background: none;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    color: #6b7280;
-    transition: all 0.2s;
-  }
-
-  .section-toggle:hover {
-    background: #e5e7eb;
-    color: #374151;
-  }
-
-  .section-content {
-    padding: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
-
-  .section-content.collapsed {
-    max-height: 0;
-  }
-
-  .variables-table, .equations-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-
-  .variables-table th, .equations-table th {
-    background: #f9fafb;
-    padding: 12px;
-    text-align: left;
-    font-weight: 600;
-    color: #374151;
-    border-bottom: 2px solid #e5e7eb;
-    position: sticky;
-    top: 0;
-  }
-
-  .variables-table td, .equations-table td {
-    padding: 12px;
-    border-bottom: 1px solid #f3f4f6;
-    vertical-align: top;
-  }
-
-  /* Ensure name column in equations table is top-aligned */
-  .equations-table td:first-child {
-    vertical-align: top;
-  }
-
-  .variables-table tr:hover, .equations-table tr:hover {
-    background: #f9fafb;
-  }
-
-  .latex-cell {
-    font-family: 'KaTeX_Main', 'Times New Roman', serif;
-    font-size: 16px;
-  }
-
-  /* Equation Builder Toolbar */
-  .equation-toolbar {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto 20px auto;
-    height: 60px;
-    background: linear-gradient(to right, #f8fafc, #f1f5f9);
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .toolbar-btn {
-    background: #374151;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .toolbar-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  .toolbar-btn:first-child {
-    background: #3b82f6;
-  }
-
-  .toolbar-btn:first-child:hover {
-    background: #2563eb;
-  }
-
-  .export-btn:hover { background: #059669; }
-  .import-btn:hover { background: #0d9488; }
-  .clear-btn:hover { background: #dc2626; }
-
-  .toolbar-divider {
-    width: 1px;
-    height: 30px;
-    background: #d1d5db;
-    margin: 0 8px;
-  }
-
-  .auto-save-indicator {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    background: rgba(34, 197, 94, 0.1);
-    border-radius: 6px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    margin-left: auto;
-  }
-
-  .auto-save-indicator.show {
-    opacity: 1;
-  }
-
-  .auto-save-dot {
-    width: 8px;
-    height: 8px;
-    background: #22c55e;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-
-  .auto-save-text {
-    font-size: 12px;
-    color: #166534;
-    font-weight: 500;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-
-  /* Remove the content offset since toolbar is now relative */
-  .section {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-    text-align: center;
-  }
-
   .input-group {
     margin-bottom: 16px;
   }
@@ -4576,203 +2996,5 @@ import Layout from '../layouts/Layout.astro';
 
   .delete-btn:hover {
     background: #dc2626;
-  }
-  /* Palette Footer */
-  .palette-footer {
-    padding: 12px;
-    border-top: 1px solid #e5e7eb;
-    margin-top: auto;
-  }
-
-  /* Help Button */
-  .help-button {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-  }
-
-  .help-button:hover {
-    background: #2563eb;
-    transform: scale(1.05);
-  }
-
-  /* Help Modal */
-  .help-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    z-index: 1001;
-    overflow-y: auto;
-  }
-
-  .help-modal.active {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
-
-  .help-content {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    max-width: 800px;
-    width: 100%;
-    max-height: 80vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .help-header {
-    padding: 20px 24px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px 12px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .help-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1e293b;
-  }
-
-  .help-nav {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .help-page-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .help-page-btn {
-    padding: 4px 8px;
-    background: #e2e8f0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #475569;
-  }
-
-  .help-page-btn:hover {
-    background: #cbd5e1;
-  }
-
-  .help-page-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .help-page-indicator {
-    font-size: 14px;
-    color: #64748b;
-    min-width: 50px;
-    text-align: center;
-  }
-
-  .help-body {
-    padding: 24px;
-    overflow-y: auto;
-    line-height: 1.6;
-  }
-
-  .help-section {
-    margin-bottom: 32px;
-  }
-
-  .help-section h3 {
-    color: #374151;
-    margin: 0 0 16px 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    border-bottom: 2px solid #e5e7eb;
-    padding-bottom: 8px;
-  }
-
-  .node-family {
-    margin-bottom: 24px;
-    padding: 16px;
-    background: #f9fafb;
-    border-radius: 8px;
-    border-left: 4px solid #6366f1;
-  }
-
-  .node-family h4 {
-    margin: 0 0 12px 0;
-    color: #4f46e5;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-
-  .node-family p {
-    margin: 0 0 8px 0;
-    color: #6b7280;
-  }
-
-  .node-list {
-    list-style: none;
-    padding: 0;
-    margin: 8px 0 0 0;
-  }
-
-  .node-list li {
-    padding: 4px 0;
-    color: #374151;
-    font-family: 'Monaco', 'Consolas', monospace;
-    font-size: 0.9rem;
-  }
-
-  .node-list li::before {
-    content: "→ ";
-    color: #6366f1;
-    font-weight: bold;
-    margin-right: 8px;
-  }
-
-  .help-tip {
-    background: #f0f9ff;
-    border: 1px solid #0ea5e9;
-    border-radius: 6px;
-    padding: 12px;
-    margin: 16px 0;
-  }
-
-  .help-tip strong {
-    color: #0c4a6e;
-  }
-
-  /* Close button for help modal */
-  .help-header .close-btn {
-    background: #e2e8f0;
-    color: #475569;
-    border: 1px solid #cbd5e1;
-  }
-
-  .help-header .close-btn:hover {
-    background: #cbd5e1;
   }
 </style>

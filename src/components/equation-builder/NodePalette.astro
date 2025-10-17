@@ -1,0 +1,155 @@
+---
+// Node Palette Component - Left sidebar with draggable nodes
+const { className = '' } = Astro.props;
+---
+
+<div class={`node-palette ${className}`}>
+  <h3>Node Library</h3>
+  
+  <div class="palette-section">
+    <h4>Generators</h4>
+    <div class="palette-items" role="group" aria-label="Generator nodes">
+      <button class="palette-node" data-node-type="number" data-title="Number" 
+              aria-label="Add number node to canvas" 
+              tabindex="0">123</button>
+      <button class="palette-node" data-node-type="variable" data-title="Variable" 
+              aria-label="Add variable node to canvas" 
+              tabindex="0">x</button>
+      <button class="palette-node" data-node-type="constant" data-title="Constant" 
+              aria-label="Add constant node to canvas" 
+              tabindex="0">π</button>
+    </div>
+  </div>
+  
+  <div class="palette-section">
+    <h4>Operators</h4>
+    <div class="palette-items" role="group" aria-label="Operator nodes">
+      <button class="palette-node" data-node-type="add" data-title="Add" 
+              aria-label="Add addition operator to canvas" 
+              tabindex="0">+</button>
+      <button class="palette-node" data-node-type="subtract" data-title="Subtract" 
+              aria-label="Add subtraction operator to canvas" 
+              tabindex="0">−</button>
+      <button class="palette-node" data-node-type="multiply" data-title="Multiply" 
+              aria-label="Add multiplication operator to canvas" 
+              tabindex="0">×</button>
+      <button class="palette-node" data-node-type="divide" data-title="Divide" 
+              aria-label="Add division operator to canvas" 
+              tabindex="0">÷</button>
+      <button class="palette-node" data-node-type="power" data-title="Power" 
+              aria-label="Add power operator to canvas" 
+              tabindex="0">^</button>
+    </div>
+  </div>
+  
+  <div class="palette-section">
+    <h4>Functions</h4>
+    <div class="palette-items" role="group" aria-label="Function nodes">
+      <button class="palette-node" data-node-type="sin" data-title="Sine" 
+              aria-label="Add sine function to canvas" 
+              tabindex="0">sin</button>
+      <button class="palette-node" data-node-type="cos" data-title="Cosine" 
+              aria-label="Add cosine function to canvas" 
+              tabindex="0">cos</button>
+      <button class="palette-node" data-node-type="sqrt" data-title="Square Root" 
+              aria-label="Add square root function to canvas" 
+              tabindex="0">√</button>
+    </div>
+  </div>
+  
+  <div class="palette-section">
+    <h4>Output</h4>
+    <div class="palette-items" role="group" aria-label="Output nodes">
+      <button class="palette-node" data-node-type="output" data-title="Output" 
+              aria-label="Add output node to canvas" 
+              tabindex="0"
+              style="background: #fef3c7; border-color: #f59e0b;">=</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Node Palette Styles */
+  .node-palette {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    overflow-y: auto;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-normal);
+  }
+  
+  .node-palette:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .palette-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .palette-section h4 {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-border-subtle);
+    position: relative;
+  }
+  
+  .palette-section h4::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 2rem;
+    height: 2px;
+    background: var(--color-primary);
+    border-radius: 1px;
+  }
+
+  .palette-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .palette-node {
+    padding: 1rem 0.75rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    cursor: grab;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all var(--transition-normal);
+    user-select: none;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    -webkit-user-drag: element;
+  }
+
+  .palette-node:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background: var(--color-surface-hover);
+  }
+
+  .palette-node:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+  }
+
+  .palette-node.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+</style>

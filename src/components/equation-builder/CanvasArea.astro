@@ -1,0 +1,377 @@
+---
+// Canvas Area Component - Main workspace with controls and canvas
+const { className = '' } = Astro.props;
+---
+
+<div class={`canvas-container ${className}`}>
+  <div class="canvas-controls">
+    <!-- Primary Actions Group -->
+    <div class="control-group primary-actions">
+      <button id="exportEquation" class="control-btn primary">Export Equation</button>
+      <button id="clearCanvas" class="control-btn">Clear Canvas</button>
+    </div>
+    
+    <!-- File Operations Group -->
+    <div class="control-group file-operations">
+      <div class="dropdown">
+        <button id="fileMenuBtn" class="control-btn dropdown-btn">File ▼</button>
+        <div id="fileMenu" class="dropdown-content">
+          <a href="#" id="saveNodeMap">💾 Save Node Map</a>
+          <a href="#" id="loadNodeMap">📂 Load Node Map</a>
+          <hr class="dropdown-divider">
+          <a href="#" id="exportNodeMap">📤 Export to File</a>
+          <a href="#" id="importNodeMapBtn">📥 Import from File</a>
+        </div>
+      </div>
+      
+      <div class="dropdown">
+        <button id="databaseMenuBtn" class="control-btn dropdown-btn">Database ▼</button>
+        <div id="databaseMenu" class="dropdown-content">
+          <a href="#" id="saveToDB">🗄️ Save to Database</a>
+          <a href="#" id="openDBManager">📊 Database Manager</a>
+          <hr class="dropdown-divider">
+          <a href="#" id="quickSaveDB">⚡ Quick Save</a>
+          <a href="#" id="exportDBData">📤 Export All Data</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Canvas Tools Group -->
+    <div class="control-group canvas-tools">
+      <button id="zoomOut" class="control-btn" title="Zoom Out">🔍−</button>
+      <span id="zoomLevel" class="zoom-display">100%</span>
+      <button id="zoomIn" class="control-btn" title="Zoom In">🔍+</button>
+      <button id="zoomFit" class="control-btn" title="Fit to Screen">⏹️</button>
+      <button id="toggleStarSystem" class="control-btn">⭐ Starred</button>
+      <button id="resizeCanvas" class="control-btn" title="Resize Canvas">🔄 Resize</button>
+    </div>
+    
+    <!-- Auto-save Indicator -->
+    <div class="auto-save-indicator">
+      <span id="autoSaveIndicator">Ready to save</span>
+    </div>
+    
+    <input type="file" id="importNodeMap" accept=".json" style="display: none;">
+  </div>
+  
+  <div class="node-canvas" id="nodeCanvas">
+    <div class="canvas-grid"></div>
+    <svg class="connection-layer" id="connectionLayer"></svg>
+  </div>
+</div>
+
+<style>
+  /* Canvas Container */
+  .canvas-container {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-normal);
+  }
+  
+  .canvas-container:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .canvas-controls {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+    background: var(--color-surface);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    backdrop-filter: blur(8px);
+  }
+
+  .control-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding-right: 0.75rem;
+    border-right: 1px solid var(--color-border-subtle, #e5e7eb);
+  }
+
+  .control-group:last-child {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .control-group.primary-actions {
+    order: 1;
+  }
+
+  .control-group.file-operations {
+    order: 2;
+  }
+
+  .control-group.canvas-tools {
+    order: 3;
+    margin-left: auto;
+  }
+
+  .zoom-display {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    font-weight: 500;
+    padding: 0 0.5rem;
+    background: var(--color-bg-subtle);
+    border-radius: 4px;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  .control-btn {
+    padding: 0.625rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .control-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left var(--transition-slow);
+  }
+
+  .control-btn.primary {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .control-btn.primary:hover {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .control-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+  }
+  
+  .control-btn:hover::before {
+    left: 100%;
+  }
+  
+  .control-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Dropdown Styles */
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-btn {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    z-index: var(--z-dropdowns);
+    padding: 0.5rem 0;
+    margin-top: 0.25rem;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .dropdown-content.show {
+    display: block;
+    animation: dropdownSlide 0.2s ease-out;
+  }
+
+  @keyframes dropdownSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .dropdown-content a {
+    color: var(--color-text);
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    display: block;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+  }
+
+  .dropdown-content a:hover {
+    background-color: var(--color-bg-subtle);
+  }
+
+  .dropdown-divider {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 0.5rem 0;
+  }
+
+  /* Node Canvas */
+  .node-canvas {
+    position: relative;
+    height: calc(100% - 60px);
+    background: 
+      radial-gradient(circle, #ddd 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    overflow: hidden;
+    cursor: grab;
+    transition: transform 0.2s ease;
+  }
+
+  .node-canvas.panning {
+    cursor: grabbing;
+  }
+
+  .node-canvas.zoomed {
+    background-size: calc(20px * var(--zoom-scale, 1)) calc(20px * var(--zoom-scale, 1));
+  }
+
+  .canvas-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .connection-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--z-canvas-connections);
+  }
+
+  /* Canvas Drop Target Styling */
+  .node-canvas.drag-over {
+    background: 
+      radial-gradient(circle at 20px 20px, #667eea 2px, transparent 2px),
+      linear-gradient(to right, #e3f2fd 0%, #f3e5f5 100%);
+    border-color: #667eea;
+    box-shadow: inset 0 0 20px rgba(102, 126, 234, 0.2);
+  }
+  
+  .node-canvas.drag-over::before {
+    content: "Drop node here";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #667eea;
+    font-size: 1.2em;
+    font-weight: 600;
+    pointer-events: none;
+    opacity: 0.7;
+    z-index: var(--z-canvas-preview);
+  }
+
+  /* Auto-save Indicator */
+  .auto-save-indicator {
+    padding: 0.75rem 1.25rem;
+    text-align: center;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border-subtle);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+  }
+
+  #autoSaveIndicator {
+    color: var(--color-text-secondary);
+    transition: all var(--transition-normal);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  #autoSaveIndicator::before {
+    content: '●';
+    font-size: 0.5rem;
+    transition: color var(--transition-normal);
+  }
+
+  #autoSaveIndicator.saving {
+    color: var(--color-warning);
+  }
+  
+  #autoSaveIndicator.saving::before {
+    color: var(--color-warning);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  #autoSaveIndicator.saved {
+    color: var(--color-success);
+  }
+  
+  #autoSaveIndicator.saved::before {
+    color: var(--color-success);
+  }
+
+  #autoSaveIndicator.error {
+    color: var(--color-danger);
+  }
+  
+  #autoSaveIndicator.error::before {
+    color: var(--color-danger);
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .canvas-controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+    
+    .control-group {
+      justify-content: center;
+    }
+    
+    .control-group.canvas-tools {
+      margin-left: 0;
+    }
+  }
+</style>

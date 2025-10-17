@@ -1,10 +1,12 @@
----
 import { useState } from 'react';
 import ReactFlow, { 
   Controls, 
   Background, 
   addEdge, 
-  ConnectionMode 
+  ConnectionMode,
+  type Connection,
+  type Edge,
+  type NodeTypes 
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -67,6 +69,5 @@ const EquationBuilder = () => {
     </div>
   );
 };
----
 
-<EquationBuilder client:load />
+export default EquationBuilder;

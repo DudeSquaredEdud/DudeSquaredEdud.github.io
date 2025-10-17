@@ -1,0 +1,81 @@
+---
+// Loading State Component
+const { text = 'Loading...', type = 'spinner' } = Astro.props;
+---
+
+<div class="loading-container" role="status" aria-live="polite">
+  {type === 'spinner' && (
+    <div class="spinner" aria-hidden="true"></div>
+  )}
+  {type === 'progress' && (
+    <div class="progress-bar" aria-hidden="true">
+      <div class="progress-fill"></div>
+    </div>
+  )}
+  <span class="loading-text">{text}</span>
+</div>
+
+<style>
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1rem;
+  }
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-border-subtle);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .progress-bar {
+    width: 200px;
+    height: 4px;
+    background: var(--color-border-subtle);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 2px;
+    animation: progress 2s ease-in-out infinite;
+  }
+
+  .loading-text {
+    font-size: 0.875rem;
+    color: var(--color-text-subtle);
+    font-weight: 500;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes progress {
+    0% { width: 0%; transform: translateX(-100%); }
+    50% { width: 100%; transform: translateX(0%); }
+    100% { width: 100%; transform: translateX(100%); }
+  }
+
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .spinner {
+      animation: none;
+      border: 3px solid var(--color-primary);
+    }
+    
+    .progress-fill {
+      animation: none;
+      width: 50%;
+    }
+  }
+</style>

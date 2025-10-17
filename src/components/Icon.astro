@@ -1,0 +1,26 @@
+---
+const { icon, color, size = '1rem', gradient = false } = Astro.props;
+---
+
+<div 
+  class:list={['icon', { gradient }]}
+  style={`font-size: ${size}; color: ${color || 'currentColor'};`}
+  aria-label={icon}
+>
+  <!-- Simple placeholder for icon -->
+  <span>⚡</span>
+</div>
+
+<style>
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .gradient {
+    background: linear-gradient(45deg, var(--accent-regular), var(--accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>
