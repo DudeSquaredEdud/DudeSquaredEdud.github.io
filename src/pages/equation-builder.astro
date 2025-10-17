@@ -58,7 +58,18 @@ import Layout from '../layouts/Layout.astro';
     <div class="canvas" id="equation-canvas">
       <svg class="connections" id="connections-svg" width="100%" height="100%"></svg>
       
-      <!-- Equation Display -->
+      <!-- Selection Status -->
+      <div class="selection-status" id="selection-status" style="display: none;">
+        <span class="selection-count">0 nodes selected</span>
+        <div class="selection-actions">
+          <button class="selection-btn" id="group-selected" title="Group Selected (Ctrl+G)">Group</button>
+          <button class="selection-btn" id="copy-selected" title="Copy (Ctrl+C)">Copy</button>
+          <button class="selection-btn" id="cut-selected" title="Cut (Ctrl+X)">Cut</button>
+          <button class="selection-btn danger" id="delete-selected" title="Delete (Del)">Delete</button>
+        </div>
+      </div>
+
+    <!-- Equation Display -->
       <div class="equation-display" id="equation-display">
         Click nodes above to add them to the canvas...
       </div>
@@ -163,6 +174,27 @@ import Layout from '../layouts/Layout.astro';
       this.isEditingComponent = false;
       this.currentComponentId = null;
       
+      // Enhanced interaction states
+      this.connectionDrag = {
+        isDragging: false,
+        startPort: null,
+        tempLine: null,
+        startX: 0,
+        startY: 0
+      };
+      this.nodeDrag = {
+        isDragging: false,
+        nodeType: null,
+        dragElement: null,
+        offsetX: 0,
+        offsetY: 0
+      };
+      this.canvasClickState = {
+        lastClickTime: 0,
+        clickTimeout: null,
+        clickCount: 0
+      };
+      
       // Global variable and output management
       this.globalVariables = new Map(); // variable name -> {value, isSet, inTable}
       this.globalOutputs = new Map(); // output node id -> {name, equation, result, inTable}
@@ -171,6 +203,15 @@ import Layout from '../layouts/Layout.astro';
       this.currentPage = 0;
       this.mainCanvasBackup = null;
       this.nodePages = [];
+      
+      // Multi-selection system
+      this.selectedNodes = new Set(); // Set of selected node IDs
+      this.selectionRectangle = null; // For drag-to-select functionality
+      this.clipboard = null; // Stores copied/cut nodes and connections
+      this.isDragSelecting = false;
+      this.dragStartX = 0;
+      this.dragStartY = 0;
+      this.justFinishedDragSelection = false;
       
       this.canvas = document.getElementById('equation-canvas');
       this.sidebar = document.getElementById('property-sidebar');
@@ -185,6 +226,7 @@ import Layout from '../layouts/Layout.astro';
       this.setupEventListeners();
       this.setupHelpModal();
       this.setupTables();
+      this.setupMultiSelection();
     }
     
     setupPalette() {
@@ -278,23 +320,11 @@ import Layout from '../layouts/Layout.astro';
       document.getElementById('prev-page').disabled = this.currentPage === 0;
       document.getElementById('next-page').disabled = this.currentPage === this.nodePages.length - 1;
       
-      // Add event listeners to new buttons
-      content.querySelectorAll('.palette-node').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const nodeType = e.target.dataset.nodeType;
-          const rect = this.canvas.getBoundingClientRect();
-          
-          // Create position that snaps to grid
-          const gridSize = 20;
-          const rawX = Math.random() * (rect.width - 150) + 50;
-          const rawY = Math.random() * (rect.height - 150) + 50;
-          
-          const position = {
-            x: Math.round(rawX / gridSize) * gridSize,
-            y: Math.round(rawY / gridSize) * gridSize
-          };
-          
-          this.addNode(nodeType, position);
+      // Add enhanced event listeners to new buttons with drag-and-drop support
+      // Use requestAnimationFrame to ensure DOM is fully rendered before attaching listeners
+      requestAnimationFrame(() => {
+        content.querySelectorAll('.palette-node').forEach(btn => {
+          this.setupPaletteNodeDragDrop(btn);
         });
       });
     }
@@ -345,11 +375,21 @@ import Layout from '../layouts/Layout.astro';
         });
       });
 
-      // Canvas events
+      // Enhanced canvas events with right-click support for node menu
       this.canvas.addEventListener('click', (e) => {
-        if (e.target === this.canvas || e.target === this.connectionsSvg) {
+        // Handle single clicks (deselect nodes and clear multi-selection)
+        // But don't clear if we just finished a drag selection
+        if ((e.target === this.canvas || e.target === this.connectionsSvg) && !this.justFinishedDragSelection) {
           this.deselectAll();
+          this.clearSelection();
         }
+        // Reset the flag
+        this.justFinishedDragSelection = false;
+      });
+      
+      // Right-click context menu for node creation
+      this.canvas.addEventListener('contextmenu', (e) => {
+        this.handleCanvasRightClick(e);
       });
 
       // Sidebar close
@@ -614,6 +654,9 @@ import Layout from '../layouts/Layout.astro';
         equals: { label: '=', inputs: ['in1', 'in2'], outputs: ['out'] },
         greater: { label: '>', inputs: ['in1', 'in2'], outputs: ['out'] },
         less: { label: '<', inputs: ['in1', 'in2'], outputs: ['out'] },
+        greaterEqual: { label: '≥', inputs: ['in1', 'in2'], outputs: ['out'] },
+        lessEqual: { label: '≤', inputs: ['in1', 'in2'], outputs: ['out'] },
+        notEqual: { label: '≠', inputs: ['in1', 'in2'], outputs: ['out'] },
         
         // Component I/O (for sub-equation editing)
         componentInput: { label: 'Input', inputs: [], outputs: ['out'], componentIO: true },
@@ -621,12 +664,12 @@ import Layout from '../layouts/Layout.astro';
         
         // Advanced Components
         component: { label: 'Component', inputs: [], outputs: [], customizable: true },
-        conditional: { label: 'Conditional', inputs: ['value'], outputs: ['result'] },
+        conditional: { label: 'Conditional', inputs: ['value'], outputs: ['output'] },
         multiplexer: { label: 'Multiplexer', inputs: ['choice0', 'choice1', 'selector'], outputs: ['output'], customizable: true },
         splitter: { label: 'Splitter', inputs: ['input'], outputs: ['output0', 'output1'], customizable: true },
         
         // Output
-        output: { label: 'Result', inputs: ['in'], outputs: [] }
+        output: { label: 'Output', inputs: ['in'], outputs: [] }
       };
 
       const config = nodeConfigs[type];
@@ -673,23 +716,10 @@ import Layout from '../layouts/Layout.astro';
       }
       
       // Explicit positioning and base styles to ensure visibility
-      nodeEl.style.cssText = `
-        position: absolute;
-        left: ${node.position.x}px;
-        top: ${node.position.y}px;
-        min-width: 80px;
-        padding: 8px 12px;
-        background: white;
-        border: 2px solid #cbd5e1;
-        border-radius: 6px;
-        cursor: move;
-        user-select: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        font-size: 14px;
-        font-weight: 500;
-        z-index: 10;
-        display: block;
-      `;
+      // Apply base node class and set position via style (position needs to be dynamic)
+      nodeEl.classList.add('equation-node');
+      nodeEl.style.left = `${node.position.x}px`;
+      nodeEl.style.top = `${node.position.y}px`;
       
       // Special handling for component nodes
       if (node.type === 'component') {
@@ -697,21 +727,21 @@ import Layout from '../layouts/Layout.astro';
           <div class="node-content">
             ${node.label}
           </div>
-          ${node.inputs.map((input, i) => `
-            <div class="port input-port" data-port="${input}" data-node="${node.id}" data-port-index="${i}" data-total-ports="${node.inputs.length}" data-tooltip="${this.getPortLabel(node.type, input, 'input')}" style="position: absolute; left: -7px; width: 12px; height: 12px; background: #10b981; border: 2px solid white; border-radius: 50%; cursor: crosshair; z-index: 30; pointer-events: auto;"></div>
+          ${(node.inputs || []).map((input, i) => `
+            <div class="port input-port" data-port="${input}" data-node="${node.id}" data-port-index="${i}" data-total-ports="${(node.inputs || []).length}" data-tooltip="${this.getPortLabel(node.type, input, 'input')}" style="position: absolute; left: -7px; width: 12px; height: 12px; background: #10b981; border: 2px solid white; border-radius: 50%; cursor: crosshair; z-index: 30; pointer-events: auto;"></div>
           `).join('')}
-          ${node.outputs.map((output, i) => `
-            <div class="port output-port" data-port="${output}" data-node="${node.id}" data-port-index="${i}" data-total-ports="${node.outputs.length}" data-tooltip="${this.getPortLabel(node.type, output, 'output')}" style="position: absolute; right: -7px; width: 12px; height: 12px; background: #f59e0b; border: 2px solid white; border-radius: 50%; cursor: crosshair; z-index: 30; pointer-events: auto;"></div>
+          ${(node.outputs || []).map((output, i) => `
+            <div class="port output-port" data-port="${output}" data-node="${node.id}" data-port-index="${i}" data-total-ports="${(node.outputs || []).length}" data-tooltip="${this.getPortLabel(node.type, output, 'output')}" style="position: absolute; right: -7px; width: 12px; height: 12px; background: #f59e0b; border: 2px solid white; border-radius: 50%; cursor: crosshair; z-index: 30; pointer-events: auto;"></div>
           `).join('')}
         `;
       } else {
         nodeEl.innerHTML = `
           <div class="node-content">${node.label}</div>
-          ${node.inputs.map((input, i) => `
-            <div class="port input-port" data-port="${input}" data-node="${node.id}" data-port-index="${i}" data-total-ports="${node.inputs.length}" data-tooltip="${this.getPortLabel(node.type, input, 'input')}" style="position: absolute; left: -7px; width: 12px; height: 12px; background: #10b981; border: 2px solid white; border-radius: 50%; cursor: crosshair; z-index: 30; pointer-events: auto;"></div>
+          ${(node.inputs || []).map((input, i) => `
+            <div class="port input-port" data-port="${input}" data-node="${node.id}" data-port-index="${i}" data-total-ports="${(node.inputs || []).length}" data-tooltip="${this.getPortLabel(node.type, input, 'input')}" style="position: absolute; left: -7px; width: 12px; height: 12px; background: #10b981; border: 2px solid white; border-radius: 50%; cursor: crosshair; z-index: 30; pointer-events: auto;"></div>
           `).join('')}
-          ${node.outputs.map((output, i) => `
-            <div class="port output-port" data-port="${output}" data-node="${node.id}" data-port-index="${i}" data-total-ports="${node.outputs.length}" data-tooltip="${this.getPortLabel(node.type, output, 'output')}" style="position: absolute; right: -7px; width: 12px; height: 12px; background: #f59e0b; border: 2px solid white; border-radius: 50%; cursor: crosshair; z-index: 30; pointer-events: auto;"></div>
+          ${(node.outputs || []).map((output, i) => `
+            <div class="port output-port" data-port="${output}" data-node="${node.id}" data-port-index="${i}" data-total-ports="${(node.outputs || []).length}" data-tooltip="${this.getPortLabel(node.type, output, 'output')}" style="position: absolute; right: -7px; width: 12px; height: 12px; background: #f59e0b; border: 2px solid white; border-radius: 50%; cursor: crosshair; z-index: 30; pointer-events: auto;"></div>
           `).join('')}
         `;
       }
@@ -720,41 +750,22 @@ import Layout from '../layouts/Layout.astro';
       nodeEl.addEventListener('mousedown', (e) => this.handleNodeMouseDown(e, node.id));
       nodeEl.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.selectNode(node.id);
+        
+        // Multi-selection support
+        if (e.ctrlKey || e.metaKey) {
+          this.toggleNodeSelection(node.id, true);
+        } else {
+          // Traditional single selection (also opens sidebar)
+          this.toggleNodeSelection(node.id, false);
+          this.selectNode(node.id);
+        }
       });
 
 
 
-      // Port click events with proper event handling
+      // Enhanced port click events with drag support
       nodeEl.querySelectorAll('.port').forEach(port => {
-        port.addEventListener('mousedown', (e) => {
-          e.stopPropagation(); // Prevent node drag from starting
-          e.preventDefault();
-        });
-        
-        port.addEventListener('mouseenter', (e) => {
-          port.style.transform = 'scale(1.4)';
-          port.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.4)';
-          
-          // Create and show tooltip
-          this.showTooltip(e, port.getAttribute('data-tooltip'));
-        });
-        
-        port.addEventListener('mouseleave', (e) => {
-          if (!this.connecting.from) {
-            port.style.transform = 'scale(1)';
-            port.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.3)';
-          }
-          
-          // Hide tooltip
-          this.hideTooltip();
-        });
-        
-        port.addEventListener('click', (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          this.handlePortClick(port.dataset.port, port.dataset.node, port.classList.contains('output-port'));
-        });
+        this.setupEnhancedPortHandlers(port, nodeEl);
       });
 
       this.canvas.appendChild(nodeEl);
@@ -768,7 +779,7 @@ import Layout from '../layouts/Layout.astro';
         // Basic nodes
         number: { out: 'Number Value' },
         variable: { out: 'Variable Value' },
-        output: { in: 'Final Result' },
+        output: { in: 'Final Output' },
         
         // Arithmetic  
         add: { in1: 'First Number', in2: 'Second Number', out: 'Sum' },
@@ -809,7 +820,7 @@ import Layout from '../layouts/Layout.astro';
         component: { out: 'Component Output' },
         conditional: { 
           value: 'Input Value to Check', 
-          result: 'Result Based on Rules'
+          output: 'Output Based on Rules'
         },
         multiplexer: {
           selector: 'Selector (bottom port: 0, 1, 2, etc.)',
@@ -1039,6 +1050,26 @@ import Layout from '../layouts/Layout.astro';
           font-size: 14px;
           width: 150px;
         ">
+        <button id="export-component" style="
+          background: #8b5cf6;
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+          font-size: 13px;
+        ">Export</button>
+        <button id="import-component" style="
+          background: #f59e0b;
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+          font-size: 13px;
+        ">Import</button>
         <button id="save-component" style="
           background: #10b981;
           color: white;
@@ -1064,6 +1095,16 @@ import Layout from '../layouts/Layout.astro';
       document.body.appendChild(overlay);
       
       // Add event listeners
+      document.getElementById('export-component').addEventListener('click', (e) => {
+        e.preventDefault();
+        this.exportComponent();
+      });
+      
+      document.getElementById('import-component').addEventListener('click', (e) => {
+        e.preventDefault();
+        this.importComponent();
+      });
+      
       document.getElementById('save-component').addEventListener('click', (e) => {
         e.preventDefault();
         this.saveComponentAndExit(nodeId);
@@ -1278,46 +1319,57 @@ import Layout from '../layouts/Layout.astro';
     }
 
     handleMouseMove(e) {
-      if (!this.dragState.isDragging || !this.dragState.nodeId) return;
+      // Handle existing node dragging
+      if (this.dragState.isDragging && this.dragState.nodeId) {
+        const canvasRect = this.canvas.getBoundingClientRect();
+        let newPosition = {
+          x: e.clientX - canvasRect.left - this.dragState.offset.x,
+          y: e.clientY - canvasRect.top - this.dragState.offset.y
+        };
 
-      const canvasRect = this.canvas.getBoundingClientRect();
-      let newPosition = {
-        x: e.clientX - canvasRect.left - this.dragState.offset.x,
-        y: e.clientY - canvasRect.top - this.dragState.offset.y
-      };
+        // Snap to grid (20px grid to match background)
+        const gridSize = 20;
+        newPosition.x = Math.round(newPosition.x / gridSize) * gridSize;
+        newPosition.y = Math.round(newPosition.y / gridSize) * gridSize;
 
-      // Snap to grid (20px grid to match background)
-      const gridSize = 20;
-      newPosition.x = Math.round(newPosition.x / gridSize) * gridSize;
-      newPosition.y = Math.round(newPosition.y / gridSize) * gridSize;
+        // Constrain to canvas bounds
+        newPosition.x = Math.max(10, Math.min(newPosition.x, canvasRect.width - 100));
+        newPosition.y = Math.max(10, Math.min(newPosition.y, canvasRect.height - 50));
 
-      // Constrain to canvas bounds
-      newPosition.x = Math.max(10, Math.min(newPosition.x, canvasRect.width - 100));
-      newPosition.y = Math.max(10, Math.min(newPosition.y, canvasRect.height - 50));
-
-      const node = this.nodes.get(this.dragState.nodeId);
-      if (node) {
-        node.position = newPosition;
-        const nodeEl = document.getElementById(node.id);
-        
-        // Disable transitions during drag for performance
-        nodeEl.style.transition = 'none';
-        nodeEl.style.left = `${newPosition.x}px`;
-        nodeEl.style.top = `${newPosition.y}px`;
-        
-        this.updateConnections();
+        const node = this.nodes.get(this.dragState.nodeId);
+        if (node) {
+          node.position = newPosition;
+          const nodeEl = document.getElementById(node.id);
+          
+          // Disable transitions during drag for performance
+          nodeEl.style.transition = 'none';
+          nodeEl.style.left = `${newPosition.x}px`;
+          nodeEl.style.top = `${newPosition.y}px`;
+          
+          this.updateConnections();
+        }
+      }
+      
+      // Handle connection dragging
+      if (this.connectionDrag.isDragging) {
+        this.updateConnectionDrag(e);
       }
     }
 
-    handleMouseUp() {
-      // Re-enable transitions after drag
-      if (this.dragState.nodeId) {
+    handleMouseUp(e) {
+      // Handle existing node dragging
+      if (this.dragState.isDragging && this.dragState.nodeId) {
         const nodeEl = document.getElementById(this.dragState.nodeId);
         if (nodeEl) {
           nodeEl.style.transition = '';
         }
+        this.dragState = { isDragging: false, nodeId: null, offset: { x: 0, y: 0 } };
       }
-      this.dragState = { isDragging: false, nodeId: null, offset: { x: 0, y: 0 } };
+      
+      // Handle connection dragging
+      if (this.connectionDrag.isDragging) {
+        this.completeConnectionDrag(e);
+      }
     }
 
     handlePortClick(portId, nodeId, isOutput) {
@@ -1417,6 +1469,474 @@ import Layout from '../layouts/Layout.astro';
       }
     }
 
+    // Connection dragging methods
+    startConnectionDrag(port, event) {
+      const portRect = port.getBoundingClientRect();
+      const canvasRect = this.canvas.getBoundingClientRect();
+      
+      // Calculate port center position relative to canvas
+      const portCenterX = portRect.left + portRect.width / 2 - canvasRect.left;
+      const portCenterY = portRect.top + portRect.height / 2 - canvasRect.top;
+      
+      this.connectionDrag = {
+        isDragging: true,
+        startPort: port,
+        startX: portCenterX,
+        startY: portCenterY,
+        tempLine: null
+      };
+      
+      // Create temporary SVG line for visual feedback
+      this.createTempConnectionLine(portCenterX, portCenterY, event.clientX - canvasRect.left, event.clientY - canvasRect.top);
+      
+      // Show connection feedback
+      this.showConnectionFeedback();
+      
+      // Set cursor style
+      document.body.style.cursor = 'crosshair';
+    }
+
+    createTempConnectionLine(startX, startY, endX, endY) {
+      // Remove existing temp line
+      if (this.connectionDrag.tempLine) {
+        this.connectionDrag.tempLine.remove();
+      }
+      
+      // Create new temporary line
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', startX);
+      line.setAttribute('y1', startY);
+      line.setAttribute('x2', endX);
+      line.setAttribute('y2', endY);
+      line.setAttribute('stroke', '#3b82f6');
+      line.setAttribute('stroke-width', '3');
+      line.setAttribute('stroke-dasharray', '5,5');
+      line.setAttribute('opacity', '0.7');
+      line.style.pointerEvents = 'none';
+      
+      this.connectionsSvg.appendChild(line);
+      this.connectionDrag.tempLine = line;
+    }
+
+    updateConnectionDrag(event) {
+      if (!this.connectionDrag.isDragging) return;
+      
+      const canvasRect = this.canvas.getBoundingClientRect();
+      const currentX = event.clientX - canvasRect.left;
+      const currentY = event.clientY - canvasRect.top;
+      
+      // Update temporary line position
+      if (this.connectionDrag.tempLine) {
+        this.connectionDrag.tempLine.setAttribute('x2', currentX);
+        this.connectionDrag.tempLine.setAttribute('y2', currentY);
+      }
+      
+      // Highlight input ports when hovering over them
+      const elementUnderCursor = document.elementFromPoint(event.clientX, event.clientY);
+      if (elementUnderCursor && elementUnderCursor.classList.contains('input-port')) {
+        // Highlight potential target
+        elementUnderCursor.style.background = '#10b981';
+        elementUnderCursor.style.transform = 'scale(1.6)';
+        elementUnderCursor.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.8)';
+      }
+    }
+
+    completeConnectionDrag(event) {
+      if (!this.connectionDrag.isDragging) return;
+      
+      // Find target port under cursor
+      const elementUnderCursor = document.elementFromPoint(event.clientX, event.clientY);
+      
+      if (elementUnderCursor && elementUnderCursor.classList.contains('input-port')) {
+        // Create connection
+        const fromPort = `${this.connectionDrag.startPort.dataset.node}-${this.connectionDrag.startPort.dataset.port}`;
+        const toPort = `${elementUnderCursor.dataset.node}-${elementUnderCursor.dataset.port}`;
+        
+        this.addConnection(fromPort, toPort);
+      }
+      
+      // Clean up drag state
+      this.endConnectionDrag();
+    }
+
+    endConnectionDrag() {
+      // Remove temporary line
+      if (this.connectionDrag.tempLine) {
+        this.connectionDrag.tempLine.remove();
+      }
+      
+      // Reset connection feedback
+      this.hideConnectionFeedback();
+      
+      // Reset cursor
+      document.body.style.cursor = '';
+      
+      // Reset drag state
+      this.connectionDrag = {
+        isDragging: false,
+        startPort: null,
+        tempLine: null,
+        startX: 0,
+        startY: 0
+      };
+    }
+
+    // Enhanced port event handlers for both clicking and dragging
+    setupEnhancedPortHandlers(port, nodeEl) {
+      let clickTimeout = null;
+      
+      // Handle mousedown for potential drag start
+      port.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        // Store click position for drag detection
+        const startX = e.clientX;
+        const startY = e.clientY;
+        let hasDragged = false;
+        
+        // Set a timeout to detect click vs drag
+        clickTimeout = setTimeout(() => {
+          // If we haven't moved significantly, treat as click
+          if (!hasDragged) {
+            this.handlePortClick(port.dataset.port, port.dataset.node, port.classList.contains('output-port'));
+          }
+        }, 150); // 150ms delay to distinguish click from drag
+        
+        // Track mouse movement to detect drag
+        const handleMouseMove = (moveEvent) => {
+          const deltaX = Math.abs(moveEvent.clientX - startX);
+          const deltaY = Math.abs(moveEvent.clientY - startY);
+          
+          // If moved more than 5px, start drag operation
+          if (deltaX > 5 || deltaY > 5) {
+            hasDragged = true;
+            clearTimeout(clickTimeout);
+            
+            // Only start drag from output ports
+            if (port.classList.contains('output-port')) {
+              this.startConnectionDrag(port, moveEvent);
+            }
+            
+            // Remove movement listener
+            document.removeEventListener('mousemove', handleMouseMove);
+          }
+        };
+        
+        // Listen for mouse movement
+        document.addEventListener('mousemove', handleMouseMove);
+        
+        // Clean up on mouse up
+        const handleMouseUp = () => {
+          clearTimeout(clickTimeout);
+          document.removeEventListener('mousemove', handleMouseMove);
+          document.removeEventListener('mouseup', handleMouseUp);
+        };
+        
+        document.addEventListener('mouseup', handleMouseUp);
+      });
+      
+      // Keep existing hover effects
+      port.addEventListener('mouseenter', (e) => {
+        port.style.transform = 'scale(1.4)';
+        port.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.4)';
+        this.showTooltip(e, port.getAttribute('data-tooltip'));
+      });
+      
+      port.addEventListener('mouseleave', (e) => {
+        if (!this.connecting.from && !this.connectionDrag.isDragging) {
+          port.style.transform = 'scale(1)';
+          port.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.3)';
+        }
+        this.hideTooltip();
+      });
+    }
+
+    // Canvas right-click functionality for node menu
+    handleCanvasRightClick(event) {
+      // Prevent default context menu
+      event.preventDefault();
+      
+      // Only handle clicks on canvas background (not on nodes or connections)
+      if (event.target !== this.canvas && event.target !== this.connectionsSvg) {
+        return;
+      }
+      
+      this.showNodeSelectionMenu(event);
+    }
+
+    showNodeSelectionMenu(event) {
+      // Remove existing menu if present
+      const existingMenu = document.getElementById('node-selection-menu');
+      if (existingMenu) {
+        existingMenu.remove();
+      }
+      
+      // Calculate canvas center position
+      const canvasRect = this.canvas.getBoundingClientRect();
+      const centerX = canvasRect.width / 2;
+      const centerY = canvasRect.height / 2;
+      
+      // Create menu element
+      const menu = document.createElement('div');
+      menu.id = 'node-selection-menu';
+      menu.style.cssText = `
+        position: absolute;
+        left: ${centerX - 100}px;
+        top: ${centerY - 150}px;
+        width: 200px;
+        max-height: 300px;
+        background: white;
+        border: 2px solid #3b82f6;
+        border-radius: 8px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        z-index: 1000;
+        overflow-y: auto;
+        padding: 8px;
+      `;
+      
+      // Add menu header
+      menu.innerHTML = `
+        <div style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151; text-align: center;">
+          Select Node Type
+        </div>
+        <div style="max-height: 250px; overflow-y: auto;">
+          ${this.generateNodeMenuItems()}
+        </div>
+      `;
+      
+      this.canvas.appendChild(menu);
+      
+      // Add click handlers to menu items
+      menu.querySelectorAll('.menu-node-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          const nodeType = e.target.dataset.nodeType;
+          this.handleMenuItemClick(nodeType);
+        });
+      });
+      
+      // Add click-away handler
+      setTimeout(() => {
+        document.addEventListener('click', this.handleMenuClickAway.bind(this), { once: true });
+      }, 100);
+    }
+
+    generateNodeMenuItems() {
+      let menuItems = '';
+      
+      // Iterate through all pages to collect all node types
+      this.nodePages.forEach(page => {
+        menuItems += `<div style="font-size: 12px; font-weight: 600; color: #6b7280; padding: 8px 4px 4px; border-top: 1px solid #f3f4f6;">${page.title}</div>`;
+        
+        page.nodes.forEach(node => {
+          menuItems += `
+            <div class="menu-node-item" data-node-type="${node.type}" style="
+              padding: 6px 8px;
+              cursor: pointer;
+              border-radius: 4px;
+              font-size: 14px;
+              color: #374151;
+              transition: background-color 0.2s;
+            " onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='transparent'">
+              ${node.label}
+            </div>
+          `;
+        });
+      });
+      
+      return menuItems;
+    }
+
+    handleMenuItemClick(nodeType) {
+      const canvasRect = this.canvas.getBoundingClientRect();
+      const gridSize = 20;
+      
+      // Position at canvas center, snapped to grid
+      const centerX = Math.round((canvasRect.width / 2) / gridSize) * gridSize;
+      const centerY = Math.round((canvasRect.height / 2) / gridSize) * gridSize;
+      
+      const position = {
+        x: centerX,
+        y: centerY
+      };
+      
+      // Create node at center position
+      this.addNode(nodeType, position);
+      
+      // Remove menu
+      const menu = document.getElementById('node-selection-menu');
+      if (menu) {
+        menu.remove();
+      }
+    }
+
+    handleMenuClickAway(event) {
+      const menu = document.getElementById('node-selection-menu');
+      if (menu && !menu.contains(event.target)) {
+        menu.remove();
+      }
+    }
+
+    // Palette drag-and-drop functionality
+    setupPaletteNodeDragDrop(button) {
+      let dragStarted = false;
+      
+      button.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        
+        const nodeType = button.dataset.nodeType;
+        const startX = e.clientX;
+        const startY = e.clientY;
+        
+        // Create a simple, fixed-size drag element
+        const dragElement = document.createElement('div');
+        dragElement.textContent = button.textContent;
+        dragElement.style.cssText = `
+          position: fixed;
+          top: ${startY}px;
+          left: ${startX}px;
+          width: 80px;
+          height: 32px;
+          margin: 0;
+          padding: 6px 12px;
+          background: #3b82f6;
+          color: white;
+          border: 1px solid #2563eb;
+          border-radius: 6px;
+          font-size: 14px;
+          font-family: system-ui, sans-serif;
+          font-weight: 500;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          pointer-events: none;
+          opacity: 0.8;
+          transform: rotate(3deg);
+          z-index: 10000;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+          white-space: nowrap;
+        `;
+        
+        document.body.appendChild(dragElement);
+        
+        this.nodeDrag = {
+          isDragging: true,
+          nodeType: nodeType,
+          dragElement: dragElement,
+          offsetX: 0,
+          offsetY: 0
+        };
+        
+        // Set cursor
+        document.body.style.cursor = 'grabbing';
+        
+        // Handle mouse movement during drag
+        const handleDragMove = (moveEvent) => {
+          if (this.nodeDrag.isDragging) {
+            dragStarted = true;
+            this.nodeDrag.dragElement.style.left = moveEvent.clientX + 'px';
+            this.nodeDrag.dragElement.style.top = moveEvent.clientY + 'px';
+            
+            // Highlight canvas when hovering over it
+            const canvasRect = this.canvas.getBoundingClientRect();
+            if (moveEvent.clientX >= canvasRect.left && 
+                moveEvent.clientX <= canvasRect.right &&
+                moveEvent.clientY >= canvasRect.top && 
+                moveEvent.clientY <= canvasRect.bottom) {
+              
+              this.canvas.style.background = 'rgba(59, 130, 246, 0.1)';
+              this.canvas.style.border = '2px dashed #3b82f6';
+            } else {
+              this.canvas.style.background = '';
+              this.canvas.style.border = '';
+            }
+          }
+        };
+        
+        // Handle mouse up - complete or cancel drag
+        const handleDragEnd = (endEvent) => {
+          if (dragStarted && this.nodeDrag.isDragging) {
+            // Check if dropped on canvas
+            const canvasRect = this.canvas.getBoundingClientRect();
+            if (endEvent.clientX >= canvasRect.left && 
+                endEvent.clientX <= canvasRect.right &&
+                endEvent.clientY >= canvasRect.top && 
+                endEvent.clientY <= canvasRect.bottom) {
+              
+              // Calculate position relative to canvas
+              const gridSize = 20;
+              const rawX = endEvent.clientX - canvasRect.left;
+              const rawY = endEvent.clientY - canvasRect.top;
+              
+              const position = {
+                x: Math.round(rawX / gridSize) * gridSize,
+                y: Math.round(rawY / gridSize) * gridSize
+              };
+              
+              // Constrain to canvas bounds
+              position.x = Math.max(10, Math.min(position.x, canvasRect.width - 100));
+              position.y = Math.max(10, Math.min(position.y, canvasRect.height - 50));
+              
+              // Create node at drop position
+              this.addNode(this.nodeDrag.nodeType, position);
+            }
+          } else if (!dragStarted) {
+            // Handle as regular click if no drag occurred
+            this.handlePaletteButtonClick(button);
+          }
+          
+          // Clean up
+          this.endNodeDrag();
+          document.removeEventListener('mousemove', handleDragMove);
+          document.removeEventListener('mouseup', handleDragEnd);
+        };
+        
+        document.addEventListener('mousemove', handleDragMove);
+        document.addEventListener('mouseup', handleDragEnd);
+      });
+    }
+
+    handlePaletteButtonClick(button) {
+      const nodeType = button.dataset.nodeType;
+      const rect = this.canvas.getBoundingClientRect();
+      
+      // Create position that snaps to grid (original behavior)
+      const gridSize = 20;
+      const rawX = Math.random() * (rect.width - 150) + 50;
+      const rawY = Math.random() * (rect.height - 150) + 50;
+      
+      const position = {
+        x: Math.round(rawX / gridSize) * gridSize,
+        y: Math.round(rawY / gridSize) * gridSize
+      };
+      
+      this.addNode(nodeType, position);
+    }
+
+    endNodeDrag() {
+      if (this.nodeDrag.dragElement) {
+        this.nodeDrag.dragElement.remove();
+      }
+      
+      // Reset canvas styling
+      this.canvas.style.background = '';
+      this.canvas.style.border = '';
+      
+      // Reset cursor
+      document.body.style.cursor = '';
+      
+      // Reset drag state
+      this.nodeDrag = {
+        isDragging: false,
+        nodeType: null,
+        dragElement: null,
+        offsetX: 0,
+        offsetY: 0
+      };
+    }
+
     selectNode(nodeId) {
       this.selectedNode = nodeId;
       document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
@@ -1496,7 +2016,7 @@ import Layout from '../layouts/Layout.astro';
             </label>
           </div>
           <p style="font-size: 12px; color: #666; margin-top: 10px;">
-            This output will show the final result of connected calculations.<br>
+            This output will show the final output of connected calculations.<br>
             Check the box to include this equation in the equations table.
           </p>
         `;
@@ -3035,6 +3555,24 @@ import Layout from '../layouts/Layout.astro';
           if (left === '?' || right === '?') return '?';
           return left < right ? 1 : 0;
         }
+        case 'greaterEqual': {
+          const left = this.calculateResult(sourceNode.id, 'in1');
+          const right = this.calculateResult(sourceNode.id, 'in2');
+          if (left === '?' || right === '?') return '?';
+          return left >= right ? 1 : 0;
+        }
+        case 'lessEqual': {
+          const left = this.calculateResult(sourceNode.id, 'in1');
+          const right = this.calculateResult(sourceNode.id, 'in2');
+          if (left === '?' || right === '?') return '?';
+          return left <= right ? 1 : 0;
+        }
+        case 'notEqual': {
+          const left = this.calculateResult(sourceNode.id, 'in1');
+          const right = this.calculateResult(sourceNode.id, 'in2');
+          if (left === '?' || right === '?') return '?';
+          return left !== right ? 1 : 0;
+        }
         
         // Advanced Components
         case 'component': {
@@ -3190,14 +3728,17 @@ import Layout from '../layouts/Layout.astro';
         case 'modulo':
         case 'equals':
         case 'greater':
-        case 'less': {
+        case 'less':
+        case 'greaterEqual':
+        case 'lessEqual':
+        case 'notEqual': {
           const left = this.buildEquation(sourceNode.id, 'in1');
           const right = this.buildEquation(sourceNode.id, 'in2');
           if (!left || !right) return '';
           
           const operators = { 
             add: '+', subtract: '-', multiply: '*', divide: '/', modulo: '%',
-            equals: '=', greater: '>', less: '<'
+            equals: '=', greater: '>', less: '<', greaterEqual: '≥', lessEqual: '≤', notEqual: '≠'
           };
           const op = operators[sourceNode.type];
           return `(${left} ${op} ${right})`;
@@ -3715,25 +4256,29 @@ import Layout from '../layouts/Layout.astro';
         // Restore data
         const { nodes, connections, globalVariables, globalOutputs } = sessionData.data;
         
-        // Restore nodes
-        this.nodes = new Map(nodes.map(([id, nodeData]) => {
-          // Create actual DOM element for the node
-          const position = { x: nodeData.x, y: nodeData.y };
-          this.addNode(nodeData.type, position);
-          const newNode = Array.from(this.nodes.values()).find(n => n.type === nodeData.type && Math.abs(n.x - nodeData.x) < 10);
-          if (newNode) {
-            // Carefully restore saved data while preserving critical properties
-            const restoredNode = {
-              ...newNode, // Keep the properly initialized node
-              ...nodeData, // Apply saved data
-              inputs: nodeData.inputs || newNode.inputs || [], // Ensure inputs exist
-              outputs: nodeData.outputs || newNode.outputs || [], // Ensure outputs exist
-              id: id // Ensure ID matches
-            };
-            return [id, restoredNode];
-          }
-          return null;
-        }).filter(Boolean));
+        // Restore nodes - clear first to avoid ID conflicts
+        this.nodes.clear();
+        
+        // Directly restore nodes with original IDs (don't use addNode which generates new IDs)
+        nodes.forEach(([id, nodeData]) => {
+          // Extract position properly - it's stored as nodeData.position, not nodeData.x/y
+          const position = nodeData.position || { x: 50, y: 50 };
+          
+          // Restore node data with original ID
+          const restoredNode = {
+            ...nodeData,
+            id: id, // Preserve original ID
+            position: position, // Use the actual saved position
+            inputs: nodeData.inputs || [], // Ensure inputs exist
+            outputs: nodeData.outputs || [] // Ensure outputs exist
+          };
+          
+          // Add to nodes map
+          this.nodes.set(id, restoredNode);
+          
+          // Render the DOM element
+          this.renderNode(restoredNode);
+        });
 
         // Restore connections
         this.connections = [...connections];
@@ -3745,7 +4290,7 @@ import Layout from '../layouts/Layout.astro';
         // Update visual state
         this.updateConnections();
         this.updateVariablesTable();
-        this.updateEquationsTable();
+        this.updateEquationsTable(); // This already updates outputs
 
         alert(`Session imported successfully! (${new Date(sessionData.timestamp).toLocaleString()})`);
         return true;
@@ -3776,6 +4321,580 @@ import Layout from '../layouts/Layout.astro';
 
     hasAutoSave() {
       return localStorage.getItem('equation_builder_autosave') !== null;
+    }
+
+    // Multi-selection system
+    setupMultiSelection() {
+      // Keyboard event listeners for copy/cut/paste
+      document.addEventListener('keydown', (e) => {
+        // Only handle shortcuts when not typing in inputs
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        
+        if (e.ctrlKey || e.metaKey) {
+          switch (e.key.toLowerCase()) {
+            case 'c':
+              e.preventDefault();
+              this.copySelectedNodes();
+              break;
+            case 'x':
+              e.preventDefault();
+              this.cutSelectedNodes();
+              break;
+            case 'v':
+              e.preventDefault();
+              this.pasteNodes();
+              break;
+            case 'a':
+              e.preventDefault();
+              this.selectAllNodes();
+              break;
+          }
+        }
+        
+        // Delete key to remove selected nodes
+        if (e.key === 'Delete' && this.selectedNodes.size > 0) {
+          e.preventDefault();
+          this.deleteSelectedNodes();
+        }
+        
+        // Escape to clear selection
+        if (e.key === 'Escape') {
+          this.clearSelection();
+        }
+      });
+      
+      // Setup drag selection on canvas
+      this.setupDragSelection();
+      
+      // Setup selection action buttons
+      this.setupSelectionActions();
+    }
+    
+    setupDragSelection() {
+      // Canvas mouse events for drag selection
+      this.canvas.addEventListener('mousedown', (e) => {
+        // Only start drag selection if clicking on canvas background (not nodes)
+        if (e.target === this.canvas || e.target === this.connectionsSvg) {
+          this.startDragSelection(e);
+        }
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (this.isDragSelecting) {
+          this.updateDragSelection(e);
+        }
+      });
+      
+      document.addEventListener('mouseup', (e) => {
+        if (this.isDragSelecting) {
+          this.endDragSelection(e);
+        }
+      });
+    }
+    
+    startDragSelection(e) {
+      this.isDragSelecting = true;
+      const canvasRect = this.canvas.getBoundingClientRect();
+      this.dragStartX = e.clientX - canvasRect.left;
+      this.dragStartY = e.clientY - canvasRect.top;
+      
+      // Clear existing selection unless Ctrl is held
+      if (!e.ctrlKey) {
+        this.clearSelection();
+      }
+      
+      // Create selection rectangle element
+      this.selectionRectangle = document.createElement('div');
+      this.selectionRectangle.className = 'selection-rectangle';
+      this.selectionRectangle.style.position = 'absolute';
+      this.selectionRectangle.style.left = this.dragStartX + 'px';
+      this.selectionRectangle.style.top = this.dragStartY + 'px';
+      this.selectionRectangle.style.width = '0px';
+      this.selectionRectangle.style.height = '0px';
+      this.canvas.appendChild(this.selectionRectangle);
+    }
+    
+    updateDragSelection(e) {
+      if (!this.selectionRectangle) return;
+      
+      const canvasRect = this.canvas.getBoundingClientRect();
+      const currentX = e.clientX - canvasRect.left;
+      const currentY = e.clientY - canvasRect.top;
+      
+      const left = Math.min(this.dragStartX, currentX);
+      const top = Math.min(this.dragStartY, currentY);
+      const width = Math.abs(currentX - this.dragStartX);
+      const height = Math.abs(currentY - this.dragStartY);
+      
+      this.selectionRectangle.style.left = left + 'px';
+      this.selectionRectangle.style.top = top + 'px';
+      this.selectionRectangle.style.width = width + 'px';
+      this.selectionRectangle.style.height = height + 'px';
+      
+      // Find nodes within selection rectangle and highlight them
+      this.highlightNodesInSelection(left, top, width, height);
+    }
+    
+    endDragSelection(e) {
+      if (!this.isDragSelecting) return;
+      
+      this.isDragSelecting = false;
+      this.justFinishedDragSelection = true; // Prevent click handler from clearing selection
+      
+      // Remove selection rectangle
+      if (this.selectionRectangle) {
+        this.selectionRectangle.remove();
+        this.selectionRectangle = null;
+      }
+      
+      // Finalize selection
+      this.updateNodeSelectionVisuals();
+    }
+    
+    highlightNodesInSelection(selectionLeft, selectionTop, selectionWidth, selectionHeight) {
+      const selectionRight = selectionLeft + selectionWidth;
+      const selectionBottom = selectionTop + selectionHeight;
+      
+      for (const [nodeId, node] of this.nodes.entries()) {
+        const nodeEl = document.getElementById(nodeId);
+        if (!nodeEl) continue;
+        
+        const nodeRect = nodeEl.getBoundingClientRect();
+        const canvasRect = this.canvas.getBoundingClientRect();
+        
+        // Convert node position to canvas coordinates
+        const nodeLeft = nodeRect.left - canvasRect.left;
+        const nodeTop = nodeRect.top - canvasRect.top;
+        const nodeRight = nodeLeft + nodeRect.width;
+        const nodeBottom = nodeTop + nodeRect.height;
+        
+        // Check if node intersects with selection rectangle
+        const intersects = !(nodeRight < selectionLeft || 
+                           nodeLeft > selectionRight || 
+                           nodeBottom < selectionTop || 
+                           nodeTop > selectionBottom);
+        
+        if (intersects) {
+          this.selectedNodes.add(nodeId);
+        }
+      }
+    }
+    
+    setupSelectionActions() {
+      // Button event listeners with safety checks
+      const copyBtn = document.getElementById('copy-selected');
+      const cutBtn = document.getElementById('cut-selected');
+      const deleteBtn = document.getElementById('delete-selected');
+      const groupBtn = document.getElementById('group-selected');
+      
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          this.copySelectedNodes();
+        });
+      }
+      
+      if (cutBtn) {
+        cutBtn.addEventListener('click', () => {
+          this.cutSelectedNodes();
+        });
+      }
+      
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+          this.deleteSelectedNodes();
+        });
+      }
+      
+      if (groupBtn) {
+        groupBtn.addEventListener('click', () => {
+          this.groupSelectedNodes();
+        });
+      }
+      
+      // Keyboard shortcut for grouping
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'g' && this.selectedNodes.size > 1) {
+          e.preventDefault();
+          this.groupSelectedNodes();
+        }
+      });
+    }
+    
+    groupSelectedNodes() {
+      if (this.selectedNodes.size < 2) {
+        console.log('Need at least 2 nodes to group');
+        return;
+      }
+      
+      // Calculate the bounding box of selected nodes
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      
+      for (const nodeId of this.selectedNodes) {
+        const nodeEl = document.getElementById(nodeId);
+        if (nodeEl) {
+          const rect = nodeEl.getBoundingClientRect();
+          const canvasRect = this.canvas.getBoundingClientRect();
+          const x = rect.left - canvasRect.left;
+          const y = rect.top - canvasRect.top;
+          
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x + rect.width);
+          maxY = Math.max(maxY, y + rect.height);
+        }
+      }
+      
+      // Create a visual group indicator
+      this.createGroupIndicator(minX, minY, maxX - minX, maxY - minY);
+      
+      console.log(`Grouped ${this.selectedNodes.size} nodes`);
+    }
+    
+    createGroupIndicator(x, y, width, height) {
+      // Remove any existing group indicators
+      const existingIndicators = this.canvas.querySelectorAll('.group-indicator');
+      existingIndicators.forEach(indicator => indicator.remove());
+      
+      // Create new group indicator
+      const groupIndicator = document.createElement('div');
+      groupIndicator.className = 'group-indicator';
+      groupIndicator.style.position = 'absolute';
+      groupIndicator.style.left = (x - 10) + 'px';
+      groupIndicator.style.top = (y - 10) + 'px';
+      groupIndicator.style.width = (width + 20) + 'px';
+      groupIndicator.style.height = (height + 20) + 'px';
+      groupIndicator.style.pointerEvents = 'none';
+      groupIndicator.style.zIndex = '1';
+      
+      this.canvas.appendChild(groupIndicator);
+      
+      // Auto-remove after 3 seconds
+      setTimeout(() => {
+        if (groupIndicator.parentNode) {
+          groupIndicator.remove();
+        }
+      }, 3000);
+    }
+
+    // Selection management methods
+    toggleNodeSelection(nodeId, multiSelect = false) {
+      if (!multiSelect) {
+        this.clearSelection();
+      }
+      
+      if (this.selectedNodes.has(nodeId)) {
+        this.selectedNodes.delete(nodeId);
+      } else {
+        this.selectedNodes.add(nodeId);
+      }
+      
+      this.updateNodeSelectionVisuals();
+    }
+
+    clearSelection() {
+      this.selectedNodes.clear();
+      this.updateNodeSelectionVisuals();
+    }
+
+    selectAllNodes() {
+      this.clearSelection();
+      for (const nodeId of this.nodes.keys()) {
+        this.selectedNodes.add(nodeId);
+      }
+      this.updateNodeSelectionVisuals();
+    }
+
+    updateNodeSelectionVisuals() {
+      // Update visual selection indicators for all nodes
+      for (const [nodeId, node] of this.nodes.entries()) {
+        const nodeEl = document.getElementById(nodeId);
+        if (nodeEl) {
+          if (this.selectedNodes.has(nodeId)) {
+            nodeEl.classList.add('selected');
+          } else {
+            nodeEl.classList.remove('selected');
+          }
+        }
+      }
+      
+      // Update selection status display
+      this.updateSelectionStatus();
+    }
+    
+    updateSelectionStatus() {
+      const statusEl = document.getElementById('selection-status');
+      if (!statusEl) return; // Safety check - element might not be ready yet
+      
+      const countEl = statusEl.querySelector('.selection-count');
+      if (!countEl) return; // Safety check for nested element
+      
+      const selectedCount = this.selectedNodes.size;
+      
+      if (selectedCount > 0) {
+        statusEl.style.display = 'flex';
+        countEl.textContent = `${selectedCount} node${selectedCount === 1 ? '' : 's'} selected`;
+      } else {
+        statusEl.style.display = 'none';
+      }
+    }
+
+    // Clipboard operations
+    copySelectedNodes() {
+      if (this.selectedNodes.size === 0) return;
+      
+      // Serialize selected nodes and their connections
+      const selectedNodeData = [];
+      const selectedConnections = [];
+      
+      // Copy nodes
+      for (const nodeId of this.selectedNodes) {
+        const node = this.nodes.get(nodeId);
+        if (node) {
+          selectedNodeData.push([nodeId, {
+            ...node,
+            element: null // Don't serialize DOM elements
+          }]);
+        }
+      }
+      
+      // Copy connections between selected nodes
+      for (const connection of this.connections) {
+        const fromNodeId = connection.from.split('-').slice(0, -1).join('-');
+        const toNodeId = connection.to.split('-').slice(0, -1).join('-');
+        
+        if (this.selectedNodes.has(fromNodeId) && this.selectedNodes.has(toNodeId)) {
+          selectedConnections.push(connection);
+        }
+      }
+      
+      this.clipboard = {
+        nodes: selectedNodeData,
+        connections: selectedConnections,
+        operation: 'copy'
+      };
+      
+      console.log(`Copied ${this.selectedNodes.size} nodes to clipboard`);
+    }
+
+    cutSelectedNodes() {
+      this.copySelectedNodes();
+      if (this.clipboard) {
+        this.clipboard.operation = 'cut';
+        this.deleteSelectedNodes();
+      }
+    }
+
+    pasteNodes() {
+      if (!this.clipboard || this.clipboard.nodes.length === 0) return;
+      
+      const canvasRect = this.canvas.getBoundingClientRect();
+      const pasteOffset = { x: 50, y: 50 }; // Offset from original position
+      
+      // Map old IDs to new IDs
+      const idMapping = new Map();
+      
+      // Create new nodes with new IDs
+      for (const [oldId, nodeData] of this.clipboard.nodes) {
+        const newId = this.generateId();
+        idMapping.set(oldId, newId);
+        
+        // Offset position for paste
+        const newPosition = {
+          x: (nodeData.position?.x || 50) + pasteOffset.x,
+          y: (nodeData.position?.y || 50) + pasteOffset.y
+        };
+        
+        const newNode = {
+          ...nodeData,
+          id: newId,
+          position: newPosition
+        };
+        
+        this.nodes.set(newId, newNode);
+        this.renderNode(newNode);
+      }
+      
+      // Create connections with new IDs
+      for (const connection of this.clipboard.connections) {
+        const fromParts = connection.from.split('-');
+        const toParts = connection.to.split('-');
+        
+        const fromNodeId = fromParts.slice(0, -1).join('-');
+        const toNodeId = toParts.slice(0, -1).join('-');
+        const fromPort = fromParts[fromParts.length - 1];
+        const toPort = toParts[toParts.length - 1];
+        
+        const newFromId = idMapping.get(fromNodeId);
+        const newToId = idMapping.get(toNodeId);
+        
+        if (newFromId && newToId) {
+          const newConnection = {
+            from: `${newFromId}-${fromPort}`,
+            to: `${newToId}-${toPort}`
+          };
+          this.connections.push(newConnection);
+        }
+      }
+      
+      // Update visual connections
+      this.updateConnections();
+      
+      // Select pasted nodes
+      this.clearSelection();
+      for (const newId of idMapping.values()) {
+        this.selectedNodes.add(newId);
+      }
+      this.updateNodeSelectionVisuals();
+      
+      console.log(`Pasted ${idMapping.size} nodes`);
+    }
+
+    deleteSelectedNodes() {
+      if (this.selectedNodes.size === 0) return;
+      
+      // Remove connections involving selected nodes
+      this.connections = this.connections.filter(conn => {
+        const fromNodeId = conn.from.split('-').slice(0, -1).join('-');
+        const toNodeId = conn.to.split('-').slice(0, -1).join('-');
+        return !this.selectedNodes.has(fromNodeId) && !this.selectedNodes.has(toNodeId);
+      });
+      
+      // Remove nodes from DOM and data structure
+      for (const nodeId of this.selectedNodes) {
+        const nodeEl = document.getElementById(nodeId);
+        if (nodeEl) {
+          nodeEl.remove();
+        }
+        this.nodes.delete(nodeId);
+        this.globalOutputs.delete(nodeId); // Clean up output data if it's an output node
+      }
+      
+      this.clearSelection();
+      this.updateConnections();
+      this.updateVariablesTable();
+      this.updateEquationsTable();
+      
+      console.log('Deleted selected nodes');
+    }
+
+    // Component-specific import/export methods
+    exportComponent() {
+      if (!this.isEditingComponent) {
+        alert('You must be editing a component to export it.');
+        return;
+      }
+
+      try {
+        // Export only the current component's nodes and connections
+        const componentData = {
+          version: '1.0',
+          type: 'component',
+          name: document.getElementById('comp-name-input')?.value || 'Component',
+          timestamp: new Date().toISOString(),
+          data: {
+            nodes: Array.from(this.nodes.entries()).map(([id, node]) => [id, {
+              ...node,
+              // Position is already stored as node.position, no need to flatten to x/y
+              element: null // Don't serialize DOM elements
+            }]),
+            connections: [...this.connections],
+            globalVariables: Array.from(this.globalVariables.entries()),
+            globalOutputs: Array.from(this.globalOutputs.entries())
+          }
+        };
+
+        const jsonData = JSON.stringify(componentData, null, 2);
+        const blob = new Blob([jsonData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${componentData.name.replace(/[^a-zA-Z0-9]/g, '_')}_component.json`;
+        a.click();
+        
+        URL.revokeObjectURL(url);
+        alert(`Component "${componentData.name}" exported successfully!`);
+      } catch (error) {
+        console.error('Failed to export component:', error);
+        alert('Failed to export component.');
+      }
+    }
+
+    importComponent() {
+      if (!this.isEditingComponent) {
+        alert('You must be editing a component to import into it.');
+        return;
+      }
+
+      // Create hidden file input for component import
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.style.display = 'none';
+      
+      input.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            try {
+              const componentData = JSON.parse(e.target.result);
+              
+              // Validate component data structure
+              if (!componentData.data || componentData.type !== 'component') {
+                throw new Error('Invalid component file format');
+              }
+
+              // Clear current component content
+              this.nodes.clear();
+              this.connections = [];
+              this.clearCanvas();
+
+              // Import component data (same logic as regular import but for components)
+              const { nodes, connections } = componentData.data;
+              
+              nodes.forEach(([id, nodeData]) => {
+                // Extract position properly - it's stored as nodeData.position, not nodeData.x/y
+                const position = nodeData.position || { x: 50, y: 50 };
+                
+                const restoredNode = {
+                  ...nodeData,
+                  id: id,
+                  position: position, // Use the actual saved position
+                  inputs: nodeData.inputs || [],
+                  outputs: nodeData.outputs || []
+                };
+                
+                this.nodes.set(id, restoredNode);
+                this.renderNode(restoredNode);
+              });
+
+              this.connections = [...connections];
+              this.updateConnections();
+
+              // Update component name in the overlay
+              const nameInput = document.getElementById('comp-name-input');
+              if (nameInput && componentData.name) {
+                nameInput.value = componentData.name;
+              }
+
+              alert(`Component "${componentData.name || 'Component'}" imported successfully!`);
+            } catch (error) {
+              console.error('Failed to import component:', error);
+              alert('Failed to import component. The file may be corrupted or invalid.');
+            }
+          };
+          reader.readAsText(file);
+        }
+        
+        // Clean up
+        document.body.removeChild(input);
+      });
+      
+      document.body.appendChild(input);
+      input.click();
     }
 
     showAutoSaveIndicator() {
@@ -3815,6 +4934,13 @@ import Layout from '../layouts/Layout.astro';
     
     // Set up auto-save
     equationBuilder.setupAutoSave();
+    
+    // Check for auto-saved session and prompt user to restore
+    if (equationBuilder.hasAutoSave()) {
+      if (confirm('We found an auto-saved session. Would you like to restore it?')) {
+        equationBuilder.loadAutoSave();
+      }
+    }
     
     // Session Management Event Listeners
     document.getElementById('export-session-btn').addEventListener('click', () => {
@@ -3860,6 +4986,203 @@ import Layout from '../layouts/Layout.astro';
     margin: 0 auto;
     padding: 2rem 1rem;
     text-align: center;
+  }
+
+  /* Base node styling */
+  .equation-node {
+    position: absolute;
+    min-width: 80px;
+    padding: 8px 12px;
+    background: white;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    cursor: move;
+    user-select: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 10;
+    display: block;
+    transition: all 0.2s ease;
+  }
+
+  .equation-node:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+
+  /* Multi-selection styling */
+  .equation-node.selected {
+    border: 3px solid #3b82f6 !important;
+    box-shadow: 
+      0 0 0 2px rgba(59, 130, 246, 0.3),
+      0 4px 12px rgba(59, 130, 246, 0.2) !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05)) !important;
+    transform: scale(1.02) !important;
+    z-index: 1000 !important;
+  }
+
+  .equation-node.selected::after {
+    content: '✓';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 16px;
+    height: 16px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 1001;
+  }
+
+  .equation-node.selected::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px dashed #3b82f6;
+    border-radius: 8px;
+    pointer-events: none;
+    animation: dash 2s linear infinite;
+  }
+
+  @keyframes dash {
+    to {
+      stroke-dashoffset: -20px;
+    }
+  }
+
+  /* Selection rectangle for drag selection */
+  .selection-rectangle {
+    border: 2px dashed #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+    pointer-events: none;
+    z-index: 999;
+    border-radius: 4px;
+    animation: pulse-selection 1s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse-selection {
+    from {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+    }
+    to {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #1d4ed8;
+    }
+  }
+
+  /* Selection Status Bar */
+  .selection-status {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    padding: 8px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    animation: slideInFromTop 0.3s ease-out;
+  }
+
+  @keyframes slideInFromTop {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  .selection-count {
+    font-weight: 600;
+    color: #3b82f6;
+    font-size: 14px;
+  }
+
+  .selection-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .selection-btn {
+    padding: 6px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .selection-btn:hover {
+    background: #f8fafc;
+    border-color: #3b82f6;
+    color: #3b82f6;
+  }
+
+  .selection-btn.danger {
+    color: #dc2626;
+    border-color: #fecaca;
+  }
+
+  .selection-btn.danger:hover {
+    background: #fef2f2;
+    border-color: #dc2626;
+  }
+
+  /* Group Indicator */
+  .group-indicator {
+    border: 3px dashed #10b981;
+    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.1);
+    animation: groupPulse 2s ease-in-out infinite;
+  }
+
+  .group-indicator::after {
+    content: 'Grouped';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #10b981;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  @keyframes groupPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.02);
+      opacity: 1;
+    }
   }
 
   .section h2 {
@@ -4148,10 +5471,10 @@ import Layout from '../layouts/Layout.astro';
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
 
-  :global(.node.selected) {
-    border-color: #3b82f6;
-    background: #eff6ff;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  :global(.equation-node.selected) {
+    border-color: #3b82f6 !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05)) !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(59, 130, 246, 0.2) !important;
   }
 
   :global(.node-number), :global(.node-variable) {
@@ -4774,5 +6097,76 @@ import Layout from '../layouts/Layout.astro';
 
   .help-header .close-btn:hover {
     background: #cbd5e1;
+  }
+
+  /* Enhanced interaction styles */
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  /* Node selection menu styles */
+  #node-selection-menu {
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  #node-selection-menu .menu-node-item:hover {
+    background-color: #f3f4f6 !important;
+    transform: translateX(2px);
+  }
+
+  /* Enhanced palette button hover states for drag indication */
+  .palette-node {
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .palette-node:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .palette-node:active {
+    transform: translateY(0);
+  }
+
+  /* Canvas drop zone highlighting */
+  .canvas-drop-active {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border: 2px dashed #3b82f6 !important;
+  }
+
+  /* Connection drag feedback */
+  .connection-drag-active .input-port {
+    animation: pulse 1s infinite;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6) !important;
+  }
+
+  /* Improved port hover states */
+  .port {
+    transition: all 0.2s ease;
+  }
+
+  .port:hover {
+    transform: scale(1.4) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Dragging cursor states */
+  body.dragging-connection {
+    cursor: crosshair !important;
+  }
+
+  body.dragging-node {
+    cursor: grabbing !important;
+  }
+
+  /* Visual feedback for drag operations */
+  .drag-ghost {
+    pointer-events: none;
+    opacity: 0.7;
+    transform: rotate(3deg);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
 </style>
