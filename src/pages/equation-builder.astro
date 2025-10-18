@@ -3873,19 +3873,78 @@ import Layout from '../layouts/Layout.astro';
           return this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
         }
 
-        // Multiplexer node - shows the selected choice equation if selector is constant
+        // Comparison operations
+        case 'greaterThan': {
+          const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
+          const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
+          if (!left || !right) return '?';
+          return `(${left} > ${right})`;
+        }
+        
+        case 'greaterEqual': {
+          const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
+          const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
+          if (!left || !right) return '?';
+          return `(${left} ≥ ${right})`;
+        }
+        
+        case 'lessThan': {
+          const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
+          const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
+          if (!left || !right) return '?';
+          return `(${left} < ${right})`;
+        }
+        
+        case 'lessEqual': {
+          const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
+          const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
+          if (!left || !right) return '?';
+          return `(${left} ≤ ${right})`;
+        }
+        
+        case 'equals': {
+          const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
+          const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
+          if (!left || !right) return '?';
+          return `(${left} = ${right})`;
+        }
+
+        // Multiplexer node - shows the selected choice equation if selector can be evaluated
         case 'multiplexer': {
           const selector = this.traceEquation(sourceNodeId, 'selector', context, componentData, visitedNodes);
           if (!selector || selector === '?') return 'MUX(?)';
           
-          // Try to evaluate selector if it's a simple number
           let choiceIndex = null;
+          
+          // Try to evaluate selector if it's a simple number
           if (/^\d+$/.test(selector)) {
-            // Selector is a simple number
             choiceIndex = parseInt(selector);
           } else if (/^\d+\.\d*$/.test(selector)) {
-            // Selector is a decimal number
             choiceIndex = Math.round(parseFloat(selector));
+          } else {
+            // Try to evaluate comparison expressions
+            try {
+              // Check for comparison patterns and evaluate them
+              const comparisonMatch = selector.match(/^\((\d+(?:\.\d+)?)\s*([>≥<≤=])\s*(\d+(?:\.\d+)?)\)$/);
+              if (comparisonMatch) {
+                const left = parseFloat(comparisonMatch[1]);
+                const operator = comparisonMatch[2];
+                const right = parseFloat(comparisonMatch[3]);
+                
+                let result = false;
+                switch (operator) {
+                  case '>': result = left > right; break;
+                  case '≥': result = left >= right; break;
+                  case '<': result = left < right; break;
+                  case '≤': result = left <= right; break;
+                  case '=': result = left === right; break;
+                }
+                
+                choiceIndex = result ? 1 : 0; // true=1, false=0
+              }
+            } catch (e) {
+              // If evaluation fails, fall back to showing MUX notation
+            }
           }
           
           // If we can determine the choice index, show that choice's equation
@@ -3910,6 +3969,27 @@ import Layout from '../layouts/Layout.astro';
     // Legacy function for backward compatibility - now uses the new tracer
     buildEquation(nodeId, portId) {
       return this.traceEquation(nodeId, portId, 'main');
+    }
+
+    // Refresh all output displays after page load
+    refreshAllOutputs() {
+      // Update global outputs table
+      this.updateTables();
+      
+      // Update all node output displays
+      for (let [nodeId, node] of this.nodes.entries()) {
+        const nodeEl = document.getElementById(nodeId);
+        if (nodeEl) {
+          // Update output port displays
+          const outputPorts = nodeEl.querySelectorAll('.output-port');
+          outputPorts.forEach(port => {
+            const portId = port.dataset.port;
+            if (portId) {
+              this.updatePortValue(nodeId, portId);
+            }
+          });
+        }
+      }
     }
 
     setupTables() {
@@ -5265,41 +5345,46 @@ import Layout from '../layouts/Layout.astro';
       equationBuilder.loadAutoSave();
     }
     
-    // Session Management Event Listeners
-    document.getElementById('export-session-btn').addEventListener('click', () => {
-      equationBuilder.exportSession();
-    });
+    // Refresh all outputs after initialization
+    setTimeout(() => {
+      equationBuilder.refreshAllOutputs();
+    }, 100); // Small delay to ensure everything is loaded
+  });
 
-    document.getElementById('import-session-btn').addEventListener('click', () => {
-      document.getElementById('import-file-input').click();
-    });
+  // Session Management Event Listeners
+  document.getElementById('export-session-btn').addEventListener('click', () => {
+    equationBuilder.exportSession();
+  });
 
-    // Handle file import
-    document.getElementById('import-file-input').addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          equationBuilder.importSession(e.target.result);
-        };
-        reader.readAsText(file);
-      }
-      // Reset the input so the same file can be selected again
-      event.target.value = '';
-    });
+  document.getElementById('import-session-btn').addEventListener('click', () => {
+    document.getElementById('import-file-input').click();
+  });
 
-    document.getElementById('clear-canvas-btn').addEventListener('click', () => {
-      if (confirm('Are you sure you want to clear the entire canvas? This cannot be undone.')) {
-        equationBuilder.clearCanvas('full');
-      }
-    });
+  // Handle file import
+  document.getElementById('import-file-input').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        equationBuilder.importSession(e.target.result);
+      };
+      reader.readAsText(file);
+    }
+    // Reset the input so the same file can be selected again
+    event.target.value = '';
+  });
+
+  document.getElementById('clear-canvas-btn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear the entire canvas? This cannot be undone.')) {
+      equationBuilder.clearCanvas('full');
+    }
+  });
     
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      setTimeout(() => {
-        equationBuilder.updateConnections();
-      }, 100);
-    });
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    setTimeout(() => {
+      equationBuilder.updateConnections();
+    }, 100);
   });
 </script>
 
