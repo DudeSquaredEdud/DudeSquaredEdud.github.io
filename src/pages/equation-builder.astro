@@ -58,18 +58,7 @@ import Layout from '../layouts/Layout.astro';
     <div class="canvas" id="equation-canvas">
       <svg class="connections" id="connections-svg" width="100%" height="100%"></svg>
       
-      <!-- Selection Status -->
-      <div class="selection-status" id="selection-status" style="display: none;">
-        <span class="selection-count">0 nodes selected</span>
-        <div class="selection-actions">
-          <button class="selection-btn" id="group-selected" title="Group Selected (Ctrl+G)">Group</button>
-          <button class="selection-btn" id="copy-selected" title="Copy (Ctrl+C)">Copy</button>
-          <button class="selection-btn" id="cut-selected" title="Cut (Ctrl+X)">Cut</button>
-          <button class="selection-btn danger" id="delete-selected" title="Delete (Del)">Delete</button>
-        </div>
-      </div>
-
-    <!-- Equation Display -->
+      <!-- Equation Display -->
       <div class="equation-display" id="equation-display">
         Click nodes above to add them to the canvas...
       </div>
@@ -212,6 +201,8 @@ import Layout from '../layouts/Layout.astro';
       this.dragStartX = 0;
       this.dragStartY = 0;
       this.justFinishedDragSelection = false;
+      this.originalToolbarContent = null; // For toolbar content switching
+      this.updatingToolbar = false; // Prevent simultaneous toolbar updates
       
       this.canvas = document.getElementById('equation-canvas');
       this.sidebar = document.getElementById('property-sidebar');
@@ -352,27 +343,12 @@ import Layout from '../layouts/Layout.astro';
     updatePaletteEventListeners() {
       // Clear existing listeners and add new ones for current page
       document.querySelectorAll('.palette-node').forEach(btn => {
-        // Clone to remove existing listeners
+        // Clone to remove existing listeners (but don't add duplicate click handler)
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
         
-        // Add click listener
-        newBtn.addEventListener('click', (e) => {
-          const nodeType = e.target.dataset.nodeType;
-          const rect = this.canvas.getBoundingClientRect();
-          
-          // Create position that snaps to grid
-          const gridSize = 20;
-          const rawX = Math.random() * (rect.width - 150) + 50;
-          const rawY = Math.random() * (rect.height - 150) + 50;
-          
-          const position = {
-            x: Math.round(rawX / gridSize) * gridSize,
-            y: Math.round(rawY / gridSize) * gridSize
-          };
-          
-          this.addNode(nodeType, position);
-        });
+        // Note: Click handling is done by the drag system in setupEnhancedDragPalette()
+        // No need for additional click listener here to avoid duplicates
       });
 
       // Enhanced canvas events with right-click support for node menu
@@ -1016,83 +992,96 @@ import Layout from '../layouts/Layout.astro';
     }
 
     showComponentEditingOverlay(nodeId) {
-      // Add component editing header overlay
+      // Add component editing bar at top of canvas
       const existingOverlay = document.getElementById('component-editing-overlay');
       if (existingOverlay) existingOverlay.remove();
       
       const overlay = document.createElement('div');
       overlay.id = 'component-editing-overlay';
       overlay.style.cssText = `
-        position: fixed;
+        position: absolute;
         top: 10px;
         left: 50%;
         transform: translateX(-50%);
-        background: #3b82f6;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 12px 16px;
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
         display: flex;
         align-items: center;
         gap: 16px;
-        z-index: 1000;
+        z-index: 1001;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        max-width: 500px;
       `;
       
       const node = Array.from(this.nodes.values()).find(n => n.id === nodeId);
       const componentName = node ? (node.customName || node.label) : 'Component';
       
       overlay.innerHTML = `
-        <span style="font-weight: 600;">Editing: ${componentName}</span>
-        <input type="text" id="comp-name-input" value="${componentName}" placeholder="Component Name" style="
-          padding: 4px 8px;
-          border: none;
-          border-radius: 4px;
-          font-size: 14px;
-          width: 150px;
-        ">
-        <button id="export-component" style="
-          background: #8b5cf6;
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-weight: 500;
-          font-size: 13px;
-        ">Export</button>
-        <button id="import-component" style="
-          background: #f59e0b;
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-weight: 500;
-          font-size: 13px;
-        ">Import</button>
-        <button id="save-component" style="
-          background: #10b981;
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-weight: 500;
-        ">Save</button>
-        <button id="cancel-component-edit" style="
-          background: #ef4444;
-          color: white;
-          border: none;
-          padding: 8px 16px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-weight: 600;
-          font-size: 14px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        ">Exit Component</button>
+        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+          <span style="font-weight: 700; font-size: 16px; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">📦</span>
+          <input type="text" id="comp-name-input" value="${componentName}" placeholder="Component Name" style="
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 160px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            font-weight: 500;
+          ">
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="export-component" style="
+            background: rgba(139, 92, 246, 0.9);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s;
+          ">Export</button>
+          <button id="import-component" style="
+            background: rgba(245, 158, 11, 0.9);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+          ">Import</button>
+          <button id="save-component" style="
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+          ">Save</button>
+          <button id="cancel-component-edit" style="
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+          ">Cancel</button>
+        </div>
       `;
       
-      document.body.appendChild(overlay);
+      // Append to canvas element
+      const canvas = document.getElementById('equation-canvas');
+      canvas.appendChild(overlay);
       
       // Add event listeners
       document.getElementById('export-component').addEventListener('click', (e) => {
@@ -1206,7 +1195,7 @@ import Layout from '../layouts/Layout.astro';
       this.clearCanvas();
       this.loadMainNodes();
       
-      // Remove overlay
+      // Remove component editing overlay
       const overlay = document.getElementById('component-editing-overlay');
       if (overlay) overlay.remove();
     }
@@ -1849,7 +1838,8 @@ import Layout from '../layouts/Layout.astro';
               this.canvas.style.background = 'rgba(59, 130, 246, 0.1)';
               this.canvas.style.border = '2px dashed #3b82f6';
             } else {
-              this.canvas.style.background = '';
+              // Restore appropriate background based on component editing mode
+              this.setComponentEditingMode(this.isEditingComponent);
               this.canvas.style.border = '';
             }
           }
@@ -1920,8 +1910,8 @@ import Layout from '../layouts/Layout.astro';
         this.nodeDrag.dragElement.remove();
       }
       
-      // Reset canvas styling
-      this.canvas.style.background = '';
+      // Reset canvas styling - restore appropriate background for current mode
+      this.setComponentEditingMode(this.isEditingComponent);
       this.canvas.style.border = '';
       
       // Reset cursor
@@ -2592,6 +2582,11 @@ import Layout from '../layouts/Layout.astro';
       console.log('🧮 calculateComponentResult called:', { componentNodeId, requestedPortId });
       
       // Get component data and port mapping
+      if (!window.componentData) {
+        console.log('❌ window.componentData is not initialized');
+        return '?';
+      }
+      
       console.log('🔍 Available component data keys:', Object.keys(window.componentData || {}));
       console.log('🎯 Looking for component ID:', componentNodeId);
       
@@ -3108,6 +3103,9 @@ import Layout from '../layouts/Layout.astro';
     
     buildComponentEquation(componentNodeId, requestedPortId) {
       // Get component data and port mapping
+      if (!window.componentData) {
+        return 'Component()';
+      }
       const componentData = window.componentData[componentNodeId];
       if (!componentData || !componentData.portMapping) {
         return 'Component()';
@@ -3120,55 +3118,23 @@ import Layout from '../layouts/Layout.astro';
       }
       
       // Build equation from the componentOutput node in the component's context
-      return this.buildComponentInternalEquation(outputNodeId, componentData) || 'Component()';
+      return this.buildComponentInternalEquation(outputNodeId, componentData, componentNodeId) || 'Component()';
     }
     
-    buildComponentInternalEquation(nodeId, componentData) {
-      const node = componentData.nodes.get(nodeId);
-      if (!node) return 'Component()';
+    buildComponentInternalEquation(nodeId, componentData, parentComponentId = null) {
+      // Set the current component context for external tracing
+      this.currentComponentId = parentComponentId;
       
-      // For componentOutput nodes, get the connected input equation
-      if (node.type === 'componentOutput') {
-        const connection = componentData.connections.find(conn =>
-          conn.to === `${nodeId}-in`
-        );
-        
-        if (connection) {
-          // Parse connection format: "node-ID-timestamp-port"
-          const connectionParts = connection.from.split('-');
-          const sourceNodeId = connectionParts.slice(0, -1).join('-'); // Everything before last part is node ID
-          return this.buildComponentInternalEquation(sourceNodeId, componentData);
-        }
-      }
+      // Use the new unified tracer for component equations
+      const equation = this.traceEquation(nodeId, 'in', 'component', componentData);
       
-      // Handle different node types within the component
-      switch (node.type) {
-        case 'componentInput':
-          return node.label || 'Input';
-          
-        case 'number':
-          return node.value?.toString() || '0';
-          
-        case 'add': {
-          const left = this.getComponentNodeEquation(nodeId, 'in1', componentData);
-          const right = this.getComponentNodeEquation(nodeId, 'in2', componentData);
-          if (!left || !right) return '';
-          return `(${left} + ${right})`;
-        }
-        
-        case 'multiply': {
-          const left = this.getComponentNodeEquation(nodeId, 'in1', componentData);
-          const right = this.getComponentNodeEquation(nodeId, 'in2', componentData);
-          if (!left || !right) return '';
-          return `(${left} × ${right})`;
-        }
-        
-        default:
-          return node.label || node.type;
-      }
+      // Clear the context
+      this.currentComponentId = null;
+      
+      return equation || 'Component()';
     }
     
-    getComponentNodeEquation(nodeId, portId, componentData) {
+    getComponentNodeEquation(nodeId, portId, componentData, parentComponentId = null) {
       const connection = componentData.connections.find(conn =>
         conn.to === `${nodeId}-${portId}`
       );
@@ -3177,7 +3143,7 @@ import Layout from '../layouts/Layout.astro';
         // Parse connection format: "node-ID-timestamp-port"
         const connectionParts = connection.from.split('-');
         const sourceNodeId = connectionParts.slice(0, -1).join('-'); // Everything before last part is node ID
-        return this.buildComponentInternalEquation(sourceNodeId, componentData);
+        return this.buildComponentInternalEquation(sourceNodeId, componentData, parentComponentId);
       }
       
       return '';
@@ -3358,10 +3324,8 @@ import Layout from '../layouts/Layout.astro';
           const contentEl = outputNodeEl.querySelector('.node-content');
           if (contentEl) {
             if (equation) {
-              // Show equation instead of NaN for non-numeric results
-              const displayResult = (result === null || result === undefined || isNaN(result)) ? 
-                equation : result;
-              contentEl.textContent = `Output: ${displayResult}`;
+              // Always show the symbolic equation in the output node
+              contentEl.textContent = `Output: ${equation}`;
             } else {
               contentEl.textContent = globalOutput.name || 'Output';
             }
@@ -3679,196 +3643,273 @@ import Layout from '../layouts/Layout.astro';
       }
     }
 
-    buildEquation(nodeId, portId) {
-      console.log('🔍 buildEquation called:', nodeId, portId);
+    // New unified equation tracing system
+    traceEquation(nodeId, portId, context = 'main', componentData = null, visitedNodes = new Set()) {
+      // Prevent infinite recursion
+      const nodePortKey = `${nodeId}-${portId}`;
+      if (visitedNodes.has(nodePortKey)) {
+        return '?';
+      }
+      visitedNodes.add(nodePortKey);
+
+      // Get the target node (where we're looking for an equation)
+      let targetNode;
+      if (context === 'component' && componentData) {
+        targetNode = componentData.nodes.get(nodeId);
+      } else {
+        targetNode = this.nodes.get(nodeId);
+      }
+
+      if (!targetNode) {
+        return '?';
+      }
+
+      // CASE 1: Generator nodes - return their values directly
+      if (['variable', 'number', 'constant_pi', 'constant_e', 'constant_phi', 'constant_sqrt2'].includes(targetNode.type)) {
+        switch (targetNode.type) {
+          case 'variable':
+            return targetNode.variable || 'x';
+          case 'number':
+            return targetNode.value?.toString() || '0';
+          case 'constant_pi':
+            return 'π';
+          case 'constant_e':
+            return 'e';
+          case 'constant_phi':
+            return 'φ';
+          case 'constant_sqrt2':
+            return '√2';
+        }
+      }
+
+      // CASE 2: Find the connection feeding this port
+      let connections = context === 'component' && componentData ? componentData.connections : this.connections;
+      const connection = connections.find(conn => conn.to === `${nodeId}-${portId}`);
       
-      const connection = this.connections.find(conn => conn.to === `${nodeId}-${portId}`);
       if (!connection) {
-        console.log('❌ No connection found to:', `${nodeId}-${portId}`);
-        return '';
+        // No connection found - handle special cases
+        if (targetNode.type === 'componentInput' && context === 'component') {
+          return 'Input'; // Fallback for unconnected component inputs
+        }
+        return '?';
       }
-      
-      console.log('🔗 Found connection:', connection);
 
-      // Parse source node ID properly (e.g., "node-1-1234567-out" -> "node-1-1234567")
+      // Parse the source node and port from connection
       const fromParts = connection.from.split('-');
-      fromParts.pop(); // Remove port id
+      const sourcePortId = fromParts.pop();
       const sourceNodeId = fromParts.join('-');
-      
-      console.log('📍 Source node ID:', sourceNodeId);
-      
-      const sourceNode = this.nodes.get(sourceNodeId);
+
+      // Get the source node
+      let sourceNode;
+      if (context === 'component' && componentData) {
+        sourceNode = componentData.nodes.get(sourceNodeId);
+      } else {
+        sourceNode = this.nodes.get(sourceNodeId);
+      }
+
       if (!sourceNode) {
-        console.log('❌ Source node not found:', sourceNodeId);
-        return '';
+        return '?';
+      }
+
+      return this.traceSourceNodeEquation(sourceNode, sourceNodeId, sourcePortId, context, componentData, visitedNodes);
+    }
+
+    traceSourceNodeEquation(sourceNode, sourceNodeId, sourcePortId, context, componentData, visitedNodes) {
+      // CASE 1: Generator nodes
+      if (['variable', 'number', 'constant_pi', 'constant_e', 'constant_phi', 'constant_sqrt2'].includes(sourceNode.type)) {
+        switch (sourceNode.type) {
+          case 'variable':
+            return sourceNode.variable || 'x';
+          case 'number':
+            return sourceNode.value?.toString() || '0';
+          case 'constant_pi':
+            return 'π';
+          case 'constant_e':
+            return 'e';
+          case 'constant_phi':
+            return 'φ';
+          case 'constant_sqrt2':
+            return '√2';
+        }
+      }
+
+      // CASE 2: Pass-through nodes (splitters)
+      if (sourceNode.type === 'splitter') {
+        return this.traceEquation(sourceNodeId, 'input', context, componentData, visitedNodes);
+      }
+
+      // CASE 3: Component inputs (when in component context)
+      if (sourceNode.type === 'componentInput' && context === 'component') {
+        // For component inputs, we need to trace to the external connection
+        // We need to find the main component ID that contains this componentData
+        const mainComponentId = this.findMainComponentIdForData(componentData);
+        return this.traceComponentInputExternal(sourceNode, sourceNodeId, componentData, mainComponentId);
+      }
+
+      // CASE 4: Component nodes (when in main context) - special handling needed
+      if (sourceNode.type === 'component' && context === 'main') {
+        return this.traceComponentOutput(sourceNode, sourceNodeId, sourcePortId);
+      }
+
+      // CASE 5: Operation nodes - build equations from inputs
+      return this.traceOperationNode(sourceNode, sourceNodeId, context, componentData, visitedNodes);
+    }
+
+    findMainComponentIdForData(componentData) {
+      // Find the main canvas component node that contains this componentData
+      for (let [nodeId, node] of this.nodes.entries()) {
+        if (node.type === 'component' && window.componentData[nodeId] === componentData) {
+          return nodeId;
+        }
+      }
+      return null;
+    }
+
+    traceComponentInputExternal(inputNode, inputNodeId, componentData, mainComponentId) {
+      // Find which input port this componentInput maps to
+      const inputPortName = Object.keys(componentData.portMapping.inputs).find(portName => 
+        componentData.portMapping.inputs[portName] === inputNodeId
+      );
+      
+      if (inputPortName && mainComponentId) {
+        const targetPortId = `${mainComponentId}-${inputPortName}`;
+        const externalConnection = this.connections.find(conn => conn.to === targetPortId);
+        
+        if (externalConnection) {
+          const connectionParts = externalConnection.from.split('-');
+          const sourcePortId = connectionParts.pop();
+          const sourceNodeId = connectionParts.join('-');
+          
+          // Get the source node to determine its type
+          const sourceNode = this.nodes.get(sourceNodeId);
+          
+          // For splitters, ignore the output port and trace the node directly (it will trace input)
+          if (sourceNode && sourceNode.type === 'splitter') {
+            return this.traceEquation(sourceNodeId, 'input', 'main');
+          }
+          
+          // Trace the external equation in main context
+          return this.traceEquation(sourceNodeId, sourcePortId, 'main');
+        }
       }
       
-      console.log('✅ Source node found:', sourceNode);
+      return inputNode.label || 'Input';
+    }
 
+    traceComponentOutput(componentNode, componentNodeId, outputPortId) {
+      // This traces component outputs - use existing component equation building
+      const componentData = window.componentData[componentNodeId];
+      if (componentData) {
+        const outputNodeId = componentData.portMapping.outputs[outputPortId];
+        if (outputNodeId) {
+          return this.traceEquation(outputNodeId, 'in', 'component', componentData);
+        }
+      }
+      return 'Component()';
+    }
+
+    traceOperationNode(sourceNode, sourceNodeId, context, componentData, visitedNodes) {
       switch (sourceNode.type) {
-        // Generators
-        case 'number':
-          return sourceNode.value?.toString() || '0';
-        case 'variable':
-          return sourceNode.variable || 'x';
-        case 'constant_pi':
-          return 'π';
-        case 'constant_e':
-          return 'e';
-        case 'constant_phi':
-          return 'φ'; // φ (golden ratio)
-        case 'constant_sqrt2':
-          return '√2'; // √2
-          
-        // Binary Operators
-        case 'add':
-        case 'subtract':
-        case 'multiply':
-        case 'divide':
-        case 'modulo':
-        case 'equals':
-        case 'greater':
-        case 'less':
-        case 'greaterEqual':
-        case 'lessEqual':
-        case 'notEqual': {
-          const left = this.buildEquation(sourceNode.id, 'in1');
-          const right = this.buildEquation(sourceNode.id, 'in2');
-          if (!left || !right) return '';
-          
-          const operators = { 
-            add: '+', subtract: '-', multiply: '*', divide: '/', modulo: '%',
-            equals: '=', greater: '>', less: '<', greaterEqual: '≥', lessEqual: '≤', notEqual: '≠'
-          };
-          const op = operators[sourceNode.type];
-          return `(${left} ${op} ${right})`;
+        // Binary operations
+        case 'add': {
+          const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
+          const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
+          if (!left || !right) return '?';
+          return `(${left} + ${right})`;
         }
         
-        case 'power': {
-          const base = this.buildEquation(sourceNode.id, 'base');
-          const exp = this.buildEquation(sourceNode.id, 'exp');
-          if (!base || !exp) return '';
-          return `(${base}^${exp})`;
+        case 'subtract': {
+          const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
+          const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
+          if (!left || !right) return '?';
+          return `(${left} - ${right})`;
         }
         
-        // Unary Operators
+        case 'multiply': {
+          const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
+          const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
+          if (!left || !right) return '?';
+          return `(${left} × ${right})`;
+        }
+        
+        case 'divide': {
+          const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
+          const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
+          if (!left || !right) return '?';
+          return `(${left} ÷ ${right})`;
+        }
+
+        // Unary operations
         case 'sqrt': {
-          const value = this.buildEquation(sourceNode.id, 'value');
-          const root = this.buildEquation(sourceNode.id, 'root');
-          
-          if (!value) return '';
-          
-          // If root is specified and not default 2, show nth root notation
-          if (root && root !== '2') {
-            return `${root}√(${value})`;
-          } else {
-            return `√(${value})`;
-          }
-        }
-        case 'log': {
-          const value = this.buildEquation(sourceNode.id, 'value');
-          const base = this.buildEquation(sourceNode.id, 'base');
-          
-          if (!value) return '';
-          
-          // If base is specified and not default 10, show subscript base
-          if (base && base !== '10') {
-            return `log_${base}(${value})`;
-          } else {
-            return `log(${value})`;
-          }
-        }
-        case 'ln': {
-          const input = this.buildEquation(sourceNode.id, 'in');
-          if (!input) return '';
-          return `ln(${input})`;
-        }
-        case 'abs': {
-          const input = this.buildEquation(sourceNode.id, 'in');
-          if (!input) return '';
-          return `|${input}|`;
-        }
-        case 'sin': {
-          const input = this.buildEquation(sourceNode.id, 'in');
-          if (!input) return '';
-          return `sin(${input})`;
-        }
-        case 'cos': {
-          const input = this.buildEquation(sourceNode.id, 'in');
-          if (!input) return '';
-          return `cos(${input})`;
-        }
-        case 'tan': {
-          const input = this.buildEquation(sourceNode.id, 'in');
-          if (!input) return '';
-          return `tan(${input})`;
+          const input = this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
+          return input ? `√(${input})` : '?';
         }
         
-        // Advanced Components
-        case 'component': {
-          // Get the port ID from the connection
-          const sourcePortId = connection.from.split('-').pop();
-          return this.buildComponentEquation(sourceNodeId, sourcePortId);
+        case 'sin': {
+          const input = this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
+          return input ? `sin(${input})` : '?';
         }
-        case 'conditional': {
-          // Rule engine equation building
-          const inputEquation = this.buildEquation(sourceNode.id, 'value');
-          if (!inputEquation) return '';
-          
-          const rules = sourceNode.rules || [
-            { type: 'greater', value: 0, returnValue: 1, enabled: true },
-            { type: 'default', returnValue: 0, enabled: true }
-          ];
-          
-          // Build a readable rule description
-          const activeRules = rules.filter(r => r.enabled);
-          if (activeRules.length === 0) return 'RULES()';
-          
-          const ruleDescriptions = activeRules.map(rule => {
-            switch (rule.type) {
-              case 'greater': return `${inputEquation} > ${rule.value} → ${rule.returnValue}`;
-              case 'less': return `${inputEquation} < ${rule.value} → ${rule.returnValue}`;
-              case 'equals': return `${inputEquation} = ${rule.value} → ${rule.returnValue}`;
-              case 'range': return `${rule.value} ≤ ${inputEquation} ≤ ${rule.maxValue} → ${rule.returnValue}`;
-              case 'negative': return `${inputEquation} < 0 → ${rule.returnValue}`;
-              case 'positive': return `${inputEquation} > 0 → ${rule.returnValue}`;
-              case 'zero': return `${inputEquation} = 0 → ${rule.returnValue}`;
-              case 'default': return `default → ${rule.returnValue}`;
-              default: return `${rule.type} → ${rule.returnValue}`;
-            }
-          });
-          
-          return `RULES(${ruleDescriptions.join('; ')})`;
+        
+        case 'cos': {
+          const input = this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
+          return input ? `cos(${input})` : '?';
+        }
+        
+        case 'tan': {
+          const input = this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
+          return input ? `tan(${input})` : '?';
+        }
+
+        // Power operations
+        case 'power': {
+          const base = this.traceEquation(sourceNodeId, 'base', context, componentData, visitedNodes);
+          const exp = this.traceEquation(sourceNodeId, 'exp', context, componentData, visitedNodes);
+          if (!base || !exp) return '?';
+          return `(${base})^(${exp})`;
         }
 
         // Component I/O nodes
-        case 'componentInput': {
-          return sourceNode.label || 'Input';
-        }
         case 'componentOutput': {
-          const input = this.buildEquation(sourceNode.id, 'in');
-          return input || 'Output';
+          return this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
         }
-        
-        // Multiplexer node - shows selector and choice count
+
+        // Multiplexer node - shows the selected choice equation if selector is constant
         case 'multiplexer': {
-          const selector = this.buildEquation(sourceNode.id, 'selector');
-          if (!selector) return 'MUX(?)';
+          const selector = this.traceEquation(sourceNodeId, 'selector', context, componentData, visitedNodes);
+          if (!selector || selector === '?') return 'MUX(?)';
           
+          // Try to evaluate selector if it's a simple number
+          let choiceIndex = null;
+          if (/^\d+$/.test(selector)) {
+            // Selector is a simple number
+            choiceIndex = parseInt(selector);
+          } else if (/^\d+\.\d*$/.test(selector)) {
+            // Selector is a decimal number
+            choiceIndex = Math.round(parseFloat(selector));
+          }
+          
+          // If we can determine the choice index, show that choice's equation
+          if (choiceIndex !== null) {
+            const choicePort = `choice${choiceIndex}`;
+            if (sourceNode.inputs && sourceNode.inputs.includes(choicePort)) {
+              const selectedChoice = this.traceEquation(sourceNodeId, choicePort, context, componentData, visitedNodes);
+              return selectedChoice || '?';
+            }
+          }
+          
+          // Fallback: show MUX notation with selector
           const choiceCount = (sourceNode.inputs || []).length - 1; // Subtract selector port
           return `MUX[${choiceCount}](${selector})`;
         }
-        
-        // Splitter node - shows input being split to multiple outputs
-        case 'splitter': {
-          const input = this.buildEquation(sourceNode.id, 'input');
-          const outputCount = (sourceNode.outputs || []).length;
-          return input ? `SPLIT[${outputCount}](${input})` : `SPLIT[${outputCount}](?)`;
-        }
-        
+
         default:
-          return '';
+          return sourceNode.label || sourceNode.type || '?';
       }
+    }
+
+    // Legacy function for backward compatibility - now uses the new tracer
+    buildEquation(nodeId, portId) {
+      return this.traceEquation(nodeId, portId, 'main');
     }
 
     setupTables() {
@@ -4170,21 +4211,47 @@ import Layout from '../layouts/Layout.astro';
     // Session Management Methods
     exportSession() {
       try {
+        // Determine which data to export
+        let nodesToExport, connectionsToExport, globalVariablesToExport, globalOutputsToExport;
+        
+        if (this.isEditingComponent && this.mainCanvasBackup) {
+          // Export the main canvas data (from backup)
+          nodesToExport = this.mainCanvasBackup.nodes;
+          connectionsToExport = this.mainCanvasBackup.connections;
+          globalVariablesToExport = this.mainCanvasBackup.globalVariables || new Map();
+          globalOutputsToExport = this.mainCanvasBackup.globalOutputs || new Map();
+        } else {
+          // Export current canvas data
+          nodesToExport = this.nodes;
+          connectionsToExport = this.connections;
+          globalVariablesToExport = this.globalVariables;
+          globalOutputsToExport = this.globalOutputs;
+        }
+        
         const sessionData = {
           timestamp: new Date().toISOString(),
           version: '1.0',
           appName: 'Visual Equation Builder',
           data: {
-            nodes: Array.from(this.nodes.entries()).map(([id, node]) => [id, {
+            nodes: Array.from(nodesToExport.entries()).map(([id, node]) => [id, {
               ...node,
               element: null, // Don't serialize DOM elements
               // Ensure inputs/outputs are preserved
               inputs: node.inputs || [],
               outputs: node.outputs || []
             }]),
-            connections: [...this.connections],
-            globalVariables: Array.from(this.globalVariables.entries()),
-            globalOutputs: Array.from(this.globalOutputs.entries())
+            connections: [...connectionsToExport],
+            globalVariables: Array.from(globalVariablesToExport.entries()),
+            globalOutputs: Array.from(globalOutputsToExport.entries()),
+            componentData: Object.fromEntries(
+              Object.entries(window.componentData || {}).map(([id, compData]) => [
+                id,
+                {
+                  ...compData,
+                  nodes: Array.from(compData.nodes.entries()) // Convert Map to array for JSON
+                }
+              ])
+            ) // Include component data with proper serialization
           }
         };
 
@@ -4215,20 +4282,46 @@ import Layout from '../layouts/Layout.astro';
     // Separate auto-save method for localStorage
     autoSave() {
       try {
+        // Determine which data to save
+        let nodesToSave, connectionsToSave, globalVariablesToSave, globalOutputsToSave;
+        
+        if (this.isEditingComponent && this.mainCanvasBackup) {
+          // Save the main canvas data (from backup)
+          nodesToSave = this.mainCanvasBackup.nodes;
+          connectionsToSave = this.mainCanvasBackup.connections;
+          globalVariablesToSave = this.mainCanvasBackup.globalVariables || new Map();
+          globalOutputsToSave = this.mainCanvasBackup.globalOutputs || new Map();
+        } else {
+          // Save current canvas data
+          nodesToSave = this.nodes;
+          connectionsToSave = this.connections;
+          globalVariablesToSave = this.globalVariables;
+          globalOutputsToSave = this.globalOutputs;
+        }
+        
         const sessionData = {
           timestamp: new Date().toISOString(),
           version: '1.0',
           data: {
-            nodes: Array.from(this.nodes.entries()).map(([id, node]) => [id, {
+            nodes: Array.from(nodesToSave.entries()).map(([id, node]) => [id, {
               ...node,
               element: null, // Don't serialize DOM elements
               // Ensure inputs/outputs are preserved
               inputs: node.inputs || [],
               outputs: node.outputs || []
             }]),
-            connections: [...this.connections],
-            globalVariables: Array.from(this.globalVariables.entries()),
-            globalOutputs: Array.from(this.globalOutputs.entries())
+            connections: [...connectionsToSave],
+            globalVariables: Array.from(globalVariablesToSave.entries()),
+            globalOutputs: Array.from(globalOutputsToSave.entries()),
+            componentData: Object.fromEntries(
+              Object.entries(window.componentData || {}).map(([id, compData]) => [
+                id,
+                {
+                  ...compData,
+                  nodes: Array.from(compData.nodes.entries()) // Convert Map to array for JSON
+                }
+              ])
+            ) // Include component data with proper serialization
           }
         };
 
@@ -4250,11 +4343,19 @@ import Layout from '../layouts/Layout.astro';
           throw new Error('Invalid session file format');
         }
 
+        // If we're editing a component, warn user and exit component mode first
+        if (this.isEditingComponent) {
+          if (!confirm('Importing a session will exit component editing mode and replace the main canvas. Continue?')) {
+            return false;
+          }
+          this.exitComponentEditingMode();
+        }
+
         // Clear current state
         this.clearCanvas('full');
 
         // Restore data
-        const { nodes, connections, globalVariables, globalOutputs } = sessionData.data;
+        const { nodes, connections, globalVariables, globalOutputs, componentData } = sessionData.data;
         
         // Restore nodes - clear first to avoid ID conflicts
         this.nodes.clear();
@@ -4286,6 +4387,23 @@ import Layout from '../layouts/Layout.astro';
         // Restore global state
         this.globalVariables = new Map(globalVariables);
         this.globalOutputs = new Map(globalOutputs);
+        
+        // Restore component data
+        if (componentData) {
+          // Convert component data back to proper format
+          const restoredComponentData = {};
+          for (const [componentId, data] of Object.entries(componentData)) {
+            restoredComponentData[componentId] = {
+              ...data,
+              // Handle different serialization formats for nodes
+              nodes: data.nodes ? 
+                (Array.isArray(data.nodes) ? new Map(data.nodes) : new Map(Object.entries(data.nodes))) 
+                : new Map(),
+              connections: data.connections || []
+            };
+          }
+          window.componentData = restoredComponentData;
+        }
 
         // Update visual state
         this.updateConnections();
@@ -4411,6 +4529,11 @@ import Layout from '../layouts/Layout.astro';
       this.selectionRectangle.style.top = this.dragStartY + 'px';
       this.selectionRectangle.style.width = '0px';
       this.selectionRectangle.style.height = '0px';
+      this.selectionRectangle.style.border = '2px dashed #3b82f6';
+      this.selectionRectangle.style.background = 'rgba(59, 130, 246, 0.1)';
+      this.selectionRectangle.style.zIndex = '999';
+      this.selectionRectangle.style.pointerEvents = 'none';
+      
       this.canvas.appendChild(this.selectionRectangle);
     }
     
@@ -4624,19 +4747,182 @@ import Layout from '../layouts/Layout.astro';
     }
     
     updateSelectionStatus() {
-      const statusEl = document.getElementById('selection-status');
-      if (!statusEl) return; // Safety check - element might not be ready yet
+      const toolbar = document.querySelector('.equation-toolbar');
+      if (!toolbar) return;
       
-      const countEl = statusEl.querySelector('.selection-count');
-      if (!countEl) return; // Safety check for nested element
+      // Prevent multiple simultaneous updates
+      if (this.updatingToolbar) return;
+      this.updatingToolbar = true;
       
       const selectedCount = this.selectedNodes.size;
       
       if (selectedCount > 0) {
-        statusEl.style.display = 'flex';
-        countEl.textContent = `${selectedCount} node${selectedCount === 1 ? '' : 's'} selected`;
+        // Store original toolbar content if not already stored
+        if (!this.originalToolbarContent) {
+          this.originalToolbarContent = toolbar.innerHTML;
+        }
+        
+        // Only update if not already showing selection content
+        if (!toolbar.querySelector('.selection-toolbar-content')) {
+          // Replace with selection controls
+          toolbar.innerHTML = `
+            <div class="selection-toolbar-content" style="display: flex; align-items: center; gap: 16px; width: 100%; opacity: 0;">
+              <span style="font-weight: 600; color: #3b82f6; font-size: 14px;">${selectedCount} node${selectedCount === 1 ? '' : 's'} selected</span>
+              <div style="display: flex; gap: 8px; margin-left: auto;">
+                <button class="toolbar-btn" id="group-selected" title="Group Selected (Ctrl+G)" style="
+                  background: #374151;
+                  color: white;
+                  border: none;
+                  padding: 10px 16px;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 14px;
+                  font-weight: 500;
+                  transition: all 0.2s;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                ">Group</button>
+                <button class="toolbar-btn" id="copy-selected" title="Copy (Ctrl+C)" style="
+                  background: #374151;
+                  color: white;
+                  border: none;
+                  padding: 10px 16px;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 14px;
+                  font-weight: 500;
+                  transition: all 0.2s;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                ">Copy</button>
+                <button class="toolbar-btn" id="cut-selected" title="Cut (Ctrl+X)" style="
+                  background: #374151;
+                  color: white;
+                  border: none;
+                  padding: 10px 16px;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 14px;
+                  font-weight: 500;
+                  transition: all 0.2s;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                ">Cut</button>
+                <button class="toolbar-btn clear-btn" id="delete-selected" title="Delete (Del)" style="
+                  background: #374151;
+                  color: white;
+                  border: none;
+                  padding: 10px 16px;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 14px;
+                  font-weight: 500;
+                  transition: all 0.2s;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                ">Delete</button>
+              </div>
+            </div>
+          `;
+          
+          // Fade in animation
+          const content = toolbar.querySelector('.selection-toolbar-content');
+          setTimeout(() => {
+            content.style.transition = 'opacity 0.3s ease-out';
+            content.style.opacity = '1';
+            this.updatingToolbar = false; // Reset flag after animation
+          }, 10);
+          
+          // Re-attach event listeners for selection actions
+          this.attachSelectionEventListeners();
+        } else {
+          // Just update the count if selection content already exists
+          const countEl = toolbar.querySelector('.selection-toolbar-content span');
+          if (countEl) {
+            countEl.textContent = `${selectedCount} node${selectedCount === 1 ? '' : 's'} selected`;
+          }
+          this.updatingToolbar = false;
+        }
+        
+      } else if (this.originalToolbarContent && toolbar.querySelector('.selection-toolbar-content')) {
+        // Fade out and restore original content
+        const content = toolbar.querySelector('.selection-toolbar-content');
+        content.style.transition = 'opacity 0.3s ease-out';
+        content.style.opacity = '0';
+        
+        setTimeout(() => {
+          toolbar.innerHTML = this.originalToolbarContent;
+          this.originalToolbarContent = null;
+          // Reattach original toolbar event listeners
+          this.reattachOriginalToolbarListeners();
+          this.updatingToolbar = false; // Reset flag after restore
+        }, 300);
       } else {
-        statusEl.style.display = 'none';
+        this.updatingToolbar = false;
+      }
+    }
+
+    attachSelectionEventListeners() {
+      // Re-attach event listeners for dynamically created selection buttons
+      const copyBtn = document.getElementById('copy-selected');
+      const cutBtn = document.getElementById('cut-selected');
+      const deleteBtn = document.getElementById('delete-selected');
+      const groupBtn = document.getElementById('group-selected');
+      
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          this.copySelectedNodes();
+        });
+      }
+      
+      if (cutBtn) {
+        cutBtn.addEventListener('click', () => {
+          this.cutSelectedNodes();
+        });
+      }
+      
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+          this.deleteSelectedNodes();
+        });
+      }
+      
+      if (groupBtn) {
+        groupBtn.addEventListener('click', () => {
+          this.groupSelectedNodes();
+        });
+      }
+    }
+
+    reattachOriginalToolbarListeners() {
+      // Reattach event listeners for original toolbar buttons
+      const exportBtn = document.getElementById('export-session-btn');
+      const importBtn = document.getElementById('import-session-btn');
+      const clearBtn = document.getElementById('clear-canvas-btn');
+      const showTablesBtn = document.getElementById('show-tables-btn');
+      
+      if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+          this.exportSession();
+        });
+      }
+      
+      if (importBtn) {
+        importBtn.addEventListener('click', () => {
+          document.getElementById('import-file-input').click();
+        });
+      }
+      
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          this.clearCanvas();
+        });
+      }
+      
+      if (showTablesBtn) {
+        showTablesBtn.addEventListener('click', () => {
+          // Toggle tables sidebar visibility
+          const sidebar = document.querySelector('.tables-sidebar');
+          if (sidebar) {
+            sidebar.classList.toggle('hidden');
+          }
+        });
       }
     }
 
@@ -4711,6 +4997,41 @@ import Layout from '../layouts/Layout.astro';
           id: newId,
           position: newPosition
         };
+        
+        // Smart I/O conversion: Convert between main/component context
+        if (this.isEditingComponent && nodeData.type === 'output') {
+          // Converting main canvas output to component output
+          newNode.type = 'componentOutput';
+          newNode.label = 'Output';
+          newNode.inputs = ['in'];
+          newNode.outputs = [];
+          newNode.componentIO = true;
+          delete newNode.globalOutput;
+        } else if (this.isEditingComponent && nodeData.type === 'input') {
+          // Converting main canvas input to component input
+          newNode.type = 'componentInput';
+          newNode.label = 'Input';
+          newNode.inputs = [];
+          newNode.outputs = ['out'];
+          newNode.componentIO = true;
+          delete newNode.globalInput;
+        } else if (!this.isEditingComponent && (nodeData.type === 'componentInput' || nodeData.type === 'componentOutput')) {
+          // Converting component I/O to main canvas I/O
+          if (nodeData.type === 'componentOutput') {
+            newNode.type = 'output';
+            newNode.label = 'Output';
+            newNode.inputs = ['in'];
+            newNode.outputs = [];
+            newNode.globalOutput = true;
+          } else if (nodeData.type === 'componentInput') {
+            newNode.type = 'input';
+            newNode.label = 'Input';
+            newNode.inputs = [];
+            newNode.outputs = ['out'];
+            newNode.globalInput = true;
+          }
+          delete newNode.componentIO;
+        }
         
         this.nodes.set(newId, newNode);
         this.renderNode(newNode);
@@ -4899,10 +5220,14 @@ import Layout from '../layouts/Layout.astro';
 
     showAutoSaveIndicator() {
       const indicator = document.getElementById('auto-save-indicator');
-      indicator.classList.add('show');
-      setTimeout(() => {
-        indicator.classList.remove('show');
-      }, 3000);
+      if (indicator) {
+        indicator.classList.add('show');
+        setTimeout(() => {
+          if (indicator) {
+            indicator.classList.remove('show');
+          }
+        }, 3000);
+      }
     }
 
     // Auto-save functionality with debouncing
@@ -4935,11 +5260,9 @@ import Layout from '../layouts/Layout.astro';
     // Set up auto-save
     equationBuilder.setupAutoSave();
     
-    // Check for auto-saved session and prompt user to restore
+    // Auto-load the last saved session if available
     if (equationBuilder.hasAutoSave()) {
-      if (confirm('We found an auto-saved session. Would you like to restore it?')) {
-        equationBuilder.loadAutoSave();
-      }
+      equationBuilder.loadAutoSave();
     }
     
     // Session Management Event Listeners
@@ -5018,7 +5341,8 @@ import Layout from '../layouts/Layout.astro';
     box-shadow: 
       0 0 0 2px rgba(59, 130, 246, 0.3),
       0 4px 12px rgba(59, 130, 246, 0.2) !important;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05)) !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(59, 130, 246, 0.3)) !important;
+    color: #1e293b !important;
     transform: scale(1.02) !important;
     z-index: 1000 !important;
   }
@@ -5080,75 +5404,6 @@ import Layout from '../layouts/Layout.astro';
       background: rgba(59, 130, 246, 0.2);
       border-color: #1d4ed8;
     }
-  }
-
-  /* Selection Status Bar */
-  .selection-status {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: 12px;
-    padding: 8px 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    animation: slideInFromTop 0.3s ease-out;
-  }
-
-  @keyframes slideInFromTop {
-    from {
-      opacity: 0;
-      transform: translateX(-50%) translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-
-  .selection-count {
-    font-weight: 600;
-    color: #3b82f6;
-    font-size: 14px;
-  }
-
-  .selection-actions {
-    display: flex;
-    gap: 8px;
-  }
-
-  .selection-btn {
-    padding: 6px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    background: white;
-    color: #475569;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .selection-btn:hover {
-    background: #f8fafc;
-    border-color: #3b82f6;
-    color: #3b82f6;
-  }
-
-  .selection-btn.danger {
-    color: #dc2626;
-    border-color: #fecaca;
-  }
-
-  .selection-btn.danger:hover {
-    background: #fef2f2;
-    border-color: #dc2626;
   }
 
   /* Group Indicator */
@@ -5473,8 +5728,9 @@ import Layout from '../layouts/Layout.astro';
 
   :global(.equation-node.selected) {
     border-color: #3b82f6 !important;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05)) !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(59, 130, 246, 0.3)) !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+    color: #1e293b !important;
   }
 
   :global(.node-number), :global(.node-variable) {
