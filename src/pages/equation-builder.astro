@@ -3318,17 +3318,34 @@ import Layout from '../layouts/Layout.astro';
           globalOutput.result = result.toString();
         }
         
-        // Update the Output node itself to show the computed value
+        // Update the Output node itself to show the computed value with smart display
         const outputNodeEl = document.getElementById(outputNode.id);
         if (outputNodeEl) {
           const contentEl = outputNodeEl.querySelector('.node-content');
           if (contentEl) {
-            if (equation) {
-              // Always show the symbolic equation in the output node
-              contentEl.textContent = `Output: ${equation}`;
+            // Smart display logic (same as refreshAllOutputs)
+            let displayText = '';
+            
+            if (!equation || equation === '?') {
+              displayText = 'Output: ?';
+            } else if (result === '?' || result === null || result === undefined || isNaN(result)) {
+              // Show equation when result can't be computed
+              displayText = `Output: ${equation}`;
             } else {
-              contentEl.textContent = globalOutput.name || 'Output';
+              // Check if equation is just a number or if it's a more complex expression
+              const resultStr = result.toString();
+              const equationStr = equation.toString();
+              
+              if (equationStr === resultStr || /^-?\d+(\.\d+)?$/.test(equationStr)) {
+                // Just show the number if equation is already the result
+                displayText = `Output: ${resultStr}`;
+              } else {
+                // Show both equation and computed result when they're different
+                displayText = `Output: ${equationStr} = ${resultStr}`;
+              }
             }
+            
+            contentEl.textContent = displayText;
           }
           
           // Add click listener to make this output's equation the main display
@@ -3815,6 +3832,14 @@ import Layout from '../layouts/Layout.astro';
           const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
           const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
           if (!left || !right) return '?';
+          
+          // Try to evaluate if both are numbers
+          const leftNum = this.evaluateIfNumeric(left);
+          const rightNum = this.evaluateIfNumeric(right);
+          if (leftNum !== null && rightNum !== null) {
+            return (leftNum + rightNum).toString();
+          }
+          
           return `(${left} + ${right})`;
         }
         
@@ -3822,6 +3847,14 @@ import Layout from '../layouts/Layout.astro';
           const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
           const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
           if (!left || !right) return '?';
+          
+          // Try to evaluate if both are numbers
+          const leftNum = this.evaluateIfNumeric(left);
+          const rightNum = this.evaluateIfNumeric(right);
+          if (leftNum !== null && rightNum !== null) {
+            return (leftNum - rightNum).toString();
+          }
+          
           return `(${left} - ${right})`;
         }
         
@@ -3829,6 +3862,14 @@ import Layout from '../layouts/Layout.astro';
           const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
           const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
           if (!left || !right) return '?';
+          
+          // Try to evaluate if both are numbers
+          const leftNum = this.evaluateIfNumeric(left);
+          const rightNum = this.evaluateIfNumeric(right);
+          if (leftNum !== null && rightNum !== null) {
+            return (leftNum * rightNum).toString();
+          }
+          
           return `(${left} × ${right})`;
         }
         
@@ -3836,28 +3877,140 @@ import Layout from '../layouts/Layout.astro';
           const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
           const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
           if (!left || !right) return '?';
+          
+          // Try to evaluate if both are numbers
+          const leftNum = this.evaluateIfNumeric(left);
+          const rightNum = this.evaluateIfNumeric(right);
+          if (leftNum !== null && rightNum !== null && rightNum !== 0) {
+            return (leftNum / rightNum).toString();
+          }
+          
           return `(${left} ÷ ${right})`;
         }
 
         // Unary operations
         case 'sqrt': {
+          const value = this.traceEquation(sourceNodeId, 'value', context, componentData, visitedNodes);
+          const root = this.traceEquation(sourceNodeId, 'root', context, componentData, visitedNodes);
+          
+          if (!value) return '?';
+          
+          // Try to evaluate if inputs are numbers
+          const valueNum = this.evaluateIfNumeric(value);
+          const rootNum = root ? this.evaluateIfNumeric(root) : 2; // Default to square root
+          
+          if (valueNum !== null && valueNum >= 0 && rootNum !== null && rootNum !== 0) {
+            return Math.pow(valueNum, 1 / rootNum).toString();
+          }
+          
+          // Check for invalid operations and show error instead of symbolic form
+          if (valueNum !== null && valueNum < 0 && rootNum !== null && rootNum % 2 === 0) {
+            // Even root of negative number is invalid in real numbers
+            return 'Invalid: √(negative)';
+          }
+          
+          // Build symbolic equation - show nth root if not square root
+          if (root && root !== '2') {
+            return `${root}√(${value})`;
+          }
+          return `√(${value})`;
+        }
+        
+        case 'abs': {
           const input = this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
-          return input ? `√(${input})` : '?';
+          if (!input) return '?';
+          
+          // Try to evaluate if input is a number
+          const numericValue = this.evaluateIfNumeric(input);
+          if (numericValue !== null) {
+            return Math.abs(numericValue).toString();
+          }
+          
+          return `|${input}|`;
         }
         
         case 'sin': {
           const input = this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
-          return input ? `sin(${input})` : '?';
+          if (!input) return '?';
+          
+          // Try to evaluate if input is a number
+          const numericValue = this.evaluateIfNumeric(input);
+          if (numericValue !== null) {
+            return Math.sin(numericValue).toString();
+          }
+          
+          return `sin(${input})`;
         }
         
         case 'cos': {
           const input = this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
-          return input ? `cos(${input})` : '?';
+          if (!input) return '?';
+          
+          // Try to evaluate if input is a number
+          const numericValue = this.evaluateIfNumeric(input);
+          if (numericValue !== null) {
+            return Math.cos(numericValue).toString();
+          }
+          
+          return `cos(${input})`;
         }
         
         case 'tan': {
           const input = this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
-          return input ? `tan(${input})` : '?';
+          if (!input) return '?';
+          
+          // Try to evaluate if input is a number
+          const numericValue = this.evaluateIfNumeric(input);
+          if (numericValue !== null) {
+            return Math.tan(numericValue).toString();
+          }
+          
+          return `tan(${input})`;
+        }
+        
+        case 'ln': {
+          const input = this.traceEquation(sourceNodeId, 'in', context, componentData, visitedNodes);
+          if (!input) return '?';
+          
+          // Try to evaluate if input is a number
+          const numericValue = this.evaluateIfNumeric(input);
+          if (numericValue !== null) {
+            if (numericValue > 0) {
+              return Math.log(numericValue).toString();
+            } else {
+              // Logarithm of zero or negative number is invalid
+              return 'Invalid: ln(≤0)';
+            }
+          }
+          
+          return `ln(${input})`;
+        }
+        
+        case 'log': {
+          const value = this.traceEquation(sourceNodeId, 'value', context, componentData, visitedNodes);
+          const base = this.traceEquation(sourceNodeId, 'base', context, componentData, visitedNodes);
+          if (!value) return '?';
+          
+          // Try to evaluate if inputs are numbers
+          const valueNum = this.evaluateIfNumeric(value);
+          const baseNum = base ? this.evaluateIfNumeric(base) : 10; // Default base 10
+          
+          if (valueNum !== null && baseNum !== null) {
+            if (valueNum > 0 && baseNum > 0 && baseNum !== 1) {
+              return (Math.log(valueNum) / Math.log(baseNum)).toString();
+            } else {
+              // Invalid logarithm conditions
+              if (valueNum <= 0) return 'Invalid: log(≤0)';
+              if (baseNum <= 0) return 'Invalid: log base ≤0';
+              if (baseNum === 1) return 'Invalid: log base 1';
+            }
+          }
+          
+          // Build symbolic equation 
+          if (base && base !== '10') {
+            return `log_${base}(${value})`;
+          }
+          return `log(${value})`;
         }
 
         // Power operations
@@ -3865,6 +4018,14 @@ import Layout from '../layouts/Layout.astro';
           const base = this.traceEquation(sourceNodeId, 'base', context, componentData, visitedNodes);
           const exp = this.traceEquation(sourceNodeId, 'exp', context, componentData, visitedNodes);
           if (!base || !exp) return '?';
+          
+          // Try to evaluate if both are numbers
+          const baseNum = this.evaluateIfNumeric(base);
+          const expNum = this.evaluateIfNumeric(exp);
+          if (baseNum !== null && expNum !== null) {
+            return Math.pow(baseNum, expNum).toString();
+          }
+          
           return `(${base})^(${exp})`;
         }
 
@@ -3966,6 +4127,43 @@ import Layout from '../layouts/Layout.astro';
       }
     }
 
+    // Helper function to evaluate simple numeric expressions
+    evaluateIfNumeric(expression) {
+      if (!expression || expression === '?') return null;
+      
+      // Simple number
+      if (/^-?\d+(\.\d+)?$/.test(expression)) {
+        return parseFloat(expression);
+      }
+      
+      // Pi constant
+      if (expression === 'π') {
+        return Math.PI;
+      }
+      
+      // E constant
+      if (expression === 'e') {
+        return Math.E;
+      }
+      
+      // Other mathematical constants we recognize
+      if (expression === 'φ') {
+        return (1 + Math.sqrt(5)) / 2; // Golden ratio
+      }
+      
+      if (expression === '√2') {
+        return Math.sqrt(2);
+      }
+      
+      // Try to evaluate simple parenthetical expressions like (3.14...)
+      const parenMatch = expression.match(/^\((-?\d+(?:\.\d+)?)\)$/);
+      if (parenMatch) {
+        return parseFloat(parenMatch[1]);
+      }
+      
+      return null; // Not a simple numeric value
+    }
+
     // Legacy function for backward compatibility - now uses the new tracer
     buildEquation(nodeId, portId) {
       return this.traceEquation(nodeId, portId, 'main');
@@ -3973,23 +4171,52 @@ import Layout from '../layouts/Layout.astro';
 
     // Refresh all output displays after page load
     refreshAllOutputs() {
+      // Trigger a small canvas update that forces all nodes to recalculate
+      // This simulates the updates that normally happen when nodes are edited
+      for (let [nodeId, node] of this.nodes.entries()) {
+        if (node.type === 'output') {
+          // Get both the equation and computed result
+          const equation = this.traceEquation(nodeId, 'in', 'main');
+          const result = this.calculateResult(nodeId, 'in');
+          
+          // Find the output node element and update its display
+          const nodeEl = document.getElementById(nodeId);
+          if (nodeEl) {
+            const outputDisplay = nodeEl.querySelector('.output-display, .node-content');
+            if (outputDisplay) {
+              // Smart display logic
+              let displayText = '';
+              
+              if (!equation || equation === '?') {
+                displayText = 'Output: ?';
+              } else if (result === '?' || result === null || result === undefined || isNaN(result)) {
+                // Show equation when result can't be computed
+                displayText = `Output: ${equation}`;
+              } else {
+                // Check if equation is just a number or if it's a more complex expression
+                const resultStr = result.toString();
+                const equationStr = equation.toString();
+                
+                if (equationStr === resultStr || /^-?\d+(\.\d+)?$/.test(equationStr)) {
+                  // Just show the number if equation is already the result
+                  displayText = `Output: ${resultStr}`;
+                } else {
+                  // Show both equation and computed result when they're different
+                  displayText = `Output: ${equationStr} = ${resultStr}`;
+                }
+              }
+              
+              outputDisplay.textContent = displayText;
+            }
+          }
+        }
+      }
+      
       // Update global outputs table
       this.updateTables();
       
-      // Update all node output displays
-      for (let [nodeId, node] of this.nodes.entries()) {
-        const nodeEl = document.getElementById(nodeId);
-        if (nodeEl) {
-          // Update output port displays
-          const outputPorts = nodeEl.querySelectorAll('.output-port');
-          outputPorts.forEach(port => {
-            const portId = port.dataset.port;
-            if (portId) {
-              this.updatePortValue(nodeId, portId);
-            }
-          });
-        }
-      }
+      // Force update connections to refresh visual connections
+      this.updateConnections();
     }
 
     setupTables() {
