@@ -219,6 +219,117 @@ import Layout from '../layouts/Layout.astro';
       this.setupTables();
       this.setupMultiSelection();
     }
+
+    // Complex number support for advanced mathematical operations
+    createComplex(real, imag = 0) {
+      return { real, imag, isComplex: true };
+    }
+
+    formatComplex(complex) {
+      if (!complex || !complex.isComplex) return complex?.toString() || '0';
+      
+      const real = Math.round(complex.real * 1000) / 1000;
+      const imag = Math.round(complex.imag * 1000) / 1000;
+      
+      if (Math.abs(imag) < 0.001) return real.toString();
+      if (Math.abs(real) < 0.001) {
+        if (Math.abs(imag - 1) < 0.001) return 'i';
+        if (Math.abs(imag + 1) < 0.001) return '-i';
+        return `${imag}i`;
+      }
+      
+      const imagStr = Math.abs(imag - 1) < 0.001 ? 'i' : 
+                     Math.abs(imag + 1) < 0.001 ? 'i' : 
+                     `${Math.abs(imag)}i`;
+      return `${real} ${imag >= 0 ? '+' : '-'} ${imagStr}`;
+    }
+
+    complexAdd(a, b) {
+      if (!a?.isComplex) a = this.createComplex(a || 0);
+      if (!b?.isComplex) b = this.createComplex(b || 0);
+      return this.createComplex(a.real + b.real, a.imag + b.imag);
+    }
+
+    complexMultiply(a, b) {
+      if (!a?.isComplex) a = this.createComplex(a || 0);
+      if (!b?.isComplex) b = this.createComplex(b || 0);
+      return this.createComplex(
+        a.real * b.real - a.imag * b.imag,
+        a.real * b.imag + a.imag * b.real
+      );
+    }
+
+    complexPower(base, exp) {
+      if (!base?.isComplex) base = this.createComplex(base || 0);
+      if (!exp?.isComplex) exp = this.createComplex(exp || 0);
+
+      // Handle simple real cases
+      if (Math.abs(base.imag) < 0.001 && Math.abs(exp.imag) < 0.001) {
+        const realBase = base.real;
+        const realExp = exp.real;
+        
+        // Handle negative base with fractional exponent (complex result)
+        if (realBase < 0 && realExp % 1 !== 0) {
+          // Convert to polar form and compute
+          const r = Math.abs(realBase);
+          const theta = Math.PI; // angle for negative real number
+          const newR = Math.pow(r, realExp);
+          const newTheta = theta * realExp;
+          return this.createComplex(
+            newR * Math.cos(newTheta),
+            newR * Math.sin(newTheta)
+          );
+        }
+        
+        // Normal real computation
+        return this.createComplex(Math.pow(realBase, realExp));
+      }
+
+      // Complex power using: (re^iθ)^n = r^n * e^(inθ)
+      const r = Math.sqrt(base.real * base.real + base.imag * base.imag);
+      const theta = Math.atan2(base.imag, base.real);
+      
+      const newR = Math.pow(r, exp.real) * Math.exp(-exp.imag * theta);
+      const newTheta = exp.real * theta + exp.imag * Math.log(r);
+      
+      return this.createComplex(
+        newR * Math.cos(newTheta),
+        newR * Math.sin(newTheta)
+      );
+    }
+
+    // Enhanced parentheses removal logic
+    removeRedundantParentheses(expression) {
+      if (!expression || typeof expression !== 'string') return expression;
+      
+      // Remove outermost parentheses if they wrap the entire expression
+      if (expression.startsWith('(') && expression.endsWith(')')) {
+        // Check if these are truly outermost by counting nested parens
+        let depth = 0;
+        let isOutermost = true;
+        for (let i = 1; i < expression.length - 1; i++) {
+          if (expression[i] === '(') depth++;
+          else if (expression[i] === ')') {
+            depth--;
+            if (depth < 0) {
+              isOutermost = false;
+              break;
+            }
+          }
+        }
+        if (isOutermost && depth === 0) {
+          expression = expression.slice(1, -1);
+        }
+      }
+      
+      // Remove redundant parentheses around single functions
+      expression = expression.replace(/\((\w+\([^)]+\))\)/g, '$1');
+      
+      // Remove double parentheses in functions like sin((x))
+      expression = expression.replace(/(\w+)\(\(([^)]+)\)\)/g, '$1($2)');
+      
+      return expression;
+    }
     
     setupPalette() {
       this.nodePages = [
@@ -3312,7 +3423,12 @@ import Layout from '../layouts/Layout.astro';
         globalOutput.latexEquation = latexEquation || '';
         
         // Show equation instead of NaN/undefined for non-numeric results
-        if (result === null || result === undefined || isNaN(result)) {
+        if (result === null || result === undefined) {
+          globalOutput.result = equation || 'undefined';
+        } else if (typeof result === 'string' && (result.includes('i') || result.includes('Invalid'))) {
+          // Store complex numbers or invalid results directly
+          globalOutput.result = result;
+        } else if (isNaN(result)) {
           globalOutput.result = equation || 'undefined';
         } else {
           globalOutput.result = result.toString();
@@ -3328,8 +3444,14 @@ import Layout from '../layouts/Layout.astro';
             
             if (!equation || equation === '?') {
               displayText = 'Output: ?';
-            } else if (result === '?' || result === null || result === undefined || isNaN(result)) {
+            } else if (result === '?' || result === null || result === undefined) {
               // Show equation when result can't be computed
+              displayText = `Output: ${equation}`;
+            } else if (typeof result === 'string' && (result.includes('i') || result.includes('Invalid'))) {
+              // Show complex numbers or invalid results directly
+              displayText = `Output: ${result}`;
+            } else if (isNaN(result)) {
+              // Show equation when result is not a number and not a complex string
               displayText = `Output: ${equation}`;
             } else {
               // Check if equation is just a number or if it's a more complex expression
@@ -3459,6 +3581,13 @@ import Layout from '../layouts/Layout.astro';
           const base = this.calculateResult(sourceNode.id, 'base');
           const exp = this.calculateResult(sourceNode.id, 'exp');
           if (base === '?' || exp === '?') return '?';
+          
+          // Handle complex results for negative bases with non-integer exponents
+          if (base < 0 && exp % 1 !== 0) {
+            const complex = this.complexPower(this.createComplex(base), this.createComplex(exp));
+            return this.formatComplex(complex);
+          }
+          
           return Math.pow(base, exp);
         }
         case 'modulo': {
@@ -3476,7 +3605,29 @@ import Layout from '../layouts/Layout.astro';
           // Default to square root if no root specified
           const rootValue = (root === '?' || root === null || root === undefined) ? 2 : root;
           
-          if (value === '?' || value < 0 || rootValue === 0) return '?';
+          if (value === '?' || rootValue === 0) return '?';
+          
+          // Handle negative values properly based on root type
+          if (value < 0) {
+            // For integer roots, check if odd or even
+            if (Number.isInteger(rootValue)) {
+              if (rootValue % 2 === 1) {
+                // Odd integer root: ∛(-8) = -∛(8) = -2
+                const positiveResult = Math.pow(-value, 1 / rootValue);
+                return -positiveResult;
+              } else {
+                // Even integer root: √(-4) = 2i
+                const complex = this.complexPower(this.createComplex(value), this.createComplex(1 / rootValue));
+                return this.formatComplex(complex);
+              }
+            } else {
+              // Fractional root: for user preference, compute real root when possible
+              // 5th root of -3 = -(5th root of 3)
+              const positiveResult = Math.pow(-value, 1 / rootValue);
+              return -positiveResult;
+            }
+          }
+          
           return Math.pow(value, 1 / rootValue);
         }
         case 'log': {
@@ -3840,9 +3991,11 @@ import Layout from '../layouts/Layout.astro';
             return (leftNum + rightNum).toString();
           }
           
-          return `(${left} + ${right})`;
+          const cleanLeft = this.removeRedundantParentheses(left);
+          const cleanRight = this.removeRedundantParentheses(right);
+          return `${cleanLeft} + ${cleanRight}`;
         }
-        
+
         case 'subtract': {
           const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
           const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
@@ -3855,9 +4008,14 @@ import Layout from '../layouts/Layout.astro';
             return (leftNum - rightNum).toString();
           }
           
-          return `(${left} - ${right})`;
+          const cleanLeft = this.removeRedundantParentheses(left);
+          const cleanRight = this.removeRedundantParentheses(right);
+          // Add parentheses around right operand if it contains addition/subtraction
+          const needsRightParens = cleanRight.includes('+') || (cleanRight.includes('-') && !cleanRight.match(/^-?\d/));
+          const rightStr = needsRightParens ? `(${cleanRight})` : cleanRight;
+          return `${cleanLeft} - ${rightStr}`;
         }
-        
+
         case 'multiply': {
           const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
           const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
@@ -3870,9 +4028,16 @@ import Layout from '../layouts/Layout.astro';
             return (leftNum * rightNum).toString();
           }
           
-          return `(${left} × ${right})`;
+          const cleanLeft = this.removeRedundantParentheses(left);
+          const cleanRight = this.removeRedundantParentheses(right);
+          // Add parentheses around operands that contain addition/subtraction
+          const needsLeftParens = cleanLeft.includes('+') || cleanLeft.includes('-');
+          const needsRightParens = cleanRight.includes('+') || cleanRight.includes('-');
+          const leftStr = needsLeftParens ? `(${cleanLeft})` : cleanLeft;
+          const rightStr = needsRightParens ? `(${cleanRight})` : cleanRight;
+          return `${leftStr} × ${rightStr}`;
         }
-        
+
         case 'divide': {
           const left = this.traceEquation(sourceNodeId, 'in1', context, componentData, visitedNodes);
           const right = this.traceEquation(sourceNodeId, 'in2', context, componentData, visitedNodes);
@@ -3885,10 +4050,15 @@ import Layout from '../layouts/Layout.astro';
             return (leftNum / rightNum).toString();
           }
           
-          return `(${left} ÷ ${right})`;
-        }
-
-        // Unary operations
+          const cleanLeft = this.removeRedundantParentheses(left);
+          const cleanRight = this.removeRedundantParentheses(right);
+          // Add parentheses around operands that contain operations
+          const needsLeftParens = cleanLeft.includes('+') || cleanLeft.includes('-');
+          const needsRightParens = cleanRight.includes('+') || cleanRight.includes('-') || cleanRight.includes('×') || cleanRight.includes('÷');
+          const leftStr = needsLeftParens ? `(${cleanLeft})` : cleanLeft;
+          const rightStr = needsRightParens ? `(${cleanRight})` : cleanRight;
+          return `${leftStr} ÷ ${rightStr}`;
+        }        // Unary operations
         case 'sqrt': {
           const value = this.traceEquation(sourceNodeId, 'value', context, componentData, visitedNodes);
           const root = this.traceEquation(sourceNodeId, 'root', context, componentData, visitedNodes);
@@ -3899,21 +4069,40 @@ import Layout from '../layouts/Layout.astro';
           const valueNum = this.evaluateIfNumeric(value);
           const rootNum = root ? this.evaluateIfNumeric(root) : 2; // Default to square root
           
-          if (valueNum !== null && valueNum >= 0 && rootNum !== null && rootNum !== 0) {
-            return Math.pow(valueNum, 1 / rootNum).toString();
-          }
-          
-          // Check for invalid operations and show error instead of symbolic form
-          if (valueNum !== null && valueNum < 0 && rootNum !== null && rootNum % 2 === 0) {
-            // Even root of negative number is invalid in real numbers
-            return 'Invalid: √(negative)';
+          if (valueNum !== null && rootNum !== null && rootNum !== 0) {
+            // Handle negative values properly based on root type
+            if (valueNum < 0) {
+              // For integer roots, check if odd or even
+              if (Number.isInteger(rootNum)) {
+                if (rootNum % 2 === 1) {
+                  // Odd integer root: ∛(-8) = -∛(8) = -2
+                  const positiveResult = Math.pow(-valueNum, 1 / rootNum);
+                  return (-positiveResult).toString();
+                } else {
+                  // Even integer root: √(-4) = 2i
+                  const complex = this.complexPower(this.createComplex(valueNum), this.createComplex(1 / rootNum));
+                  return this.formatComplex(complex);
+                }
+              } else {
+                // Fractional root: compute real root
+                // 5th root of -3 = -(5th root of 3)
+                const positiveResult = Math.pow(-valueNum, 1 / rootNum);
+                return (-positiveResult).toString();
+              }
+            }
+            
+            // Real result for positive values
+            if (valueNum >= 0) {
+              return Math.pow(valueNum, 1 / rootNum).toString();
+            }
           }
           
           // Build symbolic equation - show nth root if not square root
+          const cleanValue = this.removeRedundantParentheses(value);
           if (root && root !== '2') {
-            return `${root}√(${value})`;
+            return `${root}√${cleanValue.includes(' ') ? `(${cleanValue})` : cleanValue}`;
           }
-          return `√(${value})`;
+          return `√${cleanValue.includes(' ') ? `(${cleanValue})` : cleanValue}`;
         }
         
         case 'abs': {
@@ -3926,7 +4115,8 @@ import Layout from '../layouts/Layout.astro';
             return Math.abs(numericValue).toString();
           }
           
-          return `|${input}|`;
+          const cleanInput = this.removeRedundantParentheses(input);
+          return `|${cleanInput}|`;
         }
         
         case 'sin': {
@@ -3939,7 +4129,8 @@ import Layout from '../layouts/Layout.astro';
             return Math.sin(numericValue).toString();
           }
           
-          return `sin(${input})`;
+          const cleanInput = this.removeRedundantParentheses(input);
+          return `sin(${cleanInput})`;
         }
         
         case 'cos': {
@@ -3952,7 +4143,8 @@ import Layout from '../layouts/Layout.astro';
             return Math.cos(numericValue).toString();
           }
           
-          return `cos(${input})`;
+          const cleanInput = this.removeRedundantParentheses(input);
+          return `cos(${cleanInput})`;
         }
         
         case 'tan': {
@@ -3965,7 +4157,8 @@ import Layout from '../layouts/Layout.astro';
             return Math.tan(numericValue).toString();
           }
           
-          return `tan(${input})`;
+          const cleanInput = this.removeRedundantParentheses(input);
+          return `tan(${cleanInput})`;
         }
         
         case 'ln': {
@@ -3983,7 +4176,8 @@ import Layout from '../layouts/Layout.astro';
             }
           }
           
-          return `ln(${input})`;
+          const cleanInput = this.removeRedundantParentheses(input);
+          return `ln(${cleanInput})`;
         }
         
         case 'log': {
@@ -3997,6 +4191,7 @@ import Layout from '../layouts/Layout.astro';
           
           if (valueNum !== null && baseNum !== null) {
             if (valueNum > 0 && baseNum > 0 && baseNum !== 1) {
+              const symbolicForm = base && base !== '10' ? `log_${base}(${value})` : `log(${value})`;
               return (Math.log(valueNum) / Math.log(baseNum)).toString();
             } else {
               // Invalid logarithm conditions
@@ -4006,11 +4201,13 @@ import Layout from '../layouts/Layout.astro';
             }
           }
           
-          // Build symbolic equation 
+          // Build symbolic equation with subscript for base
+          const cleanValue = this.removeRedundantParentheses(value);
           if (base && base !== '10') {
-            return `log_${base}(${value})`;
+            const cleanBase = this.removeRedundantParentheses(base);
+            return `log_${cleanBase}(${cleanValue})`;
           }
-          return `log(${value})`;
+          return `log(${cleanValue})`;
         }
 
         // Power operations
@@ -4023,10 +4220,25 @@ import Layout from '../layouts/Layout.astro';
           const baseNum = this.evaluateIfNumeric(base);
           const expNum = this.evaluateIfNumeric(exp);
           if (baseNum !== null && expNum !== null) {
+            // Handle complex results for negative bases with non-integer exponents
+            if (baseNum < 0 && expNum % 1 !== 0) {
+              const complex = this.complexPower(this.createComplex(baseNum), this.createComplex(expNum));
+              return this.formatComplex(complex);
+            }
             return Math.pow(baseNum, expNum).toString();
           }
           
-          return `(${base})^(${exp})`;
+          // Smart parentheses for symbolic form
+          const cleanBase = this.removeRedundantParentheses(base);
+          const cleanExp = this.removeRedundantParentheses(exp);
+          
+          const needsBaseParens = cleanBase.includes(' ') && !cleanBase.match(/^\w+\([^)]+\)$/);
+          const needsExpParens = cleanExp.includes(' ') && !cleanExp.match(/^\w+\([^)]+\)$/);
+          
+          const baseStr = needsBaseParens ? `(${cleanBase})` : cleanBase;
+          const expStr = needsExpParens ? `(${cleanExp})` : cleanExp;
+          
+          return `${baseStr}^${expStr}`;
         }
 
         // Component I/O nodes
@@ -4189,8 +4401,14 @@ import Layout from '../layouts/Layout.astro';
               
               if (!equation || equation === '?') {
                 displayText = 'Output: ?';
-              } else if (result === '?' || result === null || result === undefined || isNaN(result)) {
+              } else if (result === '?' || result === null || result === undefined) {
                 // Show equation when result can't be computed
+                displayText = `Output: ${equation}`;
+              } else if (typeof result === 'string' && (result.includes('i') || result.includes('Invalid'))) {
+                // Show complex numbers or invalid results directly
+                displayText = `Output: ${result}`;
+              } else if (isNaN(result)) {
+                // Show equation when result is not a number and not a complex string
                 displayText = `Output: ${equation}`;
               } else {
                 // Check if equation is just a number or if it's a more complex expression
@@ -4223,8 +4441,20 @@ import Layout from '../layouts/Layout.astro';
       const showTablesBtn = document.getElementById('show-tables-btn');
       const tablesSidebar = document.getElementById('tables-sidebar');
       
+      if (!showTablesBtn) {
+        console.error('Show Tables button not found!');
+        return;
+      }
+      
+      if (!tablesSidebar) {
+        console.error('Tables sidebar not found!');
+        return;
+      }
+      
       // Show/hide tables sidebar
-      showTablesBtn.addEventListener('click', () => {
+      showTablesBtn.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent any default behavior
+        
         if (tablesSidebar.classList.contains('open')) {
           // Close sidebar if already open
           tablesSidebar.classList.remove('open');
@@ -5223,11 +5453,19 @@ import Layout from '../layouts/Layout.astro';
       }
       
       if (showTablesBtn) {
-        showTablesBtn.addEventListener('click', () => {
-          // Toggle tables sidebar visibility
-          const sidebar = document.querySelector('.tables-sidebar');
-          if (sidebar) {
-            sidebar.classList.toggle('hidden');
+        showTablesBtn.addEventListener('click', (event) => {
+          event.preventDefault();
+          
+          const tablesSidebar = document.getElementById('tables-sidebar');
+          if (tablesSidebar.classList.contains('open')) {
+            // Close sidebar if already open
+            tablesSidebar.classList.remove('open');
+            showTablesBtn.textContent = 'Show Tables';
+          } else {
+            // Open sidebar
+            tablesSidebar.classList.add('open');
+            showTablesBtn.textContent = 'Hide Tables';
+            equationBuilder.updateTables(); // Use the global instance
           }
         });
       }
@@ -5561,6 +5799,7 @@ import Layout from '../layouts/Layout.astro';
 
   // Initialize when DOM is ready
   let equationBuilder;
+  
   document.addEventListener('DOMContentLoaded', () => {
     equationBuilder = new CleanEquationBuilder();
     
@@ -5576,35 +5815,35 @@ import Layout from '../layouts/Layout.astro';
     setTimeout(() => {
       equationBuilder.refreshAllOutputs();
     }, 100); // Small delay to ensure everything is loaded
-  });
 
-  // Session Management Event Listeners
-  document.getElementById('export-session-btn').addEventListener('click', () => {
-    equationBuilder.exportSession();
-  });
+    // Session Management Event Listeners - NOW INSIDE DOMContentLoaded
+    document.getElementById('export-session-btn')?.addEventListener('click', () => {
+      equationBuilder.exportSession();
+    });
 
-  document.getElementById('import-session-btn').addEventListener('click', () => {
-    document.getElementById('import-file-input').click();
-  });
+    document.getElementById('import-session-btn')?.addEventListener('click', () => {
+      document.getElementById('import-file-input').click();
+    });
 
-  // Handle file import
-  document.getElementById('import-file-input').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        equationBuilder.importSession(e.target.result);
-      };
-      reader.readAsText(file);
-    }
-    // Reset the input so the same file can be selected again
-    event.target.value = '';
-  });
+    // Handle file import
+    document.getElementById('import-file-input')?.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          equationBuilder.importSession(e.target.result);
+        };
+        reader.readAsText(file);
+      }
+      // Reset the input so the same file can be selected again
+      event.target.value = '';
+    });
 
-  document.getElementById('clear-canvas-btn').addEventListener('click', () => {
-    if (confirm('Are you sure you want to clear the entire canvas? This cannot be undone.')) {
-      equationBuilder.clearCanvas('full');
-    }
+    document.getElementById('clear-canvas-btn')?.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear the entire canvas? This cannot be undone.')) {
+        equationBuilder.clearCanvas('full');
+      }
+    });
   });
     
   // Handle window resize
