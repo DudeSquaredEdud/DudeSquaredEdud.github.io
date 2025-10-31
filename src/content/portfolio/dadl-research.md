@@ -9,6 +9,8 @@ tags:
 link: "#dadl-research"
 ---
 
+![The logo for the Deep Learning and Data Analysis Lab at The University of Louisiana, Lafayette. The logo itself is a popout effect from a wavy, purple and blue background, with the letters "D" "A" "D" "L".](image-1.png)
+
 Undergraduate research on optimal training order for image classification neural networks, using wavelet entropy as a proxy for the difficulty for a neural network to successfully classify a given image. Presented these findings at the IBM Thomas J. Watson Laboratory.
 
 ---

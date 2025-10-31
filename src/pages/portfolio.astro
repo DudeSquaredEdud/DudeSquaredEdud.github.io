@@ -20,13 +20,14 @@ const introduction = `I still remember Gamal Abdel Nasser's rise and fall as viv
 
 Once I saw what learning could be, I couldn't unsee what was missing everywhere else. With my CS background, I knew I could create something that could scale these experiences beyond elite magnet schools and into anyone's hands.
 
-I started with Aluminotes, using LLMs to transform hastily-typed notes into structured lecture materials - born from me and my friends' ADHD making traditional note-taking nearly impossible. We used it for a class project, and even won first place at a pitch competition with it, so we were very happy with the results.
+I started with Aluminotes, using LLMs to transform hastily-typed notes into structured lecture materials - born from my friends' and my ADHD making traditional note-taking nearly impossible. We used it for a class project, and even won first place at a pitch competition with it, so we were very happy with the results.
 
 I joined my college's ML research laboratory to learn more about AI, as I knew I would be using it later on to personalize education. My research focused on curriculum learning and experimental training methods for convolutional models - work that led to presenting at AICS at IBM's Thomas J. Watson Laboratory.
 
 Now, as fullstack engineer and researcher at BeNakama, I work on Ascend, a math-based RPG that adapts difficulty to student skill - directly implementing a program that tests students at their abilities while keeping them engaged. This is also the most direct application of my research - I am involved with design and implementation of the systems that the students use.
 
 I'm pursuing research to understand the cognitive and technological foundations of effective learning, and find out how to apply that to allow everyone access to it. My goal is to make Dr. Stephens' classroom the norm, not the exception - so every student can experience what it feels like to genuinely love learning.`;
+;
 ---
 
 <Layout
@@ -35,10 +36,10 @@ I'm pursuing research to understand the cognitive and technological foundations 
 >
   <main class="section">
     <h1>Portfolio</h1>
-    <p>{portfolioDesc}</p>
+    <p style="white-space: pre-line;">{portfolioDesc}</p>
     
     <h2>Introduction</h2>
-    <p>{introduction}</p>
+    <div style="white-space: pre-line;">{introduction}</div>
 
     <div class="projects-container">
       {projects.map(project => (
@@ -58,6 +59,14 @@ I'm pursuing research to understand the cognitive and technological foundations 
   </main>
 
   <style>
+
+    *{
+      img {
+      width: -moz-available;
+      width: -webkit-available;
+      height: auto;
+    }
+  }
     .section {
       max-width: 800px;
       margin: 0 auto;
