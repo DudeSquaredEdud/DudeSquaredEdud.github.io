@@ -1,6 +1,6 @@
 ---
-title: Undergraduate Machine Learning Research
-category: research ai
+title: Wavelet Analysis Research
+category: research
 imageSrc: DADL/poster.png
 tags:
   - Machine Learning
@@ -9,20 +9,18 @@ tags:
 link: "#dadl-research"
 ---
 
-**University of Louisiana at Lafayette**
+Undergraduate research on optimal training order for image classification neural networks, using wavelet entropy as a proxy for the difficulty for a neural network to successfully classify a given image. Presented these findings at the IBM Thomas J. Watson Laboratory.
 
-During my undergraduate studies, I had the opportunity to conduct in-depth research on curriculum learning approaches for convolutional neural networks (CNNs), a technique exploring how the order and structure in a training data affects deep learning model performance. 
+---
 
-This work was fueled by my broader mission to understand learning systems - not just in machines, but to better understand the parallels between machine learning human cognitive processes.
+Although I had help out in the DADL lab before, this was the first project where I was more in the know about the process than the other researchers. Wavelet complexity was brought up in a meeting after thinking about my favorite GIMP image effect, "wavelet decomposition". 
 
-A highlight from this was being able to present my research at the IBM Thomas J. Watson Laboratory, where I not only shared my findings but also gained valuable insights from other researchers. 
+My mentor at the time, Gabriel Trahan, had experience in signal theory. He knew that wavelets were used as a means of extracting signal from noise, but had never thought about them in an image context. I knew about them from the image point of view, but never knew how they worked.
 
-This opportunity deepened my appreciation for the research process, showing me that the most elegant solutions are often grounded in simple, clear explanations rather than complexity.
+In short, wavelet decomposition is a more advanced edge detection algorithm that matches along directions and scales. These directions and scales are "taken out" of the image, for the process to be repeated. This allows you to capture details about the image that are not visible when all the scales are presented together.
 
-Since our research focused on how a model's expectations shapes its learning, this project also ignited a deeper curiosity: We were able to make predictions based on how the model was constructed. What kinds of models are out there that can make sense of human learning systems?
+We had decided to use wavelet entropy, a special method of calculating the difference between scales, as the proxy for image complexity. Initial testing showed promising results, but an oversight - unnoticed groupings - had resulted in the model performance to be worse overall.
 
-**Technical Skills and Methods:**  
-- Implemented CNN architectures in Python for image classification tasks  
-- Applied wavelet theory and signal processing techniques for feature extraction  
-- Conducted rigorous experimental design and statistical validation to ensure robust findings  
-- Developed academic presentation skills through professional research dissemination
+---
+
+I am still proud of the experiment and I even have the poster on my wall. I believe I learned a valuable lesson on how simple considerations are often lost when thinking about the big picture.
