@@ -16,18 +16,24 @@ const projects = await Promise.all(
 );
 
 const portfolioDesc = "";
-const introduction = `I still remember Gamal Abdel Nasser's rise and fall as vividly as a film - not because I'm a history fan, but because of how I learned it. In fall 2021 at LSMSA, Dr. Kyle Stephens taught the modern Middle East as a line of vivid stories where historical figures were drawn out as very real people who had desires and fears, where locations became stages for their defining acts. It was much more similar to watching a play unfold in front of me than any lecture I had seen before. That class taught me what 13 years of Louisiana public school couldn't: learners can rise to any challenge if they enjoy the process.
+const background = `I still remember Gamal Abdel Nasser's rise and fall as vividly as a film - not because I'm a history fan, but because of how I learned it. In fall 2021 at LSMSA, Dr. Kyle Stephens taught the modern Middle East as a line of vivid stories where historical figures were drawn out as very real people with desires and fears. It was like watching a play unfold, not sitting through a lecture.
 
-Once I saw what learning could be, I couldn't unsee what was missing everywhere else. With my CS background, I knew I could create something that could scale these experiences beyond elite magnet schools and into anyone's hands.
+That being said. It was absolutely the most difficult class I had ever taken. But it taught me something 13 years of Louisiana public school couldn't: when you enjoy the learning process, you can learn anything.
 
-I started with Aluminotes, using LLMs to transform hastily-typed notes into structured lecture materials - born from my friends' and my ADHD making traditional note-taking nearly impossible. We used it for a class project, and even won first place at a pitch competition with it, so we were very happy with the results.
+Once I saw what learning could be, I couldn't unsee what was missing everywhere else. The problem wasn't that students were lazy or incapable - it was that most education environments kill enjoyment. If I could figure out how to make a system where education was more engaging, I could change everything.
 
-I joined my college's ML research laboratory to learn more about AI, as I knew I would be using it later on to personalize education. My research focused on curriculum learning and experimental training methods for convolutional models - work that led to presenting at AICS at IBM's Thomas J. Watson Laboratory.
+That insight has driven everything I've built since. I start with a problem I or someone I know actually experiences. I build a system that recognizes what's going wrong. Then I design it to respond in a way that matters.
 
-Now, as fullstack engineer and researcher at BeNakama, I work on Ascend, a math-based RPG that adapts difficulty to student skill - directly implementing a program that tests students at their abilities while keeping them engaged. This is also the most direct application of my research - I am involved with design and implementation of the systems that the students use.
+With Aluminotes, I recognized that ADHD brains process information faster but with less clarity - and built a tool that responds by reformatting their notes. With my research on curriculum learning, I learned to recognize what neural networks struggle with - and ran experiments with metrics to learn what makes certain images complex. With Ascend, I recognized that students disengage when math feels impossibly hard or boringly easy - and built a system that adapts in real-time.
 
-I'm pursuing research to understand the cognitive and technological foundations of effective learning, and find out how to apply that to allow everyone access to it. My goal is to make Dr. Stephens' classroom the norm, not the exception - so every student can experience what it feels like to genuinely love learning.`;
+My goal is to make the engagement of Dr. Stephens' classroom the norm, not the exception. To build systems that recognize struggle and respond with the kind of care that actually helps people learn.`;
 ;
+
+const projectIntroduction = `I build systems that recognize and respond to the user. Because I know the magic of education isn't just knowledge transfer - it's when the system sees what's needed and adjusts. 
+
+These projects show three different angles on that: helping ADHD students take notes and account for potential gaps, learning systems that adapt to the student's skill level, and research in understanding what makes information difficult in other systems. 
+
+They all come from the same belief: good systems pay attention.`
 ---
 
 <Layout
@@ -38,8 +44,11 @@ I'm pursuing research to understand the cognitive and technological foundations 
     <h1>Portfolio</h1>
     <p style="white-space: pre-line;">{portfolioDesc}</p>
     
-    <h2>Introduction</h2>
-    <div style="white-space: pre-line;">{introduction}</div>
+    <h2>Background</h2>
+    <div style="white-space: pre-line;">{background}</div>
+
+    <h2>Projects Introduction</h2>
+    <div style="white-space: pre-line;">{projectIntroduction}</div>
 
     <div class="projects-container">
       {projects.map(project => (

@@ -11,7 +11,9 @@ link: "#dadl-research"
 
 ![The logo for the Deep Learning and Data Analysis Lab at The University of Louisiana, Lafayette. The logo itself is a popout effect from a wavy, purple and blue background, with the letters "D" "A" "D" "L".](image-1.png)
 
-Undergraduate research on optimal training order for image classification neural networks, using wavelet entropy as a proxy for the difficulty for a neural network to successfully classify a given image. Presented these findings at the IBM Thomas J. Watson Laboratory.
+![The poster for the wavelet analysis research that was presented at IBM.](poster.png)
+
+I wanted to understand: what makes an image hard for a neural network to classify? I used wavelet entropy as a measure of image complexity, then tested whether ordering training by difficulty improves learning. Presented at IBM's Thomas J. Watson Laboratory.
 
 ---
 
@@ -19,9 +21,7 @@ Although I had help out in the DADL lab before, this was the first project where
 
 My mentor at the time, Gabriel Trahan, had experience in signal theory. He knew that wavelets were used as a means of extracting signal from noise, but had never thought about them in an image context. I knew about them from the image point of view, but never knew how they worked.
 
-In short, wavelet decomposition is a more advanced edge detection algorithm that matches along directions and scales. These directions and scales are "taken out" of the image, for the process to be repeated. This allows you to capture details about the image that are not visible when all the scales are presented together.
-
-We had decided to use wavelet entropy, a special method of calculating the difference between scales, as the proxy for image complexity. Initial testing showed promising results, but an oversight - unnoticed groupings - had resulted in the model performance to be worse overall.
+I used a math technique called wavelet entropy to measure how 'complex' an image is for neural networks. Initial testing showed promise, but an unnoticed grouping in the data made results worse overall. I'm still proud of this work - it taught me something crucial: simple details matter more than big theory. That lesson changed how I approach research.
 
 ---
 

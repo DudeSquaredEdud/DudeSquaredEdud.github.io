@@ -3,26 +3,34 @@ title: Aluminotes
 category: accessibility
 imageSrc: Aluminotes/homescreen.png
 tags:
-  - Accessibility
-  - Educational Technology
-  - Competition Winner
+  - Accessibility Software
+  - EdTech
+  - Pitch Competition Winner
 link: "#aluminotes"
 ---
 
-![The Aluminotes home page, with the logo on the right (a black paper crane against a bright red-orange gradient) and information about the website on the left.](image-3.png)
+![The Aluminotes home page, with the logo on the right (a black paper crane against a bright red-orange gradient, the letters "Al" in a bold black to white gradient font behind it) and information about the website on the left.](image-3.png)
 
-During my sophomore year of college, my friends and I with ADHD were struggling to keep up with traditional note-taking. Our notes were broken and unreadable after lectures, making review nearly impossible. I realized that given the topic and the notes as context, an LLM (which were at the time still extremely experimental) could transform it into actual structured notes, making review more accessible for students with attention disorders.
+ <video width="100%" height="auto" controls>
+  <source src="Aluminotes/aluminotes_one.mp4" type="video/mp4">
+  <source src="Aluminotes/aluminotes_one.ogg" type="video/ogg">
+</video> 
+
+
+
+My friends and I with ADHD couldn't keep up with traditional note-taking—our notes were broken and useless by the end of lectures. So we built Aluminotes: an AI system that recognizes messy notes and transforms them into structured, reviewable summaries.
+
+---
+
+We built it on Django using Google Gemini. The system takes shorthand notes and outputs coherent lecture summaries with proper structure and context. We tested it on ourselves - being our own users let us focus on real pain points instead of guessing.
 
 ---
 
-We built Aluminotes on Django, using Google Gemini to process and reformat the notes. The system would take in shorthand notes and output coherent lecture summaries with proper structure and context. 
-
-We used it for a class project and refined it based on our own experiences as the target users. Being in our own user target allowed us to focus on the specific pain points we encountered daily.
+We won first place at our school's Inn-eaux-vate pitch competition. But the real win was proving something I still believe, and that I find myself lucky to experience: EdTech works best when built by people who actually experienced the problem. Because we were the users, we knew what to solve and improve.
 
 ---
 
-Aluminotes won first place at our school's Inn-eaux-vate pitch competition. The judges recognized both the technical execution and the genuine accessibility need it addressed. More importantly, it proved to me that EdTech could directly solve real barriers to learning when designed by those who experience those barriers.
-
----
 
 You can find the code at https://github.com/DudeSquaredEdud/Aluminotes
+
+(Aluminotes.net is, sadly, now defunct)
