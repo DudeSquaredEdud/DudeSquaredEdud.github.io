@@ -12,8 +12,8 @@ link: "#aluminotes"
 ![The Aluminotes home page, with the logo on the right (a black paper crane against a bright red-orange gradient, the letters "Al" in a bold black to white gradient font behind it) and information about the website on the left.](image-3.png)
 
  <video width="100%" height="auto" controls>
-  <source src="Aluminotes/aluminotes_one.mp4" type="video/mp4">
-  <source src="Aluminotes/aluminotes_one.ogg" type="video/ogg">
+  <source src="/Aluminotes/aluminotes_one.mp4" type="video/mp4">
+  <source src="/Aluminotes/aluminotes_one.ogg" type="video/ogg">
 </video> 
 
 
