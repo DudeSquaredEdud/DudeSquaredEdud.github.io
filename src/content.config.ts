@@ -27,8 +27,18 @@ const projectDetails = defineCollection({
 	}),
 });
 
+const artStuff = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    category: z.string().optional(),
+    tags: z.array(z.string()),
+  }),
+});
+
 export const collections = {
-	portfolio,
-	bio,
-	projectDetails,
+  portfolio,
+  bio,
+  projectDetails,
+  artStuff,
 };

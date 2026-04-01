@@ -15,6 +15,20 @@ const projects = await Promise.all(
   })
 );
 
+
+const artStuff = await Promise.all(
+  (await getCollection("artStuff")).map(async artStuff => {
+    const { Content } = await artStuff.render();
+    return {
+      title: artStuff.data.title,
+      category: artStuff.data.category,
+      content: Content,
+      tags: artStuff.data.tags
+    };
+  })
+);
+
+
 const portfolioDesc = "";
 const background = `I still remember Gamal Abdel Nasser's rise and fall as vividly as a film - not because I'm a history fan, but because of how I learned it. In fall 2021 at LSMSA, Dr. Kyle Stephens taught the modern Middle East as a line of vivid stories where historical figures were drawn out as very real people with desires and fears. It was like watching a play unfold, not sitting through a lecture.
 
@@ -43,6 +57,23 @@ They all come from the same belief: good systems pay attention.`
   <main class="section">
     <h1>Portfolio</h1>
     <p style="white-space: pre-line;">{portfolioDesc}</p>
+
+    <h2>Experience with GIMP, Krita, Blender</h2>
+    <div class="artStuff-container">
+      {artStuff.map(artStuff => (
+        <div class="artStuff">
+          <h2>{artStuff.title}</h2>
+          <div class="tags">
+            {artStuff.tags.map(tag => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+          <div class="content">
+            <artStuff.content />
+          </div>
+        </div>
+      ))}
+    </div>
     
     <h2>Background</h2>
     <div style="white-space: pre-line;">{background}</div>
