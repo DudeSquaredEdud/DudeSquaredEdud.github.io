@@ -1,7 +1,7 @@
 ---
 title: "GIMP Experience"
 category: "Digital Art"
-tags: ["GIMP", "Krita", "example"]
+tags: ["GIMP", "Digital Art"]
 ---
 
 I've been using GIMP for 8 years, ever since I first installed Linux and realized it didn't come with MS paint.

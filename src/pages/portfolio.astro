@@ -57,23 +57,6 @@ They all come from the same belief: good systems pay attention.`
   <main class="section">
     <h1>Portfolio</h1>
     <p style="white-space: pre-line;">{portfolioDesc}</p>
-
-    <h2>Experience with GIMP, Krita, Blender</h2>
-    <div class="artStuff-container">
-      {artStuff.map(artStuff => (
-        <div class="artStuff">
-          <h2>{artStuff.title}</h2>
-          <div class="tags">
-            {artStuff.tags.map(tag => (
-              <span class="tag">{tag}</span>
-            ))}
-          </div>
-          <div class="content">
-            <artStuff.content />
-          </div>
-        </div>
-      ))}
-    </div>
     
     <h2>Background</h2>
     <div style="white-space: pre-line;">{background}</div>
@@ -96,6 +79,23 @@ They all come from the same belief: good systems pay attention.`
         </div>
       ))}
     </div>
+
+    <div class="artStuff-container">
+      {artStuff.map(artStuff => (
+        <div class="artStuff">
+          <h2>{artStuff.title}</h2>
+          <div class="tags">
+            {artStuff.tags.map(tag => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+          <div class="content">
+            <artStuff.content />
+          </div>
+        </div>
+      ))}
+    </div>
+
   </main>
 
   <style>

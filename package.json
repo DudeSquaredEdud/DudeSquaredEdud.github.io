@@ -22,6 +22,7 @@
     "@astrojs/check": "^0.9.4",
     "astro": "^5.13.9",
     "katex": "^0.16.22",
+    "node": "^25.8.2",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
