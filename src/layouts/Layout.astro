@@ -1,23 +1,33 @@
 ---
 interface Props {
-	title: string;
-	description?: string;
+title: string;
+description?: string;
 }
 
-const { title, description = "Ashton Andrepont - Computer Science Research" } = Astro.props;
+const { title, description = "Ashton Andrepont - Software Architect, Fullstack Developer, and AI Researcher specializing in educational technology" } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		
-		<!-- Academic Fonts -->
+<head>
+<meta charset="UTF-8" />
+<meta name="description" content={description} />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />
+<title>{title}</title>
+
+<!-- Open Graph / Social Media Meta Tags -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content="https://ashtonandrepont.com" />
+<meta property="og:site_name" content="Ashton Andrepont" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+
+<!-- Academic Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -289,11 +299,10 @@ const { title, description = "Ashton Andrepont - Computer Science Research" } = 
 				<h1>Ashton Andrepont</h1>
 				<p class="lead">Educational Technology Research • Accessibility • Human-AI Collaboration</p>
 				<nav>
-					<a href="/">Home</a>
-					<a href="/projects">Projects</a>
-					<a href="/portfolio">Portfolio</a>
-					<!-- <a href="/cv">CV</a> -->
-					<!-- <a href="/random">Random</a> -->
+				<a href="/">Home</a>
+				<a href="/projects">Projects</a>
+				<a href="/portfolio">Portfolio</a>
+				<a href="/cv">CV</a>
 				</nav>
 			</header>
 			
@@ -302,7 +311,7 @@ const { title, description = "Ashton Andrepont - Computer Science Research" } = 
 			</main>
 			
 			<footer>
-				<p>&copy; 2025 Ashton Andrepont. Built with <a href="https://astro.build">Astro</a>.</p>
+			<p>&copy; 2026 Ashton Andrepont. Built with <a href="https://astro.build">Astro</a>.</p>
 			</footer>
 		</div>
 	</body>
