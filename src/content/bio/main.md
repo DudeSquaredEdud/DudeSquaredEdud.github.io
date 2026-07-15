@@ -3,14 +3,9 @@ title: Professional Bio
 ---
 
 
-I'm a fullstack engineer researching and developing technology for education. My passion lies in how technology can support genuine personal growth, with an interest in psychological impacts such as self-image, real versus perceived progress, human–computer relationships, and evolving motivations.
+I'm a software developer and technical lead focused on making systems that help people learn, coordinate, and do complex work. At Drone Institute, I lead development of operational software spanning project intake, pilot coordination, data processing, and deliverable management.
 
 <br>
 <br>
 
-<b>Short Personal Background:</b>
-<br>
-I'm from Louisiana, where I experienced the challenges of a struggling education system firsthand. To address teacher shortages, my school introduced <a href="https://en.wikipedia.org/wiki/Edgenuity#Reception">a website</a>  that ultimately left me frustrated and disengaged. 
-<br>
-<br>
-This inspired me to dedicate my career to building better learning tools. After college, I started working at <a href="https://benakama.com/">BeNakama</a>, where I develop and research tools that help people learn effectively while enjoying the process.
+In Fall 2026, I will begin the residential M.Ed. in Innovative Design and Technology in Education (IDeaTE) at Vanderbilt University. My interests include human-centered design, learning technology, and the psychological effects software can have on motivation, self-image, and perceptions of progress.

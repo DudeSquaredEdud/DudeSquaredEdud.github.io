@@ -1,10 +1,10 @@
 # About
 
-Software architect and team lead with a focus on educational technology and accessibility. Currently pursuing an M.Ed. in Innovative Design and Technology in Education at Vanderbilt University.
+I build and manage systems spanning web applications, local tools, networked services, and platform architecture. As Lead Developer at Drone Institute, I guide development of tools supporting project intake, pilot coordination, data processing, and deliverable management.
 
-My experiences with educational technology in Louisiana inspired me to work on systems that actually help students learn. I believe technology should make learning more accessible, not more frustrating.
+In Fall 2026, I will begin Vanderbilt University's residential M.Ed. in Innovative Design and Technology in Education (IDeaTE). I'm interested in applying learning theory, human-centered design, and emerging technology to systems that help students learn at their own pace while helping teachers keep pace with them.
 
-I hold a BS in Computer Science from the University of Louisiana at Lafayette, graduating magna cum laude (3.83 GPA) in 2.5 years. I completed undergraduate research and presented at IBM Thomas J. Watson Laboratory. I am currently pursuing my M.Ed. at Vanderbilt University as a Dean's Merit Scholar.
+I hold a BS in Computer Science from the University of Louisiana at Lafayette, graduating magna cum laude (3.83 GPA) in 2.5 years. I completed undergraduate research and presented at IBM Thomas J. Watson Laboratory. I will attend Vanderbilt as a Dean's Merit Scholar and expect to graduate in 2028.
 
 # Technical Skills
 
@@ -28,6 +28,11 @@ I hold a BS in Computer Science from the University of Louisiana at Lafayette, g
 </div>
 
 # Experience
+
+## Lead Developer - Drone Institute
+**Technical Leadership • Platform Engineering • Operational Systems** | *May 2026 - Present*
+
+Guide technical direction for software supporting drone-service operations from project intake through pilot coordination, data processing, and final delivery. Translate operational needs into durable workflows, connect web and local infrastructure, and improve systems used to manage active projects. Connect cloud-based project workflows with local processing infrastructure, carrying drone data from field operations through review and customer delivery.
 
 ## Lead Fullstack Developer - BeNakama
 **EdTech • Fullstack Development • Azure DevOps** | *February 2025 - January 2026*
