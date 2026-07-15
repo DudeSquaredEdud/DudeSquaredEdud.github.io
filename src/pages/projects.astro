@@ -5,9 +5,9 @@ import Layout from '../layouts/Layout.astro';
 // const projectDetails = await getCollection('projectDetails');
 ---
 
-<Layout 
-  title="Projects & Tools - Ashton Andrepont" 
-  description="Featured projects, research work, and productivity tools including a focus timer"
+<Layout
+  title="Projects & Tools - Ashton Andrepont"
+  description="Featured projects, research work, and productivity tools"
 >
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="preconnect">
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="preconnect">
@@ -33,16 +33,9 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section> -->
 
-  <!-- Tools -->
   <section class="section">
     <h3>Tools</h3>
     <div class="projects-grid">
-      <a href="/timer" class="project-card-link">
-        <div class="project-card">
-          <h4>4-Hour Focus Timer</h4>
-        </div>
-      </a>
-      
       <a href="/equation-builder" class="project-card-link">
         <div class="project-card">
           <h4>Equation Builder</h4>
@@ -59,7 +52,6 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
-  /* Enhanced Project Card Layout */
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -106,334 +98,19 @@ import Layout from '../layouts/Layout.astro';
     color: var(--color-accent);
   }
 
-  /* Responsive Design */
-  .timer-section {
-    display: flex;
-    justify-content: center;
-    margin: 2rem 0;
-  }
-
   @media (max-width: 768px) {
     .projects-grid {
       grid-template-columns: 1fr;
       gap: 1rem;
     }
-    
+
     .project-card {
       padding: 1.5rem;
       min-height: 100px;
     }
-    
+
     .project-card h4 {
       font-size: 1.125rem;
     }
   }
 </style>
-
-<script is:inline>
-  class FocusTimer {
-    constructor() {
-      // Timer configuration
-      this.TOTAL_SECONDS = 4 * 60 * 60; // 4 hours in seconds
-      this.CIRCLE_CIRCUMFERENCE = 754.0; // 2 * π * 120
-      
-      // Timer state
-      this.timeRemaining = this.TOTAL_SECONDS;
-      this.isRunning = false;
-      this.isPaused = false;
-      this.timerInterval = null;
-      this.startTime = null;
-      this.pausedTime = 0;
-      this.pauseStartTime = null;
-      this.streak = 0;
-      this.lastCompletedDate = null;
-      
-      // DOM elements
-      this.timeDisplay = document.getElementById('timeDisplay');
-      this.progressCircle = document.getElementById('progressCircle');
-      this.statusIndicator = document.getElementById('statusIndicator');
-      this.sessionDate = document.getElementById('sessionDate');
-      this.streakNumber = document.getElementById('streakNumber');
-      this.lastCompleted = document.getElementById('lastCompleted');
-      this.todayProgress = document.getElementById('todayProgress');
-      
-      this.startBtn = document.getElementById('startBtn');
-      this.pauseBtn = document.getElementById('pauseBtn');
-      
-      // Bind event listeners
-      this.bindEvents();
-      
-      // Initialize timer
-      this.init();
-    }
-    
-    init() {
-      this.checkDailyReset();
-      this.loadTimerState();
-      this.loadStreakData();
-      this.updateDisplay();
-      this.updateSessionDate();
-    }
-    
-    bindEvents() {
-      this.startBtn.addEventListener('click', () => this.start());
-      this.pauseBtn.addEventListener('click', () => this.pause());
-      
-      // Save state when page is closed
-      window.addEventListener('beforeunload', () => this.saveTimerState());
-      
-      // Handle visibility change (tab switching)
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && this.isRunning) {
-          this.syncTime();
-        }
-      });
-    }
-    
-    checkDailyReset() {
-      const today = new Date().toDateString();
-      const lastSessionDate = localStorage.getItem('focusTimer_lastSession');
-      
-      if (lastSessionDate !== today) {
-        // New day - reset timer but check streak
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        
-        if (lastSessionDate !== yesterday.toDateString()) {
-          // Missed a day - reset streak
-          this.resetStreak();
-        }
-        
-        // Reset timer for new day
-        this.resetDailyTimer();
-        localStorage.setItem('focusTimer_lastSession', today);
-      }
-    }
-    
-    resetDailyTimer() {
-      this.timeRemaining = this.TOTAL_SECONDS;
-      this.isRunning = false;
-      this.isPaused = false;
-      this.startTime = null;
-      this.pausedTime = 0;
-      localStorage.removeItem('focusTimer_timeRemaining');
-      localStorage.removeItem('focusTimer_startTime');
-      localStorage.removeItem('focusTimer_pausedTime');
-      localStorage.removeItem('focusTimer_isRunning');
-    }
-    
-    loadTimerState() {
-      const savedTimeRemaining = localStorage.getItem('focusTimer_timeRemaining');
-      const savedStartTime = localStorage.getItem('focusTimer_startTime');
-      const savedPausedTime = localStorage.getItem('focusTimer_pausedTime');
-      const savedIsRunning = localStorage.getItem('focusTimer_isRunning') === 'true';
-      
-      if (savedTimeRemaining !== null) {
-        this.timeRemaining = parseInt(savedTimeRemaining);
-      }
-      
-      if (savedStartTime && savedIsRunning) {
-        this.startTime = parseInt(savedStartTime);
-        this.pausedTime = savedPausedTime ? parseInt(savedPausedTime) : 0;
-        this.isRunning = true;
-        this.syncTime();
-        this.startTimer();
-      } else if (savedPausedTime && !savedIsRunning) {
-        this.pausedTime = parseInt(savedPausedTime);
-        this.isPaused = true;
-      }
-    }
-    
-    syncTime() {
-      if (this.isRunning && this.startTime) {
-        const now = Date.now();
-        const elapsed = Math.floor((now - this.startTime - this.pausedTime) / 1000);
-        this.timeRemaining = Math.max(0, this.TOTAL_SECONDS - elapsed);
-        
-        if (this.timeRemaining <= 0) {
-          this.complete();
-        }
-      }
-    }
-    
-    loadStreakData() {
-      const streak = localStorage.getItem('focusTimer_streak');
-      const lastCompleted = localStorage.getItem('focusTimer_lastCompleted');
-      
-      this.streak = streak ? parseInt(streak) : 0;
-      this.lastCompletedDate = lastCompleted || null;
-    }
-    
-    saveTimerState() {
-      localStorage.setItem('focusTimer_timeRemaining', this.timeRemaining.toString());
-      localStorage.setItem('focusTimer_isRunning', this.isRunning.toString());
-      
-      if (this.startTime) {
-        localStorage.setItem('focusTimer_startTime', this.startTime.toString());
-      }
-      
-      if (this.isPaused) {
-        localStorage.setItem('focusTimer_pausedTime', this.pausedTime.toString());
-      }
-    }
-    
-    start() {
-      if (!this.isRunning) {
-        this.isRunning = true;
-        this.isPaused = false;
-        
-        if (!this.startTime) {
-          this.startTime = Date.now();
-          this.pausedTime = 0;
-        } else {
-          // Resuming from pause
-          this.pausedTime += Date.now() - this.pauseStartTime;
-        }
-        
-        this.startTimer();
-      }
-    }
-    
-    pause() {
-      if (this.isRunning) {
-        this.isRunning = false;
-        this.isPaused = true;
-        this.pauseStartTime = Date.now();
-        this.stopTimer();
-      }
-    }
-    
-    reset() {
-      this.isRunning = false;
-      this.isPaused = false;
-      this.timeRemaining = this.TOTAL_SECONDS;
-      this.startTime = null;
-      this.pausedTime = 0;
-      this.stopTimer();
-      this.updateDisplay();
-      this.saveTimerState();
-    }
-    
-    startTimer() {
-      this.stopTimer(); // Clear any existing interval
-      
-      this.timerInterval = setInterval(() => {
-        if (this.timeRemaining > 0) {
-          this.timeRemaining--;
-          this.updateDisplay();
-        } else {
-          this.complete();
-        }
-      }, 1000);
-      
-      this.updateDisplay();
-    }
-    
-    stopTimer() {
-      if (this.timerInterval) {
-        clearInterval(this.timerInterval);
-        this.timerInterval = null;
-      }
-      this.updateDisplay();
-    }
-    
-    complete() {
-      this.isRunning = false;
-      this.isPaused = false;
-      this.timeRemaining = 0;
-      this.stopTimer();
-      
-      // Update streak
-      this.streak++;
-      this.lastCompletedDate = new Date().toDateString();
-      localStorage.setItem('focusTimer_streak', this.streak.toString());
-      localStorage.setItem('focusTimer_lastCompleted', this.lastCompletedDate);
-      
-      // Show completion
-      this.statusIndicator.textContent = 'Session Complete!';
-      this.statusIndicator.style.color = '#ff3300';
-      
-      this.updateDisplay();
-      this.saveTimerState();
-      
-      // Optional: Show notification
-      this.showCompletionNotification();
-    }
-    
-    resetStreak() {
-      this.streak = 0;
-      localStorage.setItem('focusTimer_streak', '0');
-    }
-    
-    showCompletionNotification() {
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('Focus Session Complete!', {
-          body: `Congratulations! You've completed your 4-hour focus session. Streak: ${this.streak} days`,
-          icon: '/favicon.svg'
-        });
-      }
-    }
-    
-    updateDisplay() {
-      // Update time display
-      const hours = Math.floor(this.timeRemaining / 3600);
-      const minutes = Math.floor((this.timeRemaining % 3600) / 60);
-      const seconds = this.timeRemaining % 60;
-      
-      this.timeDisplay.textContent = 
-        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      
-      // Update progress circle
-      const progress = (this.TOTAL_SECONDS - this.timeRemaining) / this.TOTAL_SECONDS;
-      const offset = this.CIRCLE_CIRCUMFERENCE - (progress * this.CIRCLE_CIRCUMFERENCE);
-      this.progressCircle.style.strokeDashoffset = offset;
-      
-      // Update status
-      if (this.timeRemaining === 0) {
-        this.statusIndicator.textContent = 'Session Complete!';
-        this.statusIndicator.style.color = '#ff3300';
-      } else if (this.isRunning) {
-        this.statusIndicator.textContent = 'Focus Time Active';
-        this.statusIndicator.style.color = '#fff';
-      } else if (this.isPaused) {
-        this.statusIndicator.textContent = 'Paused';
-        this.statusIndicator.style.color = '#ff9500';
-      } else {
-        this.statusIndicator.textContent = 'Ready to Start';
-        this.statusIndicator.style.color = '#afa;';
-      }
-      
-      // Update button states
-      this.startBtn.disabled = this.isRunning || this.timeRemaining === 0;
-      this.pauseBtn.disabled = !this.isRunning;
-      
-      // Update streak display
-      this.streakNumber.textContent = this.streak;
-      this.lastCompleted.textContent = this.lastCompletedDate || 'Never';
-      
-      // Update today's progress
-      const todayProgressPercent = Math.round(((this.TOTAL_SECONDS - this.timeRemaining) / this.TOTAL_SECONDS) * 100);
-      this.todayProgress.textContent = `${todayProgressPercent}%`;
-    }
-    
-    updateSessionDate() {
-      const today = new Date();
-      this.sessionDate.textContent = today.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    }
-  }
-  
-  // Initialize timer when DOM is loaded
-  document.addEventListener('DOMContentLoaded', () => {
-    const timer = new FocusTimer();
-    
-    // Request notification permission
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  });
-</script>
