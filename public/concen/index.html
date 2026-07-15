@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ConCen</title>
+    <link rel="icon" type="image/svg+xml" href="ios_network_flat_icon.svg?v=20260701-b-favicon-thick">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="toolbar" aria-label="ConCen controls">
+        <button id="brandLogoButton" class="brand-lockup" type="button" title="Show welcome" aria-label="Show welcome">
+          <svg class="concen-logo" viewBox="0 0 1024 1024" aria-hidden="true" focusable="false">
+            <rect class="concen-logo-bg" x="64" y="64" width="896" height="896" rx="210"/>
+            <g class="concen-logo-lines" fill="none" stroke-width="42" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M780.8 414.2 A286 286 0 0 1 655 759.7"/>
+              <path d="M462.3 793.7 A286 286 0 0 1 226 512"/>
+              <path d="M292.9 328.1 A286 286 0 0 1 655 264.3"/>
+              <path d="M512 512 L731 328"/>
+              <path d="M512 512 L562 794"/>
+              <path d="M512 512 L243 414"/>
+            </g>
+            <g class="concen-logo-nodes">
+              <circle cx="512" cy="512" r="76"/>
+              <circle cx="731" cy="328" r="68"/>
+              <circle cx="562" cy="794" r="68"/>
+              <circle cx="243" cy="414" r="68"/>
+            </g>
+          </svg>
+        </button>
+        <div class="toolbar-group map-controls" aria-label="Map controls">
+          <label class="map-field">
+            <span>Map</span>
+            <select id="mapSelect"></select>
+            <div id="mapSelectDropdown" class="custom-select map-select-dropdown" data-for="mapSelect"></div>
+          </label>
+          <button id="parentMapButton" class="icon-button" data-icon="‹" type="button" title="Go to parent map (Ctrl+Left)" aria-label="Go to parent map">
+            <span class="visually-hidden">Parent Map</span>
+          </button>
+          <button id="childMapButton" class="icon-button" data-icon="›" type="button" title="Return to recent child map (Ctrl+Right)" aria-label="Return to recent child map">
+            <span class="visually-hidden">Child Map</span>
+          </button>
+          <button id="newMapButton" class="icon-button" data-icon="+" type="button" title="New map" aria-label="New map">
+            <span class="visually-hidden">New Map</span>
+          </button>
+        </div>
+
+        <div class="toolbar-group title-controls" aria-label="Title controls">
+          <label class="title-field">
+            <span>Title</span>
+            <input id="titleInput" type="text" value="Chart Title" autocomplete="off">
+          </label>
+        </div>
+
+        <div class="toolbar-group utility-controls" aria-label="View controls">
+          <output id="saveState" class="save-state" aria-live="polite">Autosaved</output>
+          <div class="zoom-controls" role="group" aria-label="Zoom controls">
+            <button id="zoomOutButton" class="icon-button" data-icon="−" type="button" title="Zoom out" aria-label="Zoom out">
+              <span class="visually-hidden">Zoom Out</span>
+            </button>
+            <button id="fitViewButton" class="icon-button" data-icon="□" type="button" title="Fit view" aria-label="Fit view">
+              <span class="visually-hidden">Fit View</span>
+            </button>
+            <button id="zoomInButton" class="icon-button" data-icon="+" type="button" title="Zoom in" aria-label="Zoom in">
+              <span class="visually-hidden">Zoom In</span>
+            </button>
+          </div>
+          <button id="commandPaletteButton" class="icon-button" data-icon="⌕" type="button" title="Search and commands (Ctrl+K)" aria-label="Search and commands">
+            <span class="visually-hidden">Search and Commands</span>
+          </button>
+          <button id="shortcutSheetButton" class="icon-button" data-icon="?" type="button" title="Shortcuts" aria-label="Shortcuts">
+            <span class="visually-hidden">Shortcuts</span>
+          </button>
+          <details class="mind-menu command-menu">
+            <summary class="icon-button" data-icon="☰" title="Mind actions" aria-label="Mind actions">
+              <span class="visually-hidden">Mind</span>
+            </summary>
+            <div class="command-panel">
+              <button id="newMindButton" type="button" data-icon="+">New Mind</button>
+              <button id="saveMindButton" type="button" data-icon="✓">Save Mind</button>
+              <button id="exportMindButton" type="button" data-icon="⇧">Save Copy</button>
+              <button id="recoveryButton" type="button" data-icon="↺">Recovery</button>
+              <details class="trust-data">
+                <summary data-icon="◇">Trust & Data</summary>
+                <div class="trust-data-panel" aria-label="Trust and data controls">
+                  <div id="trustDataSummary" class="trust-data-summary" aria-live="polite"></div>
+                  <label>
+                    <span>Author</span>
+                    <input id="authorDisplayNameInput" type="text" autocomplete="off" placeholder="Your name">
+                  </label>
+                  <div class="trust-actions">
+                    <button id="saveAuthorProfileButton" type="button" data-icon="✓">Save Author</button>
+                    <button id="trustRecoveryButton" type="button" data-icon="+">Recovery Point</button>
+                    <button id="trustBackupButton" type="button" data-icon="⇧">Download Backup</button>
+                    <button id="trustOpenRecoveryButton" type="button" data-icon="↺">Open Recovery</button>
+                    <button id="trustPushButton" type="button" data-icon="⇧">Push</button>
+                    <button id="trustPullButton" type="button" data-icon="⇩">Pull</button>
+                    <button id="trustDisconnectButton" type="button" class="quiet-danger" data-icon="×">Disconnect</button>
+                  </div>
+                </div>
+              </details>
+              <label class="import-mind" data-icon="⇩">
+                <span>Open Mind</span>
+                <input id="importMindInput" type="file" accept="application/json,.json">
+              </label>
+              <details class="github-sync">
+                <summary data-icon="⌁">GitHub Sync</summary>
+                <div class="github-sync-panel">
+                  <label>
+                    <span>Owner</span>
+                    <input id="githubOwnerInput" type="text" autocomplete="off" placeholder="github-user">
+                  </label>
+                  <label>
+                    <span>Repo</span>
+                    <input id="githubRepoInput" type="text" autocomplete="off" placeholder="private-minds">
+                  </label>
+                  <label>
+                    <span>Branch</span>
+                    <input id="githubBranchInput" type="text" autocomplete="off" placeholder="main">
+                  </label>
+                  <label>
+                    <span>Path</span>
+                    <input id="githubPathInput" type="text" autocomplete="off" placeholder="minds/concen.mind.json">
+                  </label>
+                  <label>
+                    <span>Token</span>
+                    <input id="githubTokenInput" type="password" autocomplete="off" placeholder="Fine-grained token">
+                  </label>
+                  <div class="github-sync-actions">
+                    <button id="githubSaveSettingsButton" type="button" data-icon="✓">Save</button>
+                    <button id="githubExportSettingsButton" type="button" data-icon="⇧">Download Settings</button>
+                    <label class="github-import-settings" data-icon="⇩">
+                      <span>Open Settings</span>
+                      <input id="githubImportSettingsInput" type="file" accept="application/json,.json">
+                    </label>
+                    <button id="githubPushButton" type="button" data-icon="⇧">Push</button>
+                    <button id="githubPullButton" type="button" data-icon="⇩">Pull</button>
+                    <button id="githubDisconnectButton" type="button" data-icon="×">Disconnect</button>
+                  </div>
+                </div>
+              </details>
+              <button id="clearRecentMindsButton" type="button" data-icon="⌫">Clear Recents</button>
+              <button id="deleteMapButton" type="button" class="quiet-danger" data-icon="−">Delete Map</button>
+              <button id="resetButton" type="button" class="quiet-danger" data-icon="×">Reset Mind</button>
+            </div>
+          </details>
+          <details class="settings-menu">
+            <summary class="icon-button" data-icon="⚙" title="Settings" aria-label="Settings">
+              <span class="visually-hidden">Settings</span>
+            </summary>
+            <div class="settings-panel">
+              <input id="viewModeInput" class="legacy-view-mode" type="checkbox" checked hidden>
+              <div class="theme-controls" aria-label="Theme controls">
+                <span class="settings-section-title">Appearance</span>
+                <label class="theme-field">
+                  <span>Theme</span>
+                  <select id="themePresetInput"></select>
+                  <div id="themePresetDropdown" class="custom-select" data-for="themePresetInput"></div>
+                </label>
+                <label class="theme-field">
+                  <span>Style</span>
+                  <select id="stylePresetInput"></select>
+                  <div id="stylePresetDropdown" class="custom-select" data-for="stylePresetInput"></div>
+                </label>
+                <label class="theme-field">
+                  <span>Background</span>
+                  <select id="backgroundEffectInput"></select>
+                  <div id="backgroundEffectDropdown" class="custom-select" data-for="backgroundEffectInput"></div>
+                </label>
+                <label id="backgroundImageUpload" class="background-upload import-theme" data-icon="⇧" hidden>
+                  <span>Upload image</span>
+                  <input id="backgroundImageInput" type="file" accept="image/*">
+                </label>
+                <label class="theme-field">
+                  <span>Navigation</span>
+                  <select id="navigationModeInput"></select>
+                  <div id="navigationModeDropdown" class="custom-select" data-for="navigationModeInput"></div>
+                </label>
+                <div id="customThemeEditor" class="custom-theme-editor" aria-label="Custom theme colors" hidden></div>
+                <div>
+                  <span class="theme-label">Branches</span>
+                  <div id="branchPalette" class="branch-palette" aria-label="Branch colors"></div>
+                </div>
+                <div class="theme-actions">
+                  <button id="shufflePaletteButton" type="button" data-icon="⇄">Shuffle</button>
+                  <button id="resetPaletteButton" type="button" data-icon="↺">Reset</button>
+                  <button id="exportThemeButton" type="button" data-icon="⇧">Export</button>
+                  <label class="import-theme" data-icon="⇩">
+                    <span>Import</span>
+                    <input id="importThemeInput" type="file" accept="application/json,.json">
+                  </label>
+                </div>
+                <label class="screensaver-toggle">
+                  <span>Screensaver</span>
+                  <input id="screensaverEnabledInput" type="checkbox">
+                </label>
+                <button id="startScreensaverButton" class="screensaver-start-button" type="button" data-icon="◎">Start Screensaver</button>
+              </div>
+              <div class="spacing-controls" aria-label="Spacing controls">
+                <div class="spacing-header">
+                  <span class="settings-section-title">Layout</span>
+                  <div class="segmented-control view-mode-control" role="group" aria-label="View mode">
+                    <button id="treeViewButton" type="button" aria-pressed="false">Flat</button>
+                    <button id="radialViewButton" type="button" aria-pressed="false">Radial</button>
+                    <button id="bookViewButton" type="button" aria-pressed="false">Tree</button>
+                    <button id="documentViewButton" type="button" aria-pressed="false">Book</button>
+                    <button id="notesViewButton" type="button" aria-pressed="false">Notes</button>
+                  </div>
+                  <div class="layout-preset-row" role="group" aria-label="Layout presets">
+                    <button type="button" data-layout-preset="compact">Compact</button>
+                    <button type="button" data-layout-preset="balanced">Balanced</button>
+                    <button type="button" data-layout-preset="wide">Wide</button>
+                  </div>
+                </div>
+                <div id="layoutSettingsDropdown" class="layout-settings-dropdown">
+                  <button id="layoutSettingsButton" class="custom-select-button" type="button" aria-expanded="false" aria-controls="layoutSettingsPanel">Tune layout</button>
+                  <div id="layoutSettingsPanel" class="layout-settings-panel" hidden>
+                    <div id="layoutSettingsSummary" class="layout-settings-summary">Flat settings</div>
+                    <div class="range-field" data-spacing-key="treeLevelGap" role="group" aria-labelledby="treeLevelGapLabel">
+                      <span id="treeLevelGapLabel">Layer spacing</span>
+                      <input id="treeLevelGapRange" type="range" min="40" max="260" step="4" value="72" aria-labelledby="treeLevelGapLabel">
+                      <input id="treeLevelGapInput" type="number" min="40" max="260" step="4" value="72" aria-label="Layer spacing value">
+                    </div>
+                    <div class="range-field" data-spacing-key="treeLeafGap" role="group" aria-labelledby="treeLeafGapLabel">
+                      <span id="treeLeafGapLabel">Column spacing</span>
+                      <input id="treeLeafGapRange" type="range" min="32" max="360" step="4" value="92" aria-labelledby="treeLeafGapLabel">
+                      <input id="treeLeafGapInput" type="number" min="32" max="360" step="4" value="92" aria-label="Column spacing value">
+                    </div>
+                    <div class="range-field" data-spacing-key="ringBaseRadius" role="group" aria-labelledby="ringBaseRadiusLabel">
+                      <span id="ringBaseRadiusLabel">Center radius</span>
+                      <input id="ringBaseRadiusRange" type="range" min="40" max="500" step="5" value="102" aria-labelledby="ringBaseRadiusLabel">
+                      <input id="ringBaseRadiusInput" type="number" min="40" max="500" step="5" value="102" aria-label="Center radius value">
+                    </div>
+                    <div class="range-field" data-spacing-key="ringDepthGap" role="group" aria-labelledby="ringDepthGapLabel">
+                      <span id="ringDepthGapLabel">Ring spacing</span>
+                      <input id="ringDepthGapRange" type="range" min="40" max="500" step="5" value="90" aria-labelledby="ringDepthGapLabel">
+                      <input id="ringDepthGapInput" type="number" min="40" max="500" step="5" value="90" aria-label="Ring spacing value">
+                    </div>
+                    <div class="range-field" data-spacing-key="ringNodeGap" role="group" aria-labelledby="ringNodeGapLabel">
+                      <span id="ringNodeGapLabel">Node spacing</span>
+                      <input id="ringNodeGapRange" type="range" min="0" max="200" step="4" value="20" aria-labelledby="ringNodeGapLabel">
+                      <input id="ringNodeGapInput" type="number" min="0" max="200" step="4" value="20" aria-label="Node spacing value">
+                    </div>
+                    <div class="range-field common-range-field" role="group" aria-labelledby="nodeFontSizeLabel">
+                      <span id="nodeFontSizeLabel">Font size</span>
+                      <input id="nodeFontSizeRange" type="range" min="9" max="22" step="0.5" value="13" aria-labelledby="nodeFontSizeLabel">
+                      <input id="nodeFontSizeInput" type="number" min="9" max="22" step="0.5" value="13" aria-label="Font size value">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </header>
+
+      <section class="canvas-wrap" aria-label="ConCen editor">
+        <div id="pathTrail" class="path-trail" aria-label="Map path"></div>
+        <svg id="chartCanvas" role="application" aria-label="ConCen mind map" tabindex="0"></svg>
+        <div id="notesDocument" class="notes-document" hidden>
+          <textarea id="notesDocumentInput" class="notes-document-input" aria-hidden="true" tabindex="-1"></textarea>
+          <article id="notesRichEditor" class="notes-rich-editor" contenteditable="true" spellcheck="true" aria-label="Editable notes document"></article>
+        </div>
+        <div id="screensaverLogo" class="screensaver-logo" aria-hidden="true">
+          <svg class="concen-logo" viewBox="0 0 1024 1024" focusable="false">
+            <rect class="concen-logo-bg" x="64" y="64" width="896" height="896" rx="210"/>
+            <g class="concen-logo-lines" fill="none" stroke-width="42" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M780.8 414.2 A286 286 0 0 1 655 759.7"/>
+              <path d="M462.3 793.7 A286 286 0 0 1 226 512"/>
+              <path d="M292.9 328.1 A286 286 0 0 1 655 264.3"/>
+              <path d="M512 512 L731 328"/>
+              <path d="M512 512 L562 794"/>
+              <path d="M512 512 L243 414"/>
+            </g>
+            <g class="concen-logo-nodes">
+              <circle cx="512" cy="512" r="76"/>
+              <circle cx="731" cy="328" r="68"/>
+              <circle cx="562" cy="794" r="68"/>
+              <circle cx="243" cy="414" r="68"/>
+            </g>
+          </svg>
+        </div>
+        <div id="nodeActionBar" class="node-action-bar" aria-label="Focused node actions" hidden>
+          <label class="node-field">
+            <span>Focus</span>
+            <input id="nodeLabelInput" type="text" value="Chart Title" autocomplete="off">
+          </label>
+          <button id="addButton" class="icon-button" data-icon="+" type="button" title="Add child (Enter)" aria-label="Add child">
+            <span class="visually-hidden">Add Child</span>
+          </button>
+          <button id="renameButton" class="icon-button" data-icon="✓" type="button" title="Apply label" aria-label="Apply label">
+            <span class="visually-hidden">Apply Label</span>
+          </button>
+          <button id="openMapButton" class="icon-button" data-icon="↳" type="button" title="Open node map (Alt+Enter)" aria-label="Open node map">
+            <span class="visually-hidden">Open Map</span>
+          </button>
+          <button id="reparentButton" class="icon-button" data-icon="↑" type="button" title="Create parent (Ctrl+Shift+Enter)" aria-label="Create parent">
+            <span class="visually-hidden">Create Parent</span>
+          </button>
+          <button id="noteButton" class="icon-button" data-icon="✎" type="button" title="Toggle notes (Ctrl+Enter or Ctrl+click node)" aria-label="Toggle notes">
+            <span class="visually-hidden">Open Notes</span>
+          </button>
+          <button id="deleteButton" class="icon-button quiet-danger" data-icon="×" type="button" title="Delete node" aria-label="Delete node">
+            <span class="visually-hidden">Delete</span>
+          </button>
+        </div>
+        <aside id="noteSidebar" class="note-sidebar" aria-label="Node inspector" hidden>
+          <div class="note-sidebar-header">
+            <div>
+              <span class="note-eyebrow">Inspector</span>
+              <h2 id="noteSidebarTitle">Chart Title</h2>
+            </div>
+            <button id="closeNoteButton" class="icon-button" data-icon="×" type="button" title="Close inspector" aria-label="Close inspector">
+              <span class="visually-hidden">Close Inspector</span>
+            </button>
+          </div>
+          <div class="node-meta-grid">
+            <label>
+              <span>Status</span>
+              <select id="nodeStatusInput" aria-label="Node status">
+                <option value="open">Open</option>
+                <option value="active">Active</option>
+                <option value="waiting">Waiting</option>
+                <option value="done">Done</option>
+              </select>
+              <div id="nodeStatusDropdown" class="custom-select" data-for="nodeStatusInput"></div>
+            </label>
+            <label>
+              <span>Priority</span>
+              <select id="nodePriorityInput" aria-label="Node priority">
+                <option value="low">Low</option>
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+              <div id="nodePriorityDropdown" class="custom-select" data-for="nodePriorityInput"></div>
+            </label>
+            <label class="wide">
+              <span>Tags</span>
+              <input id="nodeTagsInput" type="text" aria-label="Node tags" placeholder="comma, separated">
+            </label>
+            <label class="wide checkbox-field">
+              <span>Show marker</span>
+              <input id="nodeMarkerInput" type="checkbox" aria-label="Show priority marker colored by status">
+            </label>
+          </div>
+          <textarea id="noteInput" aria-label="Node note" placeholder="Add note"></textarea>
+          <div id="nodeLinkSuggest" class="node-link-suggest" role="listbox" aria-label="Node link suggestions" hidden></div>
+          <div id="noteLinks" class="note-links" aria-label="Detected note links"></div>
+          <div id="backlinks" class="backlinks" aria-label="Backlinks"></div>
+        </aside>
+        <output id="statusText" class="status-pill" aria-live="polite"></output>
+        <input id="nodeEditor" class="node-editor" type="text" autocomplete="off" aria-label="Edit node label">
+      </section>
+      <div id="commandPalette" class="command-palette" role="dialog" aria-modal="true" aria-label="Search and commands" hidden>
+        <div class="palette-panel">
+          <input id="commandInput" type="search" autocomplete="off" placeholder="Search nodes, notes, or commands">
+          <div id="commandResults" class="command-results"></div>
+        </div>
+      </div>
+      <div id="shortcutSheet" class="shortcut-sheet" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" hidden>
+        <div class="shortcut-panel">
+          <div class="shortcut-head">
+            <span class="welcome-label">Shortcuts</span>
+            <button id="shortcutSheetCloseButton" class="icon-button" data-icon="×" type="button" aria-label="Close shortcuts">
+              <span class="visually-hidden">Close Shortcuts</span>
+            </button>
+          </div>
+          <div class="shortcut-grid">
+            <span>Search commands</span><kbd>Ctrl K</kbd>
+            <span>Move focus</span><kbd>Arrows / WASD / HJKL</kbd>
+            <span>Open notes</span><kbd>Ctrl Enter</kbd>
+            <span>Open notes from node</span><kbd>Ctrl click</kbd>
+            <span>Open note marker</span><kbd>Double click</kbd>
+            <span>Create parent</span><kbd>Ctrl Shift Enter</kbd>
+            <span>Parent map</span><kbd>Ctrl ←</kbd>
+            <span>Child map</span><kbd>Ctrl →</kbd>
+            <span>Open node map</span><kbd>Alt Enter</kbd>
+            <span>Rename node</span><kbd>Shift Enter</kbd>
+            <span>Undo</span><kbd>Ctrl Z</kbd>
+            <span>Redo</span><kbd>Ctrl Shift Z</kbd>
+            <span>Pan canvas</span><kbd>Space drag</kbd>
+            <span>Zoom canvas</span><kbd>Ctrl wheel</kbd>
+            <span>Show this sheet</span><kbd>? button</kbd>
+          </div>
+        </div>
+      </div>
+      <div id="recoveryDialog" class="recovery-dialog" role="dialog" aria-modal="true" aria-label="Recovery" hidden>
+        <div class="recovery-panel">
+          <div class="recovery-head">
+            <div>
+              <span class="welcome-label">Recovery</span>
+              <h2>Backups</h2>
+            </div>
+            <button id="recoveryCloseButton" class="icon-button" data-icon="×" type="button" aria-label="Close recovery">
+              <span class="visually-hidden">Close Recovery</span>
+            </button>
+          </div>
+          <div class="recovery-current">
+            <div>
+              <span>Current autosave</span>
+              <output id="recoveryCurrentStats"></output>
+            </div>
+            <button id="recoveryExportCurrentButton" type="button" data-icon="⇧">Download Backup</button>
+          </div>
+          <div class="recovery-actions">
+            <button id="recoverySavePointButton" type="button" data-icon="+">Save Recovery Point</button>
+            <button id="recoveryClearButton" type="button" class="quiet-danger" data-icon="⌫">Clear Recovery Points</button>
+          </div>
+          <div id="recoveryList" class="recovery-list"></div>
+        </div>
+      </div>
+      <div id="appDialog" class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle" hidden>
+        <div class="app-dialog-panel">
+          <div class="app-dialog-head">
+            <span id="appDialogEyebrow" class="welcome-label">Confirm</span>
+            <h2 id="appDialogTitle">Confirm action</h2>
+          </div>
+          <p id="appDialogMessage"></p>
+          <div id="appDialogActions" class="app-dialog-actions"></div>
+        </div>
+      </div>
+      <div id="welcomeDialog" class="welcome-dialog" role="dialog" aria-modal="true" aria-label="Welcome to ConCen" hidden>
+        <div class="welcome-panel">
+          <div class="welcome-head">
+            <div class="welcome-brand">
+              <svg class="concen-logo welcome-logo" viewBox="0 0 1024 1024" aria-hidden="true" focusable="false">
+                <rect class="concen-logo-bg" x="64" y="64" width="896" height="896" rx="210"/>
+                <g class="concen-logo-lines" fill="none" stroke-width="42" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M780.8 414.2 A286 286 0 0 1 655 759.7"/>
+                  <path d="M462.3 793.7 A286 286 0 0 1 226 512"/>
+                  <path d="M292.9 328.1 A286 286 0 0 1 655 264.3"/>
+                  <path d="M512 512 L731 328"/>
+                  <path d="M512 512 L562 794"/>
+                  <path d="M512 512 L243 414"/>
+                </g>
+                <g class="concen-logo-nodes">
+                  <circle cx="512" cy="512" r="76"/>
+                  <circle cx="731" cy="328" r="68"/>
+                  <circle cx="562" cy="794" r="68"/>
+                  <circle cx="243" cy="414" r="68"/>
+                </g>
+              </svg>
+              <h1>ConCen</h1>
+              <p>Concentric Concepts, for Concentration</p>
+            </div>
+            <output id="welcomeStats" class="welcome-stats"></output>
+          </div>
+          <div class="welcome-section">
+            <span class="welcome-label">Start with Template</span>
+            <div class="welcome-templates" id="welcomeTemplates">
+              <button type="button" data-template="project"><strong>Project Plan</strong><small>Goals, risks, next actions</small></button>
+              <button type="button" data-template="decision"><strong>Decision Map</strong><small>Options, evidence, stakeholders</small></button>
+              <button type="button" data-template="research"><strong>Research Notes</strong><small>Questions, sources, findings</small></button>
+              <button type="button" data-template="issues"><strong>Issue Tracker</strong><small>Open, active, waiting, done</small></button>
+            </div>
+          </div>
+          <div class="welcome-section">
+            <div class="welcome-tutorial">
+              <button id="welcomeTutorialButton" type="button" data-icon="▶">Take 3-Minute Tutorial</button>
+              <span>Create, rename, note, link, and command from one guided mind.</span>
+            </div>
+          </div>
+          <div class="welcome-section">
+            <span class="welcome-label">Recent minds</span>
+            <div id="welcomeRecent" class="welcome-recent"></div>
+          </div>
+          <div class="welcome-actions">
+            <button id="welcomeCommandButton" type="button" data-icon="⌕">Open Commands</button>
+            <button id="welcomeCloseButton" type="button" data-icon="✓">Blank Mind</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="src/config.js"></script>
+    <script src="src/utils.js"></script>
+    <script src="src/model.js"></script>
+    <script src="src/storage.js"></script>
+    <script src="src/layout.js"></script>
+    <script src="src/renderer.js"></script>
+    <script src="src/tutorial.js"></script>
+    <script src="src/controller.js"></script>
+    <script src="src/icons.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
